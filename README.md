@@ -6,16 +6,76 @@ Kenpali is a *pure functional* programming language. Kenpali programs cannot *do
 
 Kenpali can be written in two main forms. *Kenpali Code* is designed for human programmers, with a syntax loosely based on JavaScript. Meanwhile, *Kenpali JSON* is a direct encoding of the abstract syntax tree (AST) in JSON, allowing for easy manipulation of Kenpali programs by other code (including the program itself!). At minimum, a Kenpali implementation must provide a `kpparse` function to convert Kenpali Code to Kenpali JSON, and a `kpeval` function to evaluate a Kenpali JSON expression and return the result.
 
-<!-- ## Syntax Overview -->
+## Crash Course
 
-<!-- Kenpali Code supports the following features:
+### Data Types
 
-- Literal types based on JSON: `null`; booleans `true` and `false`; numbers like `0`, `42`, and `-1.5`; and strings like `"foo"`.
-- Arrays containing arbitrary values, e.g. `[4, 5, "six"]`.
-- Objects containing string keys and arbitrary values, e.g. `{"foo": 42, "bar": "baz"}`.
-- Function calls: `inc(1)` calls the function `inc` (increment) with `1` as its argument, yielding `2`.
-- Scopes with declared names: `x = 1; inc(x)` also calls the function `inc` with `1` as its value, since `x` is defined to have the value `1`.
-- Function definitions: `foo = (x) => plus(x, 3); foo(5)` yields 8, because `foo` is defined as a function that adds 3 to its argument.
-- Optional parameters: `foo = (x, y: 3) => plus(x, 3); [foo(5), foo(5, 4)]` yields `[8, 9]`, because the second parameter is assigned the value `3` if no second argument is provided.
-- Keyword parameters: defining the function as `foo = (x=) => plus(x, 3)` means it has to be called as `foo(x = 5)`, not just `foo(5)`.
-- Optional *arguments*:  -->
+All [JSON values](https://www.json.org/json-en.html) are also valid Kenpali values:
+
+- `null`
+- booleans: `true` and `false`
+- numbers: `42`, `-1.5`, `3e-4`, etc.
+- strings: `"foo"`, `"\u1234\n\\\""`, etc.
+- arrays: `[1, "two", [null, true, false]]`, etc.
+- objects: `{"answer": 42, "question": null}`, etc.
+
+### Expressions
+
+Kenpali works by evaluating expressions. You can experiment with Kenpali expressions in the REPL.
+
+The simplest expression is just a single JSON value, which evaluates
+to itself:
+
+```
+kenpali> 42
+42
+kenpali> ["foo", "bar"]
+["foo", "bar"]
+kenpali> null
+null
+```
+
+To build more complex Kenpali expressions, you call functions. For example, the `negative` function flips the sign of a number:
+
+```
+kenpali> negative(42)
+-42
+kenpali> negative(-1.5)
+1.5
+```
+
+Some functions, like `plus` and `times`, take multiple arguments:
+
+```
+kenpali> plus(1, 2)
+3
+kenpali> times(2, 3)
+6
+```
+
+Kenpali doesn't have special operators like `+` or `*` for the basic arithmetic and logic operations, using named functions instead. Minimalism takes sacrifice!
+
+Naturally, you can nest function calls to send the output of one function into another function:
+
+```
+kenpali> times(plus(1, 2), plus(3, 4))
+21
+```
+
+### Pipelines
+
+Nesting lots of function calls can make programs hard to read.
+
+```
+kenpali> dividedBy(minus(times(plus(2, 3), 4), 5), 6)
+2.5
+```
+
+Kenpali provides a *forward-pipe* operator `|` to help programs flow more naturally. The result of the expression on the left of the operator is passed to the function on the right side as its first argument. So `x | f` is the same as `f(x)`, while `x | f(y)` is the same as `f(x, y)`. This means we can rewrite the above example as:
+
+```
+kenpali> 2 | plus(3) | times(4) | minus(5) | dividedBy(6)
+2.5
+```
+
+Using the forward-pipe operator lets you express a program as a sequence of computational steps. This makes it easier to substitute one of the steps or combine them in a different way.
