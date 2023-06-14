@@ -7,3 +7,77 @@
 null
 >> {"literal": null}
 ```
+
+## Function Calls
+
+```
+# One positional argument
+foo(1)
+>> {
+    "calling": {"name": "foo"},
+    "args": [{"literal": 1}]
+}
+```
+
+```
+# Two positional arguments
+foo(1, 2)
+>> {
+    "calling": {"name": "foo"},
+    "args": [{"literal": 1}, {"literal": 2}]
+}
+```
+
+```
+# One named argument
+foo(bar: 1)
+>> {
+    "calling": {"name": "foo"},
+    "namedArgs": {"bar": {"literal": 1}}
+}
+```
+
+```
+# Two named arguments
+foo(bar: 1, baz: 2)
+>> {
+    "calling": {"name": "foo"},
+    "namedArgs": {"bar": {"literal": 1}, "baz": {"literal": 2}}
+}
+```
+
+```
+# Positional and named arguments
+foo(1, 2, bar: 3, baz: 4)
+>> {
+    "calling": {"name": "foo"},
+    "args": [{"literal": 1}, {"literal": 2}],
+    "namedArgs": {"bar": {"literal": 3}, "baz": {"literal": 4}}
+}
+```
+
+```
+# Optional arguments
+foo(1, 2?, bar: 3, baz: 4?)
+>> {
+    "calling": {"name": "foo"},
+    "args": [{"literal": 1}, {"optional": {"literal": 2}}],
+    "namedArgs": {"bar": {"literal": 3}, "baz": {"optional": {"literal": 4}}}
+}
+```
+
+```
+# Calling a function call
+foo(x)(y)
+>> {
+    "calling": {
+        "calling": {"name": "foo"},
+        "args": [{"name": "x"}]
+    },
+    "args": [{"name": "y"}]
+}
+```
+
+## Function Definitions
+
+
