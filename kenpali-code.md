@@ -80,4 +80,79 @@ foo(x)(y)
 
 ## Function Definitions
 
+```
+# One positional parameter
+(x) => plus(x, 3)
+>> {
+    "given": {
+        "params": ["x"]
+    },
+    "result": {
+        "calling": {"name": "plus"},
+        "args": [{"name": "x"}, {"literal": 3}]
+    }
+}
+```
 
+```
+# Optional positional parameter
+(x, y = 3) => plus(x, y)
+>> {
+    "given": {
+        "params": ["x", ["y", {"literal": 3}]]
+    },
+    "result": {
+        "calling": {"name": "plus"},
+        "args": [{"name": "x"}, {"name": "y"}]
+    }
+}
+```
+
+```
+# Named parameter
+(x, y:) => plus(x, y)
+>> {
+    "given": {
+        "params": ["x"],
+        "namedParams": ["y"]
+    },
+    "result": {
+        "calling": {"name": "plus"},
+        "args": [{"name": "x"}, {"name": "y"}]
+    }
+}
+```
+
+```
+# Optional named parameter
+(x, y: = 3) => plus(x, y)
+>> {
+    "given": {
+        "params": ["x"],
+        "namedParams": [["y", {"literal": 3}]]
+    },
+    "result": {
+        "calling": {"name": "plus"},
+        "args": [{"name": "x"}, {"name": "y"}]
+    }
+}
+```
+
+```
+# Scope in function body
+(x) => (y = plus(x, 3); y)
+>> {
+    "given": {
+        "params": ["x"]
+    },
+    "result": {
+        "defining": {
+            "y": {
+                "calling": {"name": "plus"},
+                "args": [{"name": "x"}, {"literal": 3}]
+            }
+        },
+        "result": {"name": "y"}
+    }
+}
+```
