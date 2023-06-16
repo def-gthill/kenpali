@@ -7,7 +7,7 @@ negative(42)
 ```
 
 ```
-TODO Pipeline
+# Pipeline
 2 | plus(3) | times(4) | minus(5) | dividedBy(6)
 >> 2.5
 ```

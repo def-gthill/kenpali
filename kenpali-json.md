@@ -309,3 +309,214 @@ Examples:
 }
 >> [true, false]
 ```
+
+```
+# Less than on numbers
+{
+    "array": [
+        {
+            "calling": {"name": "isLessThan"},
+            "args": [{"literal": 42}, {"literal": 43}]
+        },
+        {
+            "calling": {"name": "isLessThan"},
+            "args": [{"literal": 42}, {"literal": 42}]
+        },
+        {
+            "calling": {"name": "isLessThan"},
+            "args": [{"literal": 43}, {"literal": 42}]
+        }
+    ]
+}
+>> [true, false, false]
+```
+
+```
+# Type of
+{
+    "array": [
+        {
+            "calling": {"name": "typeOf"},
+            "args": [{"literal": null}]
+        },
+        {
+            "calling": {"name": "typeOf"},
+            "args": [{"literal": false}]
+        },
+        {
+            "calling": {"name": "typeOf"},
+            "args": [{"literal": 1}]
+        },
+        {
+            "calling": {"name": "typeOf"},
+            "args": [{"literal": "foo"}]
+        },
+        {
+            "calling": {"name": "typeOf"},
+            "args": [
+                {"array": [{"literal": 1}]}
+            ]
+        },
+        {
+            "calling": {"name": "typeOf"},
+            "args": [
+                {"object": [["foo", {"literal": "bar"}]]}
+            ]
+        }
+    ]
+}
+>> ["null", "boolean", "number", "string", "array", "object"]
+```
+
+```
+# To string
+{
+    "array": [
+        {
+            "calling": {"name": "toString"},
+            "args": [{"literal": null}]
+        },
+        {
+            "calling": {"name": "toString"},
+            "args": [{"literal": false}]
+        },
+        {
+            "calling": {"name": "toString"},
+            "args": [{"literal": true}]
+        },
+        {
+            "calling": {"name": "toString"},
+            "args": [{"literal": 1}]
+        },
+        {
+            "calling": {"name": "toString"},
+            "args": [{"literal": -2.5}]
+        },
+        {
+            "calling": {"name": "toString"},
+            "args": [{"literal": "foobar"}]
+        },
+        {
+            "calling": {"name": "toString"},
+            "args": [{"array": [{"literal": 1}, {"literal": "foobar"}]}]
+        },
+        {
+            "calling": {"name": "toString"},
+            "args": [
+                {
+                    "object": [
+                        ["foo", {"literal": "bar"}],
+                        ["spam!", {"literal": "eggs"}]
+                    ]
+                }
+            ]
+        }
+    ]
+}
+>> [
+    "null",
+    "false",
+    "true",
+    "1",
+    "-2.5",
+    "\"foobar\"",
+    "[1, \"foobar\"]",
+    "{foo: \"bar\", \"spam!\": \"eggs\"}"
+]
+```
+
+```
+# To number
+{
+    "array": [
+        {
+            "calling": {"name": "toNumber"},
+            "args": [{"literal": "1"}]
+        },
+        {
+            "calling": {"name": "toNumber"},
+            "args": [{"literal": "-2.5"}]
+        },
+        {
+            "calling": {"name": "toNumber"},
+            "args": [{"literal": 42}]
+        }
+    ]
+}
+>> [1, -2.5, 42]
+```
+
+```
+# If
+{
+    "array": [
+        {
+            "calling": {"name": "if"},
+            "args": [{"literal": true}],
+            "namedArgs": {"then": {"literal": 1}, "else": {"literal": 2}}
+        },
+        {
+            "calling": {"name": "if"},
+            "args": [{"literal": false}],
+            "namedArgs": {"then": {"literal": 1}, "else": {"literal": 2}}
+        }
+    ]
+}
+>> [1, 2]
+```
+
+```
+# Indexing arrays
+{
+    "array": [
+        {
+            "calling": {"name": "at"},
+            "args": [
+                {"array": [{"literal": "foo"}, {"literal": "bar"}]},
+                {"literal": 2}
+            ]
+        },
+        {
+            "calling": {"name": "at"},
+            "args": [
+                {"array": [{"literal": "foo"}, {"literal": "bar"}]},
+                {"literal": 1}
+            ]
+        }
+    ]
+}
+>> ["bar", "foo"]
+```
+
+```
+# Indexing objects
+{
+    "array": [
+        {
+            "calling": {"name": "at"},
+            "args": [
+                {
+                    "object": [
+                        ["foo", {"literal": "bar"}],
+                        ["spam", {"literal": "eggs"}]
+                    ]
+                },
+                {"literal": "spam"}
+            ]
+        },
+        {
+            "calling": {"name": "at"},
+            "args": [
+                {
+                    "object": [
+                        ["foo", {"literal": "bar"}],
+                        ["spam", {"literal": "eggs"}]
+                    ]
+                },
+                {"literal": "foo"}
+            ]
+        }
+    ]
+}
+>> ["eggs", "bar"]
+```
