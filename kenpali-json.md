@@ -153,7 +153,73 @@ Examples:
 
 ## Defining and Calling Functions
 
+```
+# One positional parameter, one positional argument
+{
+    "defining": {"foo": {"given": {"params": ["x"]}, "result": {"name": "x"}}},
+    "result": {"calling": {"name": "foo"}, "args": [{"literal": 42}]}
+}
+>> 42
+```
 
+```
+# One positional parameter, one optional positional argument
+{
+    "defining": {"foo": {"given": {"params": ["x"]}, "result": {"name": "x"}}},
+    "result": {"calling": {"name": "foo"}, "args": [{"optional": {"literal": 42}}]}
+}
+>> 42
+```
+
+```
+# Calling a non-function with no arguments
+{
+    "calling": {"literal": 42}
+}
+>> 42
+```
+
+```
+# Calling a non-function with only optional arguments
+{
+    "calling": {"literal": 42},
+    "args": [{"optional": {"literal": "foo"}}],
+    "namedArgs": {"x": {"optional": {"literal": "bar"}}}
+}
+>> 42
+```
+
+A function body can reference names that were in scope when the function was defined, even if those names are out of scope when the function is called.
+
+```
+# Closure
+{
+    "defining": {
+        "x": {"literal": 73},
+        "foo": {"given": {"params": ["y"]}, "result": {"name": "x"}}
+    },
+    "result": {"calling": {"name": "foo"}, "args": [{"literal": 42}]}
+}
+>> 73
+```
+
+On the other hand, names that are in scope when the function is called don't leak into the function body.
+
+```
+# Leakage
+{
+    "defining": {
+        "leaky": {"given": {"params": ["x"]}, "result": {"name": "intruder"}}
+    },
+    "result": {
+        "defining": {
+            "intruder": {"literal": 42}
+        },
+        "result": {"calling": {"name": "leaky"}, "args": [{"literal": 73}]}
+    }
+}
+!! nameNotDefined {"name": "intruder"}
+```
 
 ## Quoting and Unquoting
 
@@ -181,6 +247,8 @@ Examples:
 ```
 
 ## Builtins
+
+### Arithmetic
 
 ```
 # Plus
@@ -226,6 +294,28 @@ Examples:
 }
 >> {quotient: 3, remainder: 1}
 ```
+
+### Strings
+
+```
+# Length
+{
+    "calling": {"name": "length"},
+    "args": [{"literal": "foo"}]
+}
+>> 3
+```
+
+```
+# Join
+{
+    "calling": {"name": "join"},
+    "args": [{"literal": "foo"}, {"literal": "bar"}, {"literal": "baz"}]
+}
+>> "foobarbaz"
+```
+
+### Comparison
 
 ```
 # Equals on numbers
@@ -330,6 +420,8 @@ Examples:
 }
 >> [true, false, false]
 ```
+
+### Types and Type Conversion
 
 ```
 # Type of
@@ -446,6 +538,8 @@ Examples:
 >> [1, -2.5, 42]
 ```
 
+### Control Flow
+
 ```
 # If
 {
@@ -464,6 +558,40 @@ Examples:
 }
 >> [1, 2]
 ```
+
+```
+# Repeat
+{
+    "calling": {"name": "repeat"},
+    "args": [
+        {"literal": 1},
+        {
+            "given": {"params": ["previous"]},
+            "result": {
+                "object": [
+                    [
+                        "while",
+                        {
+                            "calling": {"name": "isLessThan"},
+                            "args": [{"name": "previous"}, {"literal": 1000}]
+                        }
+                    ],
+                    [
+                        "next",
+                        {
+                            "calling": {"name": "times"},
+                            "args": [{"name": "previous"}, {"literal": 2}]
+                        }
+                    ]
+                ]
+            }
+        }
+    ]
+}
+>> 1024
+```
+
+### Arrays
 
 ```
 # Indexing arrays
@@ -487,6 +615,79 @@ Examples:
 }
 >> ["bar", "foo"]
 ```
+
+```
+# Length
+{
+    "calling": {"name": "length"},
+    "args": [{"array": [{"literal": "foo"}, {"literal": "bar"}]}]
+}
+>> 2
+```
+
+```
+# Build
+{
+    "calling": {"name": "build"},
+    "args": [
+        {"array": [{"literal": 1}, {"literal": 1}]},
+        {
+            "given": {"params": ["previous"]},
+            "result": {
+                "object": [
+                    [
+                        "while",
+                        {
+                            "calling": {"name": "isLessThan"},
+                            "args": [
+                                {
+                                    "calling": {"name": "at"},
+                                    "args": [{"name": "previous"}, {"literal": 1}]
+                                },
+                                {"literal": 20}
+                            ]
+                        }
+                    ],
+                    [
+                        "out",
+                        {
+                            "calling": {"name": "at"},
+                            "args": [{"name": "previous"}, {"literal": 1}]
+                        }
+                    ],
+                    [
+                        "next",
+                        {
+                            "array": [
+                                {
+                                    "calling": {"name": "at"},
+                                    "args": [{"name": "previous"}, {"literal": 2}]
+                                },
+                                {
+                                    "calling": {"name": "plus"},
+                                    "args": [
+                                        {
+                                            "calling": {"name": "at"},
+                                            "args": [{"name": "previous"}, {"literal": 1}]
+                                        },
+                                        {
+                                            "calling": {"name": "at"},
+                                            "args": [{"name": "previous"}, {"literal": 2}]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                ]
+            }
+        }
+    ]
+}
+>> [1, 1, 2, 3, 5, 8, 13, 21]
+```
+
+### Objects
 
 ```
 # Indexing objects
