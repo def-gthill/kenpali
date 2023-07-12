@@ -67,7 +67,7 @@ foo(1, 2?, bar: 3, baz: 4?)
 ```
 
 ```
-# Calling a function call
+# Calling the result of a function call
 foo(x)(y)
 >> {
     "calling": {

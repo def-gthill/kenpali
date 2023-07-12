@@ -45,7 +45,7 @@
 ## Strings
 
 ```
-# Length
+# String length
 [length(""), length("f"), length("foo")]
 >> [0, 1, 3]
 ```
@@ -217,7 +217,7 @@ array = ["foo", "bar"]
 ```
 
 ```
-# Length
+# Array length
 [
     length([]),
     length(["foo"]),
