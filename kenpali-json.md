@@ -245,3 +245,19 @@ On the other hand, names that are in scope when the function is called don't lea
 }
 >> {array: [{literal: 2}]}
 ```
+
+## Errors
+
+```
+# Error short-circuiting
+{
+    "calling": {"name": "negative"},
+    "args": [
+        {
+            "calling": {"name": "plus"},
+            "args": [{"literal": "foo"}]
+        }
+    ]
+}
+!! wrongArgumentType {"value": "foo", "expectedType": "number"}
+```

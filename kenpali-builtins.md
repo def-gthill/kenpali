@@ -138,7 +138,7 @@
     typeOf({foo: 1, bar: 2}),
     typeOf(typeOf),
     typeOf((x) => x),
-    typeOf(1 @ 1),
+    typeOf((1 @ 1)!),
 ]
 >> ["null", "boolean", "boolean", "number", "string", "array", "record", "builtin", "given", "error"]
 ```
