@@ -20,3 +20,27 @@ plus(foo: 1)
 plus(1, "foo")
 !! wrongArgumentType {"value": "foo", "expectedType": "number"}
 ```
+
+```
+# Negative - missing argument
+negative()
+!! missingArgument {"name": "x"}
+```
+
+```
+# Negative - unexpected positional argument
+negative(1, 2)
+!! unexpectedArgument {"position": 2}
+```
+
+```
+# Negative - unexpected named argument
+negative(1, foo: 2)
+!! unexpectedArgument {"name": "foo"}
+```
+
+```
+# Negative - wrong argument type
+negative("foo")
+!! wrongArgumentType {"value": "foo", "expectedType": "number"}
+```
