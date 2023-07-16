@@ -163,6 +163,15 @@ Examples:
 ```
 
 ```
+# One positional parameter, no arguments
+{
+    "defining": {"foo": {"given": {"params": ["x"]}, "result": {"name": "x"}}},
+    "result": {"calling": {"name": "foo"}}
+}
+!! missingArgument {"name": "x"}
+```
+
+```
 # One positional parameter, one optional positional argument
 {
     "defining": {"foo": {"given": {"params": ["x"]}, "result": {"name": "x"}}},
