@@ -70,6 +70,10 @@
         equals(["foo", "bar"], ["foo", "baz"]),
     ],
     [
+        equals([[1, 2], [3, 4]], [[1, 2], [3, 4]]),
+        equals([[1, 2], [3, 4]], [[1, 2], [3, 5]]),
+    ],
+    [
         equals(
             {foo: "bar", spam: "eggs"},
             {spam: "eggs", foo: "bar"},
@@ -83,6 +87,7 @@
 >> [
     [true],
     [true, false, true],
+    [true, false],
     [true, false],
     [true, false],
     [true, false],
@@ -115,11 +120,19 @@
         ["foo", "baz"] | isLessThan(["foo", "bar"]),
         ["foo!", "aar"] | isLessThan(["foo", "bar"]),
     ],
+    [
+        [[1, 2], [3, 4]] | isLessThan([[1, 2], [3, 10]]),
+        [[1, 2], [3, 4]] | isLessThan([[1, 3], [3, 3]]),
+        [[1, 2], [3, 4]] | isLessThan([[1, 2], [3, 4]]),
+        [[1, 2], [3, 10]] | isLessThan([[1, 2], [3, 4]]),
+        [[1, 3], [3, 3]] | isLessThan([[1, 2], [3, 4]]),
+    ]
 ]
 >> [
     [true, false, false],
     [true, false, false],
     [true, false, false],
+    [true, true, false, false, false],
     [true, true, false, false, false]
 ]
 ```
