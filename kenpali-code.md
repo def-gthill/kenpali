@@ -117,7 +117,10 @@ foo(x)(y)
 (x, y = 3) => plus(x, y)
 >> {
     "given": {
-        "params": ["x", ["y", {"literal": 3}]]
+        "params": [
+            "x",
+            {"name": "y", "defaultValue": {"literal": 3}}
+        ]
     },
     "result": {
         "calling": {"name": "plus"},
@@ -147,7 +150,9 @@ foo(x)(y)
 >> {
     "given": {
         "params": ["x"],
-        "namedParams": [["y", {"literal": 3}]]
+        "namedParams": [
+            {"name": "y", "defaultValue": {"literal": 3}}
+        ]
     },
     "result": {
         "calling": {"name": "plus"},

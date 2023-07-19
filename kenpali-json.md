@@ -172,6 +172,42 @@ Examples:
 ```
 
 ```
+# One optional positional parameter, one positional argument
+{
+    "defining": {
+        "foo": {
+            "given": {
+                "params": [
+                    {"name": "x", "defaultValue": 73}
+                ]
+            },
+            "result": {"name": "x"}
+        }
+    },
+    "result": {"calling": {"name": "foo"}, "args": [{"literal": 42}]}
+}
+>> 42
+```
+
+```
+# One optional positional parameter, no arguments
+{
+    "defining": {
+        "foo": {
+            "given": {
+                "params": [
+                    {"name": "x", "defaultValue": 73}
+                ]
+            },
+            "result": {"name": "x"}
+        }
+    },
+    "result": {"calling": {"name": "foo"}}
+}
+>> 73
+```
+
+```
 # One positional parameter, one optional positional argument
 {
     "defining": {"foo": {"given": {"params": ["x"]}, "result": {"name": "x"}}},
