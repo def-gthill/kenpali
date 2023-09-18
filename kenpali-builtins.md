@@ -1,5 +1,7 @@
 # Kenpali Builtins Specification
 
+Builtins are functions that must be provided by the host platform.
+
 ## Arithmetic
 
 ```
@@ -137,6 +139,39 @@
 ]
 ```
 
+## Logic
+
+```
+# And
+[
+    and(true, true),
+    and(true, false),
+    and(false, true),
+    and(false, false),
+]
+>> [true, false, false, false]
+```
+
+```
+# Or
+[
+    or(true, true),
+    or(true, false),
+    or(false, true),
+    or(false, false),
+]
+>> [true, true, true, false]
+```
+
+```
+# Not
+[
+    not(true),
+    not(false),
+]
+>> [false, true]
+```
+
 ## Types and Type Conversion
 
 ```
@@ -205,6 +240,8 @@ The `typeOf` function never returns `"object"` or `"function"`, since these term
 >> [1, 2]
 ```
 
+The `repeat` function repeatedly updates a value by applying the specified function. When the `while` property becomes `true`, the `next` property is ignored, and the final result is the *previous* value.
+
 ```
 # Repeat
 repeat(
@@ -239,6 +276,8 @@ array = ["foo", "bar"]
 >> [0, 1, 3]
 ```
 
+The `build` function generates an array by repeatedly applying a function to a start value. When the `while` property becomes `true`, the `out` and `next` properties are ignored; the final array will contain all *previous* values of `out`.
+
 ```
 # Build
 build(
@@ -249,7 +288,7 @@ build(
         next: [previous @ 2, plus(previous @ 1, previous @ 2)],
     }
 )
->> [1, 1, 2, 3, 5, 8, 13, 21]
+>> [1, 1, 2, 3, 5, 8, 13]
 ```
 
 ## Objects

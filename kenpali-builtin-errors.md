@@ -44,3 +44,17 @@ negative(1, foo: 2)
 negative("foo")
 !! wrongArgumentType {"value": "foo", "expectedType": "number"}
 ```
+
+## Arrays
+
+```
+# Indexing - index less than 1
+["foo", "bar"] | at(0)
+!! indexOutOfBounds {"value": ["foo", "bar"], "length": 2, "index": 0}
+```
+
+```
+# Indexing - index greater than length
+["foo", "bar"] | at(3)
+!! indexOutOfBounds {"value": ["foo", "bar"], "length": 2, "index": 3}
+```
