@@ -15,15 +15,31 @@ The Core functions must be available to any Kenpali program, but they can be imp
 ```
 # At most (less than or equal)
 [
-    [
-        42 | isAtMost(43),
-        43 | isAtMost(43),
-        43 | isAtMost(42),
-    ]
+    42 | isAtMost(43),
+    43 | isAtMost(43),
+    43 | isAtMost(42),
 ]
->> [
-    [true, true, false]
+>> [true, true, false]
+```
+
+```
+# More than (greater than)
+[
+    42 | isMoreThan(43),
+    43 | isMoreThan(43),
+    43 | isMoreThan(42),
 ]
+>> [false, false, true]
+```
+
+```
+# At least (greater than or equal)
+[
+    42 | isAtLeast(43),
+    43 | isAtLeast(43),
+    43 | isAtLeast(42),
+]
+>> [false, true, true]
 ```
 
 ## Arrays
@@ -32,6 +48,18 @@ The Core functions must be available to any Kenpali program, but they can be imp
 # Transforming
 [1, 2, 3] | forEach((i) => times(i, i))
 >> [1, 4, 9]
+```
+
+```
+# Filtering
+[1, 10, 2, 9, 3, 12] | where((i) => (i | isLessThan(10)))
+>> [1, 2, 9, 3]
+```
+
+```
+# Counting
+[1, 10, 2, 9, 3, 12] | count((i) => (i | isLessThan(10)))
+>> 4
 ```
 
 ```
