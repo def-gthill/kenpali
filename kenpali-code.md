@@ -8,6 +8,21 @@ null
 >> {"literal": null}
 ```
 
+## Comments
+
+```
+# A comment on its own line
+// A billion-dollar mistake
+null
+>> {"literal": null}
+```
+
+```
+# A comment at the end of a line
+null // A billion-dollar mistake
+>> {"literal": null}
+```
+
 ## Function Calls
 
 ```
