@@ -8,6 +8,8 @@ isAtMost = (a, b) => or(
     a | isLessThan(b),
     a | equals(b),
 );
+isMoreThan = (a, b) => (b | isLessThan(a));
+isAtLeast = (a, b) => (b | isAtMost(a));
 butIf = (value, condition, ifTrue) => (
     if(condition(value?), then: ifTrue(value?), else: value)
 );
@@ -30,6 +32,30 @@ forEach = (array, transform) => (
         }
     )
 );
+where = (array, condition) => (
+    0 | build(
+        (i) => (
+            next = increment(i) | repeat(
+                (j) => (
+                    {
+                        while: if(
+                            j | isAtMost(length(array)),
+                            then: not(condition(array @ j)) !,
+                            else: false,
+                        ),
+                        next: increment(j),
+                    }
+                )
+            );
+            {
+                while: next | isAtMost(length(array)),
+                next: next,
+                out: array @ next,
+            }
+        )
+    )
+);
+count = (array, condition) => (array | where(condition) | length);
 flatten = (array) => (
     [1, 1] | build(
         (i) => {
