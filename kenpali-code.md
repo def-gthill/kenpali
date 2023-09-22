@@ -8,6 +8,12 @@ null
 >> {"literal": null}
 ```
 
+## Arrays
+
+## Objects
+
+## Names
+
 ## Comments
 
 ```
@@ -330,5 +336,133 @@ foo.bar
             "args": [{"name": "x"}]
         }
     ]
+}
+```
+
+## Scopes
+
+```
+# Simple declaration
+foo = 42; foo
+>> {
+    "defining": {
+        "foo": {"literal": 42}
+    },
+    "result": {"name": "foo"}
+}
+```
+
+```
+# Array destructuring declaration
+[foo, bar] = [42, 97];
+[spam, eggs] = [216, 729];
+plus(foo, bar, spam, eggs)
+>> {
+    "defining": {
+        "#array1": {
+            "array": [
+                {"literal": 42},
+                {"literal": 97}
+            ]
+        },
+        "foo": {
+            "calling": {"name": "at"},
+            "args": [
+                {"name": "#array1"},
+                {"literal": 1}
+            ]
+        },
+        "bar": {
+            "calling": {"name": "at"},
+            "args": [
+                {"name": "#array1"},
+                {"literal": 2}
+            ]
+        },
+        "#array2": {
+            "array": [
+                {"literal": 216},
+                {"literal": 729}
+            ]
+        },
+        "spam": {
+            "calling": {"name": "at"},
+            "args": [
+                {"name": "#array2"},
+                {"literal": 1}
+            ]
+        },
+        "eggs": {
+            "calling": {"name": "at"},
+            "args": [
+                {"name": "#array2"},
+                {"literal": 2}
+            ]
+        }
+    },
+    "result": {
+        "calling": {"name": "plus"},
+        "args": [
+            {"name": "foo"},
+            {"name": "bar"},
+            {"name": "spam"},
+            {"name": "eggs"}
+        ]
+    }
+}
+```
+
+```
+# Nested array destructuring
+[foo, [spam, eggs]] = [42, [97, 216]];
+plus(foo, spam, eggs)
+>> {
+    "defining": {
+        "#array1": {
+            "array": [
+                {"literal": 42},
+                {"array": [
+                    {"literal": 97},
+                    {"literal": 216}
+                ]}
+            ]
+        },
+        "foo": {
+            "calling": {"name": "at"},
+            "args": [
+                {"name": "#array1"},
+                {"literal": 1}
+            ]
+        },
+        "#array2": {
+            "calling": {"name": "at"},
+            "args": [
+                {"name": "#array1"},
+                {"literal": 2}
+            ]
+        },
+        "spam": {
+            "calling": {"name": "at"},
+            "args": [
+                {"name": "#array2"},
+                {"literal": 1}
+            ]
+        },
+        "eggs": {
+            "calling": {"name": "at"},
+            "args": [
+                {"name": "#array2"},
+                {"literal": 2}
+            ]
+        }
+    },
+    "result": {
+        "calling": {"name": "plus"},
+        "args": [
+            {"name": "foo"},
+            {"name": "spam"},
+            {"name": "eggs"}
+        ]
+    }
 }
 ```
