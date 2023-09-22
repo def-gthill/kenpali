@@ -58,14 +58,17 @@ where = (array, condition) => (
 count = (array, condition) => (array | where(condition) | length);
 flatten = (array) => (
     [1, 1] | build(
-        (i) => {
-            while: i @ 1 | isAtMost(length(array)),
-            next: if(
-                i @ 2 | isLessThan(length(array @ (i @ 1))),
-                then: [i @ 1, increment(i @ 2)],
-                else: [increment(i @ 1), 1],
-            ),
-            out: array @ (i @ 1) @ (i @ 2),
-        }
+        (indices) => (
+            [i, j] = indices;
+            {
+                while: i | isAtMost(length(array)),
+                next: if(
+                    j | isLessThan(length(array @ i)),
+                    then: [i, increment(j)],
+                    else: [increment(i), 1],
+                ),
+                out: array @ i @ j,
+            }
+        )
     )
 );
