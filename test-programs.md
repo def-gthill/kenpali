@@ -36,3 +36,23 @@ fizzbuzz = (n) => (
 fizzbuzz(16)
 >> ["1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz", "13", "14", "FizzBuzz", "16"]
 ```
+
+```
+# Collatz
+collatzStep = (n) => if(
+    n | isDivisibleBy(2),
+    then: n | dividedBy(2),
+    else: n | times(3) | plus(1),
+);
+collatz = (n) => (
+    n | build(
+        (previous) => {
+            next: collatzStep(previous),
+            out: previous,
+            continueIf: previous | isMoreThan(1),
+        }
+    )
+);
+collatz(7)
+>> [7, 22, 11, 34, 17, 52, 26, 13, 40, 20, 10, 5, 16, 8, 4, 2, 1]
+```
