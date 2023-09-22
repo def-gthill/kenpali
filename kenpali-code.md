@@ -194,3 +194,141 @@ foo(x)(y)
     }
 }
 ```
+
+## Forward Pipe
+
+```
+# Forward pipe into a bare name
+1 | foo
+>> {
+    "calling": {"name": "foo"},
+    "args": [{"literal": 1}]
+}
+```
+
+```
+# Forward pipe injecting a first argument
+1 | bar(2)
+>> {
+    "calling": {"name": "bar"},
+    "args": [{"literal": 1}, {"literal": 2}]
+}
+```
+
+```
+# Chaining forward pipes
+1 | foo | bar(2)
+>> {
+    "calling": {"name": "bar"},
+    "args": [
+        {
+            "calling": {"name": "foo"},
+            "args": [{"literal": 1}]
+        },
+        {"literal": 2}
+    ]
+}
+```
+
+```
+# Blocking first-argument injection
+1 | (bar(2))
+>> {
+    "calling": {
+        "calling": {"name": "bar"},
+        "args": [{"literal": 2}]
+    },
+    "args": [{"literal": 1}]
+}
+```
+
+## Indexing
+
+```
+# Indexing with @
+["foo", "bar"] @ 2
+>> {
+    "calling": {"name": "at"},
+    "args": [
+        {"array": [
+            {"literal": "foo"},
+            {"literal": "bar"}
+        ]},
+        {"literal": 2}
+    ]
+}
+```
+
+```
+# Correct precedence of @
+[x @ 1 | f, x | f @ 1]
+>> {
+    "array": [
+        {
+            "calling": {"name": "f"},
+            "args": [
+                {
+                    "calling": {"name": "at"},
+                    "args": [
+                        {"name": "x"},
+                        {"literal": 1}
+                    ]
+                }
+            ]
+        },
+        {
+            "calling": {"name": "at"},
+            "args": [
+                {
+                    "calling": {"name": "f"},
+                    "args": [{"name": "x"}]
+                },
+                {"literal": 1}
+            ]
+        }
+    ]
+}
+```
+
+```
+# Indexing with .
+foo.bar
+>> {
+    "calling": {"name": "at"},
+    "args": [
+        {"name": "foo"},
+        {"literal": "bar"}
+    ]
+}
+```
+
+```
+# Correct precedence of .
+[x.y | f, x | y.f]
+>> {
+    "array": [
+        {
+            "calling": {"name": "f"},
+            "args": [
+                {
+                    "calling": {"name": "at"},
+                    "args": [
+                        {"name": "x"},
+                        {"literal": "y"}
+                    ]
+                }
+            ]
+        },
+        {
+            "calling": {
+                "calling": {"name": "at"},
+                "args": [
+                    {"name": "y"},
+                    {"literal": "f"}
+                ]
+            },
+            "args": [{"name": "x"}]
+        }
+    ]
+}
+```
