@@ -173,6 +173,15 @@ Builtins are functions that must be provided by the host platform.
 ```
 
 ```
+# Or short-circuiting
+[
+    or(true, [] @ 1),
+    or(true, (foo = foo; foo)),
+]
+>> [true, true]
+```
+
+```
 # Not
 [
     not(true),
