@@ -258,6 +258,17 @@ The `typeOf` function never returns `"object"` or `"function"`, since these term
 >> [1, 2]
 ```
 
+```
+# If short-circuiting
+[
+    if(true, then: 1, else: [] @ 1),
+    if(true, then: 1, else: (foo = foo; foo)),
+    if(false, then: [] @ 1, else: 2),
+    if(false, then: (foo = foo; foo), else: 2),
+]
+>> [1, 1, 2, 2]
+```
+
 The `repeat` function repeatedly updates a value by applying the specified function. When the `while` property becomes `false`, the `next` property is ignored, and the final result is the *previous* value.
 
 ```
