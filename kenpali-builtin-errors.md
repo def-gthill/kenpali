@@ -45,6 +45,20 @@ negative("foo")
 !! wrongArgumentType {"value": "foo", "expectedType": "number"}
 ```
 
+## Logic
+
+```
+# And - wrong argument type
+and(true, "foo")
+!! wrongArgumentType {"value": "foo", "expectedType": "boolean"}
+```
+
+```
+# Or - wrong argument type
+or(false, "foo")
+!! wrongArgumentType {"value": "foo", "expectedType": "boolean"}
+```
+
 ## Arrays
 
 ```
