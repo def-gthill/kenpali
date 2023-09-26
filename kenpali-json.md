@@ -234,6 +234,22 @@ Examples:
 >> 42
 ```
 
+```
+# Non-functions don't evaluate arguments
+{
+    "calling": {"literal": 42},
+    "args": [{
+        "optional": {
+            "defining": {
+                "foo": {"name": "foo"}
+            },
+            "result": {"name": "foo"}
+        }
+    }]
+}
+>> 42
+```
+
 A function body can reference names that were in scope when the function was defined, even if those names are out of scope when the function is called.
 
 ```
