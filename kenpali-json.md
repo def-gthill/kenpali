@@ -196,7 +196,10 @@ Examples:
         "foo": {
             "given": {
                 "params": [
-                    {"name": "x", "defaultValue": 73}
+                    {
+                        "name": "x",
+                        "defaultValue": {"literal": 73}
+                    }
                 ]
             },
             "result": {"name": "x"}
@@ -212,6 +215,31 @@ Examples:
 {
     "defining": {"foo": {"given": {"params": ["x"]}, "result": {"name": "x"}}},
     "result": {"calling": {"name": "foo"}, "args": [{"optional": {"literal": 42}}]}
+}
+>> 42
+```
+
+Arguments to declared functions are evaluated *lazily*. If an argument isn't actually needed to find the function's result, it's never evaluated.
+
+```
+# Unused arguments aren't evaluated
+{
+    "defining": {
+        "foo": {
+            "given": {"params": ["x", "y"]},
+            "result": {"name": "y"}
+        }
+    },
+    "result": {
+        "calling": {"name": "foo"},
+        "args": [
+            {
+                "defining": {"bar": {"name": "bar"}},
+                "result": {"name": "bar"}
+            },
+            {"literal": 42}
+        ]
+    }
 }
 >> 42
 ```
