@@ -56,3 +56,20 @@ collatz = (n) => (
 collatz(7)
 >> [7, 22, 11, 34, 17, 52, 26, 13, 40, 20, 10, 5, 16, 8, 4, 2, 1]
 ```
+
+```
+# Primes
+[2 | to(100), 1] | repeat((args) => (
+  [numbers, i] = args;
+  next = numbers
+    | where((n) => or(
+       n | equals(numbers @ i),
+       not(n | isDivisibleBy(numbers @ i))
+    ));
+  {
+    while: not(next | equals(numbers)),
+    next: [next, increment(i)],
+  }
+)) @ 1
+>> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+```
