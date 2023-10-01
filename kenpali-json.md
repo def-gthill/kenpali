@@ -111,9 +111,27 @@ Examples:
 ## Arrays
 
 ```
+# Empty array
+{"array": []}
+>> []
+```
+
+```
 # Array of literals
 {"array": [{"literal": 1}, {"literal": 2}, {"literal": 3}]}
 >> [1, 2, 3]
+```
+
+```
+# Array with elements of mixed types
+{"array": [{"literal": null}, {"literal": 1}, {"literal": "foo"}]}
+>> [null, 1, "foo"]
+```
+
+```
+# Nested arrays
+{"array": [{"array": [{"literal": 1}]}]}
+>> [[1]]
 ```
 
 ```
@@ -128,6 +146,12 @@ Examples:
 ## Objects
 
 ```
+# Empty object
+{"object": []}
+>> {}
+```
+
+```
 # Object with literal values
 {
     "object": [
@@ -139,7 +163,45 @@ Examples:
 ```
 
 ```
-# Object containing expressions to evaluate
+# Object with explicit literal keys
+{
+    "object": [
+        [{"literal": "foo"}, {"literal": "bar"}],
+        [{"literal": "spam"}, {"literal": "eggs"}]
+    ]
+}
+>> {foo: "bar", spam: "eggs"}
+```
+
+```
+# Object with values of mixed types
+{
+    "object": [
+        ["foo", {"literal": null}],
+        ["bar", {"literal": 1}],
+        ["baz", {"array": [{"literal": 2}]}]
+    ]
+}
+>> {foo: null, bar: 1, baz: [2]}
+```
+
+```
+# Nested objects
+{
+    "object": [
+        [
+            "foo",
+            {
+                "object": [["bar", {"literal": "baz"}]]
+            }
+        ]
+    ]
+}
+>> {foo: {bar: "baz"}}
+```
+
+```
+# Object with expression keys and values
 {
     "defining": {"key": {"literal": "foo"}, "value": {"literal": 42}},
     "result": {
@@ -313,26 +375,68 @@ On the other hand, names that are in scope when the function is called don't lea
 ## Quoting and Unquoting
 
 ```
-# Quoting
+# Quoting - literal
 {"quote": {"literal": 1}}
 >> {literal: 1}
 ```
 
 ```
-# Unquoting
+# Quoting - array
+{"quote": {"array": [{"literal": 1}]}}
+>> {array: [{literal: 1}]}
+```
+
+```
+# Quoting - object
+{"quote": {"object": [["foo", {"literal": "bar"}]]}}
+>> {object: [["foo", {literal: "bar"}]]}
+```
+
+```
+# Unquoting to evaluate
 {
-    "quote": {
-        "array": [
-            {
-                "unquote": {
-                    "calling": {"name": "plus"},
-                    "args": [{"literal": 1}, {"literal": 1}]
-                }
-            }
-        ]
+    "unquote": {
+        "object": [[{"literal": "literal"}, {"literal": 1}]]
     }
 }
->> {array: [{literal: 2}]}
+>> 1
+```
+
+```
+# Unquote undoes an enclosing quote
+{
+    "quote": {
+        "unquote": {
+            "object": [[{"literal": "literal"}, {"literal": 1}]]
+        }
+    }
+}
+>> {literal: 1}
+```
+
+```
+# Quote undoes an enclosing unquote
+{
+    "unquote": {"quote": {"literal": 1}}
+}
+>> 1
+```
+
+```
+# Using unquote to substitute in an AST node
+{
+    "defining": {
+        "expression": {"quote": {"literal": 1}}
+    },
+    "result": {
+        "quote": {
+            "array": [
+                {"unquote": {"name": "expression"}}
+            ]
+        }
+    }
+}
+>> {array: [{literal: 1}]}
 ```
 
 ## Errors

@@ -8,11 +8,164 @@ null
 >> {"literal": null}
 ```
 
+```
+# Literal false
+false
+>> {"literal": false}
+```
+
+```
+# Literal true
+true
+>> {"literal": true}
+```
+
+```
+# Literal integer
+1
+>> {"literal": 1}
+```
+
+```
+# Literal decimal
+-2.5
+>> {"literal": -2.5}
+```
+
+```
+# Literal string
+"foobar"
+>> {"literal": "foobar"}
+```
+
+## Names
+
+```
+# Name with only letters
+foo
+>> {"name": "foo"}
+```
+
+```
+# Name with uppercase letters
+FOO
+>> {"name": "FOO"}
+```
+
+```
+# Name with numbers
+f00
+>> {"name": "f00"}
+```
+
 ## Arrays
+
+```
+# Empty array
+[]
+>> {"array": []}
+```
+
+```
+# Single-element array
+[1]
+>> {"array": [{"literal": 1}]}
+```
+
+```
+# Array of literals
+[1, 2, 3]
+>> {"array": [{"literal": 1}, {"literal": 2}, {"literal": 3}]}
+```
+
+```
+# Trailing comma
+[1, 2, 3,]
+>> {"array": [{"literal": 1}, {"literal": 2}, {"literal": 3}]}
+```
+
+```
+# Array with elements of mixed types
+[null, 1, "foo"]
+>> {"array": [{"literal": null}, {"literal": 1}, {"literal": "foo"}]}
+```
+
+```
+# Nested arrays
+[[1]]
+>> {"array": [{"array": [{"literal": 1}]}]}
+```
+
+```
+# Array containing an expression to evaluate
+[foo]
+>> {"array": [{"name": "foo"}]}
+```
 
 ## Objects
 
-## Names
+```
+# Empty object
+{}
+>> {"object": []}
+```
+
+```
+# Object with literal values
+{"foo": "bar", "spam": "eggs"}
+>> {
+    "object": [
+        ["foo", {"literal": "bar"}],
+        ["spam", {"literal": "eggs"}]
+    ]
+}
+```
+
+If a key is a valid Kenpali name, the quotes can be omitted.
+
+```
+# Object with shorthand keys
+{foo: "bar", spam: "eggs"}
+>> {
+    "object": [
+        ["foo", {"literal": "bar"}],
+        ["spam", {"literal": "eggs"}]
+    ]
+}
+```
+
+```
+# Object with values of mixed types
+{foo: null, bar: 1, baz: [2]}
+>> {
+    "object": [
+        ["foo", {"literal": null}],
+        ["bar", {"literal": 1}],
+        ["baz", {"array": [{"literal": 2}]}]
+    ]
+}
+```
+
+```
+# Nested objects
+{foo: {bar: "baz"}}
+>> {
+    "object": [
+        [
+            "foo",
+            {
+                "object": [["bar", {"literal": "baz"}]]
+            }
+        ]
+    ]
+}
+```
+
+```
+# Object with expression keys and values
+{<<key>>: value}
+>> {"object": [[{"name": "key"}, {"name": "value"}]]}
+```
 
 ## Comments
 
@@ -309,7 +462,7 @@ foo.bar
 ```
 
 ```
-# Correct precedence of .
+# Correct precedence of . and |
 [x.y | f, x | y.f]
 >> {
     "array": [
@@ -339,6 +492,114 @@ foo.bar
 }
 ```
 
+```
+# Correct precedence of . and function calls
+[x.f(y), f(x).y]
+>> {
+    "array": [
+        {
+            "calling": {
+                "calling": {"name": "at"},
+                "args": [
+                    {"name": "x"},
+                    {"literal": "f"}
+                ]
+            },
+            "args": [{"name": "y"}]
+        },
+        {
+            "calling": {"name": "at"},
+            "args": [
+                {
+                    "calling": {"name": "f"},
+                    "args": [{"name": "x"}]
+                },
+                {"literal": "y"}
+            ]
+        }
+    ]
+}
+```
+
+```
+# Indexing an expression with .
+(x | f).y
+>> {
+    "calling": {"name": "at"},
+    "args": [
+        {
+            "calling": {"name": "f"},
+            "args": [
+                {"name": "x"}
+            ]
+        },
+        {"literal": "y"}
+    ]
+}
+```
+
+```
+# Chaining indexing with .
+x.y.z
+>> {
+    "calling": {"name": "at"},
+    "args": [
+        {
+            "calling": {"name": "at"},
+            "args": [
+                {"name": "x"},
+                {"literal": "y"}
+            ]
+        },
+        {"literal": "z"}
+    ]
+}
+```
+
+```
+# Explicit string indexing with .
+x."y"
+>> {
+    "calling": {"name": "at"},
+    "args": [
+        {"name": "x"},
+        {"literal": "y"}
+    ]
+}
+```
+
+```
+# Dynamic indexing with .
+x.<<y>>
+>> {
+    "calling": {"name": "at"},
+    "args": [
+        {"name": "x"},
+        {"name": "y"}
+    ]
+}
+```
+
+## Quoting and Unquoting
+
+```
+# Quoting
+'(1)'
+>> {"quote": {"literal": 1}}
+```
+
+```
+# Unquoting
+<<1>>
+>> {"unquote": {"literal": 1}}
+```
+
+```
+# Nested quoting and unquoting
+'('(<<<<1>>>>)')'
+>> {"quote": {"quote": {"unquote": {"unquote": {"literal": 1}}}}}
+```
+
 ## Scopes
 
 ```
@@ -347,6 +608,22 @@ foo = 42; foo
 >> {
     "defining": {
         "foo": {"literal": 42}
+    },
+    "result": {"name": "foo"}
+}
+```
+
+```
+# Nested scopes
+foo = (bar = 1; bar); foo
+>> {
+    "defining": {
+        "foo": {
+            "defining": {
+                "bar": {"literal": 1}
+            },
+            "result": {"name": "bar"}
+        }
     },
     "result": {"name": "foo"}
 }

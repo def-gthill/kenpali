@@ -53,6 +53,28 @@ Builtins are functions that must be provided by the host platform.
 ```
 
 ```
+# Indexing strings
+string = "foobar"
+[
+    string @ 1,
+    string @ 4,
+    string @ 6,
+]
+>> ["f", "b", "r"]
+```
+
+```
+# Indexing strings with escapes
+string = "\"\\\/\b\f\n\r\t\u1234"
+[
+    string @ 1,
+    string @ 5,
+    string @ 9,
+]
+>> ["\"", "\f", "\u1234"]
+```
+
+```
 # Join
 [join(), join("foo"), join("foo", "bar", "baz")]
 >> ["", "foo", "foobarbaz"]
@@ -210,6 +232,40 @@ Builtins are functions that must be provided by the host platform.
 ```
 
 The `typeOf` function never returns `"object"` or `"function"`, since these terms aren't specific enough. The term "object" includes records, givens, and errors (i.e. anything that can be serialized to a JSON object), while the term "function" includes builtins and givens (i.e. anything that can be called).
+
+```
+# Is null
+[
+    isNull(null),
+    isNull(false),
+    isNull(true),
+    isNull(42),
+    isNull("foo"),
+    isNull([1, 2, 3]),
+    isNull({foo: 1, bar: 2}),
+    isNull(typeOf),
+    isNull((x) => x),
+    isNull((1 @ 1)!),
+]
+>> [true, false, false, false, false, false, false, false, false,false]
+```
+
+```
+# Is boolean
+[
+    isBoolean(null),
+    isBoolean(false),
+    isBoolean(true),
+    isBoolean(42),
+    isBoolean("foo"),
+    isBoolean([1, 2, 3]),
+    isBoolean({foo: 1, bar: 2}),
+    isBoolean(typeOf),
+    isBoolean((x) => x),
+    isBoolean((1 @ 1)!),
+]
+>> [false, true, true, false, false, false, false, false, false,false]
+```
 
 ```
 # To string
