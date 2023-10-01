@@ -404,21 +404,13 @@ On the other hand, names that are in scope when the function is called don't lea
 
 ```
 # Unquote undoes an enclosing quote
-{
-    "quote": {
-        "unquote": {
-            "object": [[{"literal": "literal"}, {"literal": 1}]]
-        }
-    }
-}
->> {literal: 1}
+{"quote": {"unquote": {"literal": 1}}}
+>> 1
 ```
 
 ```
 # Quote undoes an enclosing unquote
-{
-    "unquote": {"quote": {"literal": 1}}
-}
+{"unquote": {"quote": {"literal": 1}}}
 >> 1
 ```
 
@@ -438,6 +430,14 @@ On the other hand, names that are in scope when the function is called don't lea
 }
 >> {array: [{literal: 1}]}
 ```
+
+```
+# Evaluating a non-expression
+{"unquote": {"literal": 1}}
+!! notAnExpression {"value": 1}
+```
+
+But as we see in the "unquote undoes an enclosing quote" example, unquoting a non-expression inside a quote doesn't *immediately* produce an error, though it's unlikely the resulting AST is valid.
 
 ## Errors
 
