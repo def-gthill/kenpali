@@ -375,6 +375,16 @@ foo(x)(y)
 ```
 
 ```
+# Forward pipe injecting alongside a named argument
+1 | bar(foo: 2)
+>> {
+    "calling": {"name": "bar"},
+    "args": [{"literal": 1}],
+    "namedArgs": {"foo": {"literal": 2}}
+}
+```
+
+```
 # Chaining forward pipes
 1 | foo | bar(2)
 >> {

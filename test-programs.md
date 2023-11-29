@@ -15,7 +15,7 @@ negative(42)
 ```
 # Hello world
 hello = (name) => (
-    join("Hello, ", name, "!")
+    join(["Hello, ", name, "!"])
 );
 hello("world")
 >> "Hello, world!"
@@ -27,8 +27,8 @@ fizzbuzz = (n) => (
     1 | to(n) | forEach(
         (i) => (
             ""
-            | butIf(i | isDivisibleBy(3), (s) => join(s, "Fizz"))
-            | butIf(i | isDivisibleBy(5), (s) => join(s, "Buzz"))
+            | butIf(i | isDivisibleBy(3), (s) => join([s, "Fizz"]))
+            | butIf(i | isDivisibleBy(5), (s) => join([s, "Buzz"]))
             | butIf(isEmpty, toString(i))
         )
     )

@@ -10,6 +10,58 @@ The Core functions must be available to any Kenpali program, but they can be imp
 >> [3, -3]
 ```
 
+## Strings
+
+```
+# Array of characters in a string
+characters("foobar")
+>> ["f", "o", "o", "b", "a", "r"]
+```
+
+```
+# Slicing strings
+[
+    "foobar" | slice(2 | to(4)),
+]
+>> [
+    "oob",
+]
+```
+
+```
+# Splitting on a delimiter
+[
+    "foo,bar,,baz" | split(","),
+    "foo=>bar=>=>baz" | split("=>"),
+]
+>> [
+    ["foo", "bar", "", "baz"],
+    ["foo", "bar", "", "baz"],
+]
+```
+
+```
+# Splitting lines
+"foo\nbar\n\nbaz" | splitLines
+>> ["foo", "bar", "", "baz"]
+```
+
+```
+# Joining lines
+["foo", "bar", "", "baz"] | joinLines
+>> "foo\nbar\n\nbaz"
+```
+
+```
+# Trimming whitespace
+[
+    "foo" | trim,
+    "   foo    " | trim,
+    "  foo bar baz " | trim,
+]
+>> ["foo", "foo", "foo bar baz"]
+```
+
 ## Comparison
 
 ```
@@ -43,6 +95,30 @@ The Core functions must be available to any Kenpali program, but they can be imp
 ```
 
 ## Arrays
+
+```
+# Ranges
+[
+    1 | to(5),
+    5 | to(10),
+]
+>> [
+    [1, 2, 3, 4, 5],
+    [5, 6, 7, 8, 9, 10],
+]
+```
+
+```
+# Ranges defined by size
+[
+    1 | toSize(5),
+    5 | toSize(6),
+]
+>> [
+    [1, 2, 3, 4, 5],
+    [5, 6, 7, 8, 9, 10],
+]
+```
 
 ```
 # Transforming

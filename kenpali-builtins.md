@@ -75,9 +75,14 @@ string = "\"\\\/\b\f\n\r\t\u1234"
 ```
 
 ```
-# Join
-[join(), join("foo"), join("foo", "bar", "baz")]
->> ["", "foo", "foobarbaz"]
+# Joining strings
+[
+    join([]),
+    join(["foo"]),
+    join(["foo", "bar", "baz"]),
+    join(["foo", "bar", "baz"], with: "|"),
+]
+>> ["", "foo", "foobarbaz", "foo|bar|baz"]
 ```
 
 ## Comparison
