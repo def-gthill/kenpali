@@ -252,7 +252,7 @@ The `typeOf` function never returns `"object"` or `"function"`, since these term
     isNull((x) => x),
     isNull((1 @ 1)!),
 ]
->> [true, false, false, false, false, false, false, false, false,false]
+>> [true, false, false, false, false, false, false, false, false, false]
 ```
 
 ```
@@ -269,7 +269,24 @@ The `typeOf` function never returns `"object"` or `"function"`, since these term
     isBoolean((x) => x),
     isBoolean((1 @ 1)!),
 ]
->> [false, true, true, false, false, false, false, false, false,false]
+>> [false, true, true, false, false, false, false, false, false, false]
+```
+
+```
+# Is string
+[
+    isString(null),
+    isString(false),
+    isString(true),
+    isString(42),
+    isString("foo"),
+    isString([1, 2, 3]),
+    isString({foo: 1, bar: 2}),
+    isString(typeOf),
+    isString((x) => x),
+    isString((1 @ 1)!),
+]
+>> [false, false, false, false, true, false, false, false, false, false]
 ```
 
 ```

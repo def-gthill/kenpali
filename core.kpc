@@ -41,13 +41,19 @@ joinLines = (strings) => (strings | join(with: "\n"));
 trim = (string) => (
     firstIndex = 1 | repeat(
         (i) => {
-            while: string @ i | equals(" "),
+            while: and(
+                i | isAtMost(length(string)),
+                string @ i | equals(" "),
+            ),
             next: increment(i),
         }
     );
     lastIndex = length(string) | repeat(
         (i) => {
-            while: string @ i | equals(" "),
+            while: and(
+                i | isAtLeast(1),
+                string @ i | equals(" "),
+            ),
             next: decrement(i),
         }
     );
@@ -63,9 +69,11 @@ butIf = (value, condition, ifTrue) => (
     if(condition(value?), then: ifTrue(value?), else: value)
 );
 isEmpty = (coll) => (length(coll) | equals(0));
+dropFirst = (coll, n = 1) => slice(coll, increment(n) | to(length(coll)));
+dropLast = (coll, n = 1) => slice(coll, 1 | to(length(coll) | minus(n)));
 slice = (coll, indices) => (
     result = indices | forEach((index) => (coll @ index));
-    join(result)
+    result | butIf(isString(coll), join(result))
 );
 to = (start, end) => (
     start | build(

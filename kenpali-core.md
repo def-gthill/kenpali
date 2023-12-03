@@ -29,14 +29,32 @@ characters("foobar")
 ```
 
 ```
+# Dropping leading and trailing characters
+[
+    "foobar" | dropFirst,
+    "foobar" | dropFirst(2),
+    "foobar" | dropLast,
+    "foobar" | dropLast(2),
+]
+>> [
+    "oobar",
+    "obar",
+    "fooba",
+    "foob",
+]
+```
+
+```
 # Splitting on a delimiter
 [
     "foo,bar,,baz" | split(","),
     "foo=>bar=>=>baz" | split("=>"),
+    "|foo||bar|" | split("|"),
 ]
 >> [
     ["foo", "bar", "", "baz"],
     ["foo", "bar", "", "baz"],
+    ["", "foo", "", "bar", ""],
 ]
 ```
 
@@ -55,11 +73,13 @@ characters("foobar")
 ```
 # Trimming whitespace
 [
+    "" | trim,
+    "  " | trim,
     "foo" | trim,
     "   foo    " | trim,
     "  foo bar baz " | trim,
 ]
->> ["foo", "foo", "foo bar baz"]
+>> ["", "", "foo", "foo", "foo bar baz"]
 ```
 
 ## Comparison
@@ -117,6 +137,32 @@ characters("foobar")
 >> [
     [1, 2, 3, 4, 5],
     [5, 6, 7, 8, 9, 10],
+]
+```
+
+```
+# Slicing arrays
+[
+    [42, 97, 6, 12, 64] | slice(2 | to(4)),
+]
+>> [
+    [97, 6, 12],
+]
+```
+
+```
+# Dropping leading and trailing elements
+[
+    [42, 97, 6, 12, 64] | dropFirst,
+    [42, 97, 6, 12, 64] | dropFirst(3),
+    [42, 97, 6, 12, 64] | dropLast,
+    [42, 97, 6, 12, 64] | dropLast(3),
+]
+>> [
+    [97, 6, 12, 64],
+    [12, 64],
+    [42, 97, 6, 12],
+    [42, 97],
 ]
 ```
 
