@@ -45,6 +45,20 @@ negative("foo")
 !! wrongArgumentType {"value": "foo", "expectedType": "number"}
 ```
 
+## Strings
+
+```
+# Indexing - wrong argument type
+42 @ 2
+!! wrongArgumentType {"value": 42, "expectedType": {"#either": ["string", "array", "object"]}}
+```
+
+```
+# Joining - wrong element type
+join(["foo", 1])
+!! wrongArgumentType {"value": ["foo", 1], "expectedType": {"#type": "array", "elements": "string"}}
+```
+
 ## Logic
 
 ```

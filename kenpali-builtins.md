@@ -441,3 +441,224 @@ object = {foo: "bar", spam: "eggs"};
 ]
 >> ["eggs", "bar"]
 ```
+
+## Validation
+
+```
+# Matching typeOf results
+[
+    null | matches("null"),
+    false | matches("null"),
+    false | matches("boolean"),
+    42 | matches("boolean"),
+    42 | matches("number"),
+    "foo" | matches("number"),
+    "foo" | matches("string"),
+    [1, 2, 3] | matches("string"),
+    [1, 2, 3] | matches("array"),
+    {foo: 1, bar: 2} | matches("array"),
+    {foo: 1, bar: 2} | matches("record"),
+    typeOf | matches("record"),
+    typeOf | matches("builtin"),
+    (x) => x | matches("builtin"),
+    (x) => x | matches("given"),
+    matches((1 @ 1)!, "given"),
+    matches((1 @ 1)!, "error"),
+    null | matches("error"),
+]
+>> [
+    true,
+    false,
+    true,
+    false,
+    true,
+    false,
+    true,
+    false,
+    true,
+    false,
+    true,
+    false,
+    true,
+    false,
+    true,
+    false,
+    true,
+    false,
+]
+```
+
+```
+# Matching the supertypes "object", "function", and "sequence"
+[
+    "foo" | matches("object"),
+    [1, 2, 3] | matches("object"),
+    {foo: 1, bar: 2} | matches("object"),
+    typeOf | matches("object"),
+    (x) => x | matches("object"),
+    matches((1 @ 1)!, "object"),
+    "foo" | matches("function"),
+    [1, 2, 3] | matches("function"),
+    {foo: 1, bar: 2} | matches("function"),
+    typeOf | matches("function"),
+    (x) => x | matches("function"),
+    matches((1 @ 1)!, "function"),
+    "foo" | matches("sequence"),
+    [1, 2, 3] | matches("sequence"),
+    {foo: 1, bar: 2} | matches("sequence"),
+    typeOf | matches("sequence"),
+    (x) => x | matches("sequence"),
+    matches((1 @ 1)!, "sequence"),
+]
+>> [
+    false,
+    false,
+    true,
+    false,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+]
+```
+
+```
+# Matching a type with a predicate
+sch = is("number", where: (n) => isLessThan(n, 10));
+[
+    1 | matches(sch),
+    42 | matches(sch),
+    "foo" | matches(sch),
+]
+>> [
+    true,
+    false,
+    false,
+]
+```
+
+```
+# Matching a list of specific values
+sch = oneOf("red", "green", "blue");
+[
+    "red" | matches(sch),
+    "blue" | matches(sch),
+    "foo" | matches(sch),
+    42 | matches(sch),
+]
+>> [
+    true,
+    true,
+    false,
+    false,
+]
+```
+
+```
+# Matching an array where all elements must be of a given type
+sch = arrayOf("string");
+[
+    [] | matches(sch),
+    ["foo", "bar"] | matches(sch),
+    [1, 2, 3] | matches(sch),
+    ["foo", 1] | matches(sch),
+    42 | matches(sch),
+]
+>> [
+    true,
+    true,
+    false,
+    false,
+    false,
+]
+```
+
+```
+# Matching an array where each element has its own schema
+sch = ["string", "number", arrayOf("number")];
+[
+    ["foo", 42, [1, 2, 3]] | matches(sch),
+    ["foo", 42, [], "extra"] | matches(sch),
+    ["foo", "bar", [1, 2, 3]] | matches(sch),
+    ["foo", 42] | matches(sch),
+    42 | matches(sch),
+]
+>> [
+    true,
+    true,
+    false,
+    false,
+    false,
+]
+```
+
+```
+# Matching an object where names and values must match schemas
+sch = objectOf(names: is("string", where: (s) => (length(s) | equals(1))), values: "number");
+[
+    {} | matches(sch),
+    {x: 42} | matches(sch),
+    {x: 0, y: 0, z: 0} | matches(sch),
+    {x: 0, y: 0, za: 0} | matches(sch),
+    {x: 0, y: 0, "": 0} | matches(sch),
+    {x: 0, y: 0, z: "foo"} | matches(sch),
+    42 | matches(sch),
+]
+>> [
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+]
+```
+
+```
+# Matching an object with a specific structure
+person = {name: "string", age: optional("number")};
+[
+    {name: "John", age: 42} | matches(person),
+    {name: "John"} | matches(person),
+    {name: "John", age: 42, job: "doctor"} | matches(person),
+    {name: "John", age: "middle"} | matches(person),
+    {name: 42} | matches(person),
+    {age: 42} | matches(person),
+    42 | matches(person),
+]
+>> [
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+]
+```
+
+```
+# Matching a union
+sch = either("string", "number");
+[
+    "foo" | matches(sch),
+    42 | matches(sch),
+    [1, 2, 3] | matches(sch),
+]
+>> [
+    true,
+    true,
+    false,
+]
+```

@@ -72,7 +72,9 @@ isEmpty = (coll) => (length(coll) | equals(0));
 dropFirst = (coll, n = 1) => slice(coll, increment(n) | to(length(coll)));
 dropLast = (coll, n = 1) => slice(coll, 1 | to(length(coll) | minus(n)));
 slice = (coll, indices) => (
-    result = indices | forEach((index) => (coll @ index));
+    result = indices
+        | where((index) => and(index | isAtLeast(1), index | isAtMost(length(coll))))
+        | forEach((index) => (coll @ index));
     result | butIf(isString(coll), join(result))
 );
 to = (start, end) => (

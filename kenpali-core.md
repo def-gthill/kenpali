@@ -22,9 +22,13 @@ characters("foobar")
 # Slicing strings
 [
     "foobar" | slice(2 | to(4)),
+    "foobar" | slice(2 | to(10)),
+    "foobar" | slice(0 | to(4)),
 ]
 >> [
     "oob",
+    "oobar",
+    "foob",
 ]
 ```
 
