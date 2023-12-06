@@ -9,31 +9,35 @@ characters = (string) => (
     1 | to(length(string)) | forEach((i) => (string @ i))
 );
 split = (string, delimiter) => (
-    0 | build(
+    delimiterLocations = 1 | build(
         (i) => (
-            word = increment(i) | build(
-                (j) => (
-                    {
-                        while: and(
-                            j | isAtMost(length(string)),
-                            not(
-                                string
-                                | slice(j | toSize(length(delimiter)))
-                                | equals(delimiter)
-                            ),
-                        ),
-                        next: increment(j),
-                        out: string @ j,
-                    }
-                )
-            ) | join;
-            next = i | plus(length(word), length(delimiter));
+            delimiterMatched = (
+                string
+                | slice(i | toSize(length(delimiter)))
+                | equals(delimiter)
+            );
             {
                 while: i | isAtMost(length(string)),
-                next: next,
-                out: word,
+                next: if(
+                    delimiterMatched,
+                    then: i | plus(length(delimiter)),
+                    else: i | increment
+                ),
+                out: i,
+                where: delimiterMatched,
             }
         )
+    );
+    startIndices = [
+        [1],
+        delimiterLocations | forEach((i) => (i | plus(length(delimiter)))),
+    ] | flatten;
+    endIndices = [
+        delimiterLocations | forEach(decrement),
+        [length(string)],
+    ] | flatten;
+    1 | to(length(startIndices)) | forEach(
+        (i) => (string | slice(startIndices @ i | to(endIndices @ i)))
     )
 );
 splitLines = (string) => (string | split("\n"));
@@ -97,25 +101,13 @@ forEach = (array, transform) => (
     )
 );
 where = (array, condition) => (
-    0 | build(
-        (i) => (
-            next = increment(i) | repeat(
-                (j) => (
-                    {
-                        while: and(
-                            j | isAtMost(length(array)),
-                            not(condition(array @ j)),
-                        ),
-                        next: increment(j),
-                    }
-                )
-            );
-            {
-                while: next | isAtMost(length(array)),
-                next: next,
-                out: array @ next,
-            }
-        )
+    1 | build(
+        (i) => {
+            while: i | isAtMost(length(array)),
+            next: increment(i),
+            out: array @ i,
+            where: condition(array @ i),
+        }
     )
 );
 count = (array, condition) => (array | where(condition) | length);

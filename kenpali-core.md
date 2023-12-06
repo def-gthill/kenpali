@@ -53,9 +53,11 @@ characters("foobar")
 [
     "foo,bar,,baz" | split(","),
     "foo=>bar=>=>baz" | split("=>"),
+    "foo||bar||||baz" | split("||"),
     "|foo||bar|" | split("|"),
 ]
 >> [
+    ["foo", "bar", "", "baz"],
     ["foo", "bar", "", "baz"],
     ["foo", "bar", "", "baz"],
     ["", "foo", "", "bar", ""],

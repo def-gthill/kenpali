@@ -430,6 +430,23 @@ build(
 >> [1, 1, 2, 3, 5, 8, 13]
 ```
 
+A `where` boolean property can also be provided; if
+it's false, this `out` value is skipped, but the internal state is still updated.
+
+```
+# Build with Where
+build(
+    [1, 1],
+    (previous) => {
+        while: previous @ 1 | isLessThan(20),
+        out: previous @ 1,
+        next: [previous @ 2, plus(previous @ 1, previous @ 2)],
+        where: previous @ 1 | isDivisibleBy(2) | not,
+    }
+)
+>> [1, 1, 3, 5, 13]
+```
+
 ## Objects
 
 ```
