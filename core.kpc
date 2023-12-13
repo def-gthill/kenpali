@@ -29,13 +29,13 @@ split = (string, delimiter) => (
         )
     );
     startIndices = [
-        [1],
-        delimiterLocations | forEach((i) => (i | plus(length(delimiter)))),
-    ] | flatten;
+        1,
+        *delimiterLocations | forEach((i) => (i | plus(length(delimiter)))),
+    ];
     endIndices = [
-        delimiterLocations | forEach(decrement),
-        [length(string)],
-    ] | flatten;
+        *delimiterLocations | forEach(decrement),
+        length(string),
+    ];
     1 | to(length(startIndices)) | forEach(
         (i) => (string | slice(startIndices @ i | to(endIndices @ i)))
     )

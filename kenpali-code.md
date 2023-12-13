@@ -590,6 +590,37 @@ x.<<y>>
 }
 ```
 
+## Spread Operators
+
+```
+# Spreading arrays into arrays
+foo = [1, 2, 3];
+[42, *foo, 97]
+>> {
+    "defining": {
+        "foo": {
+            "array": [
+                {"literal": 1},
+                {"literal": 2},
+                {"literal": 3}
+            ]
+        }
+    },
+    "result": {
+        "calling": {"name": "flatten"},
+        "args": [
+            {
+                "array": [
+                    {"array": [{"literal": 42}]},
+                    {"name": "foo"},
+                    {"array": [{"literal": 97}]}
+                ]
+            }
+        ]
+    }
+}
+```
+
 ## Quoting and Unquoting
 
 ```
