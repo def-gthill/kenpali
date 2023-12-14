@@ -459,6 +459,20 @@ object = {foo: "bar", spam: "eggs"};
 >> ["eggs", "bar"]
 ```
 
+```
+# Object keys
+object = {foo: "bar", spam: "eggs"};
+object | keys
+>> ["foo", "spam"]
+```
+
+```
+# Object from properties
+properties = [["foo", "bar"], ["spam", "eggs"]];
+properties | toObject
+>> {foo: "bar", spam: "eggs"}
+```
+
 ## Validation
 
 ```
@@ -506,7 +520,7 @@ object = {foo: "bar", spam: "eggs"};
 ```
 
 ```
-# Matching the supertypes "object", "function", and "sequence"
+# Matching the supertypes "object", "function", "sequence", and "any"
 [
     "foo" | matches("object"),
     [1, 2, 3] | matches("object"),
@@ -526,6 +540,12 @@ object = {foo: "bar", spam: "eggs"};
     typeOf | matches("sequence"),
     (x) => x | matches("sequence"),
     matches((1 @ 1)!, "sequence"),
+    "foo" | matches("any"),
+    [1, 2, 3] | matches("any"),
+    {foo: 1, bar: 2} | matches("any"),
+    typeOf | matches("any"),
+    (x) => x | matches("any"),
+    matches((1 @ 1)!, "any"),
 ]
 >> [
     false,
@@ -546,6 +566,12 @@ object = {foo: "bar", spam: "eggs"};
     false,
     false,
     false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
 ]
 ```
 

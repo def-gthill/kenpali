@@ -621,6 +621,34 @@ foo = [1, 2, 3];
 }
 ```
 
+```
+# Spreading objects into objects
+foo = {bar: 1, baz: 2};
+{answer: 42, **foo, question: 69}
+>> {
+    "defining": {
+        "foo": {
+            "object": [
+                ["bar", {"literal": 1}],
+                ["baz", {"literal": 2}]
+            ]
+        }
+    },
+    "result": {
+        "calling": {"name": "merge"},
+        "args": [
+            {
+                "array": [
+                    {"object": [["answer", {"literal": 42}]]},
+                    {"name": "foo"},
+                    {"object": [["question", {"literal": 69}]]}
+                ]
+            }
+        ]
+    }
+}
+```
+
 ## Quoting and Unquoting
 
 ```
