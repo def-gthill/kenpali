@@ -261,6 +261,15 @@ foo(1, 2)
 
 ```
 # Spread positional arguments
+foo(*bar)
+>> {
+    "calling": {"name": "foo"},
+    "args": {"name": "bar"}
+}
+```
+
+```
+# Positional and spread positional arguments
 foo(1, *bar)
 >> {
     "calling": {"name": "foo"},
