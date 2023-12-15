@@ -281,6 +281,20 @@ Examples:
 >> 42
 ```
 
+```
+# Dynamic positional argument array
+{
+    "calling": {"name": "plus"},
+    "args": {
+        "array": [
+            {"literal": 1},
+            {"literal": 2}
+        ]
+    }
+}
+>> 3
+```
+
 Arguments to declared functions are evaluated *lazily*. If an argument isn't actually needed to find the function's result, it's never evaluated.
 
 ```

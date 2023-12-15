@@ -102,6 +102,35 @@ f00
 >> {"array": [{"name": "foo"}]}
 ```
 
+```
+# Arrays with spread
+foo = [1, 2, 3];
+[42, *foo, 97]
+>> {
+    "defining": {
+        "foo": {
+            "array": [
+                {"literal": 1},
+                {"literal": 2},
+                {"literal": 3}
+            ]
+        }
+    },
+    "result": {
+        "calling": {"name": "flatten"},
+        "args": [
+            {
+                "array": [
+                    {"array": [{"literal": 42}]},
+                    {"name": "foo"},
+                    {"array": [{"literal": 97}]}
+                ]
+            }
+        ]
+    }
+}
+```
+
 ## Objects
 
 ```
@@ -167,6 +196,34 @@ If a key is a valid Kenpali name, the quotes can be omitted.
 >> {"object": [[{"name": "key"}, {"name": "value"}]]}
 ```
 
+```
+# Objects with spread
+foo = {bar: 1, baz: 2};
+{answer: 42, **foo, question: 69}
+>> {
+    "defining": {
+        "foo": {
+            "object": [
+                ["bar", {"literal": 1}],
+                ["baz", {"literal": 2}]
+            ]
+        }
+    },
+    "result": {
+        "calling": {"name": "merge"},
+        "args": [
+            {
+                "array": [
+                    {"object": [["answer", {"literal": 42}]]},
+                    {"name": "foo"},
+                    {"object": [["question", {"literal": 69}]]}
+                ]
+            }
+        ]
+    }
+}
+```
+
 ## Comments
 
 ```
@@ -199,6 +256,25 @@ foo(1, 2)
 >> {
     "calling": {"name": "foo"},
     "args": [{"literal": 1}, {"literal": 2}]
+}
+```
+
+```
+# Spread positional arguments
+foo(1, *bar)
+>> {
+    "calling": {"name": "foo"},
+    "args": {
+        "calling": {"name": "flatten"},
+        "args": [
+            {
+                "array": [
+                    {"array": [{"literal": 1}]},
+                    {"name": "bar"}
+                ]
+            }
+        ]
+    }
 }
 ```
 
@@ -587,65 +663,6 @@ x.<<y>>
         {"name": "x"},
         {"name": "y"}
     ]
-}
-```
-
-## Spread Operators
-
-```
-# Spreading arrays into arrays
-foo = [1, 2, 3];
-[42, *foo, 97]
->> {
-    "defining": {
-        "foo": {
-            "array": [
-                {"literal": 1},
-                {"literal": 2},
-                {"literal": 3}
-            ]
-        }
-    },
-    "result": {
-        "calling": {"name": "flatten"},
-        "args": [
-            {
-                "array": [
-                    {"array": [{"literal": 42}]},
-                    {"name": "foo"},
-                    {"array": [{"literal": 97}]}
-                ]
-            }
-        ]
-    }
-}
-```
-
-```
-# Spreading objects into objects
-foo = {bar: 1, baz: 2};
-{answer: 42, **foo, question: 69}
->> {
-    "defining": {
-        "foo": {
-            "object": [
-                ["bar", {"literal": 1}],
-                ["baz", {"literal": 2}]
-            ]
-        }
-    },
-    "result": {
-        "calling": {"name": "merge"},
-        "args": [
-            {
-                "array": [
-                    {"object": [["answer", {"literal": 42}]]},
-                    {"name": "foo"},
-                    {"object": [["question", {"literal": 69}]]}
-                ]
-            }
-        ]
-    }
 }
 ```
 
