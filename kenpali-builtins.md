@@ -646,8 +646,8 @@ sch = ["string", "number", arrayOf("number")];
 ```
 
 ```
-# Matching an object where names and values must match schemas
-sch = objectOf(names: is("string", where: (s) => (length(s) | equals(1))), values: "number");
+# Matching an object where keys and values must match schemas
+sch = objectOf(keys: is("string", where: (s) => (length(s) | equals(1))), values: "number");
 [
     {} | matches(sch),
     {x: 42} | matches(sch),
