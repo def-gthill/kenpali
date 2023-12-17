@@ -295,6 +295,23 @@ Examples:
 >> 3
 ```
 
+```
+# Dynamic named argument object
+{
+    "calling": {"name": "if"},
+    "args": [{"literal": true}],
+    "namedArgs": {
+        "#all": {
+            "object": [
+                ["then", {"literal": 1}],
+                ["else", {"literal": 2}]
+            ]
+        }
+    }
+}
+>> 1
+```
+
 Arguments to declared functions are evaluated *lazily*. If an argument isn't actually needed to find the function's result, it's never evaluated.
 
 ```
