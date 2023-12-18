@@ -164,7 +164,7 @@ null | bind(either("string", "number"))
 !! badProperty {"key": "z", "value": "foo"}
 ```
 
-## Binding
+## Automatic Binding
 
 ```
 # Automatic binding of object properties
@@ -188,4 +188,70 @@ null | bind(either("string", "number"))
 # Failed object binding - wrong property type
 {name: "John", age: "middle"} | bind({name: "string", age: "number"})
 !! badProperty {"value": {"name": "John", "age": "middle"}, "key": "age"}
+```
+
+```
+# Lifting bindings out of an array
+[{name: "John", age: 42}, {name: "Kate", age: 33}] | bind(arrayOf({name: "string", age: "number"}))
+>> {name: ["John", "Kate"], age: [42, 33]}
+```
+
+## Explicit Binding
+
+```
+# Explicit binding of a single value
+42 | bind("number" | as("answer"))
+>> {answer: 42}
+```
+
+```
+# Failed explicit binding of a single value
+"foo" | bind("number" | as("answer"))
+!! wrongType {"value": "foo", "expectedType": "number"}
+```
+
+```
+# Explicit and implicit binding
+{name: "John", age: 42} | bind({name: "string", age: "number"} | as("person"))
+>> {name: "John", age: 42, person: {name: "John", age: 42}}
+```
+
+```
+# Explicit binding of array elements
+["foo", 42] | bind(["string" | as("question"), "number" | as("answer")])
+>> {question: "foo", answer: 42}
+```
+
+```
+# Failed binding of array elements - missing element
+["foo"] | bind(["string" | as("question"), "number" | as("answer")])
+!! missingElement {"value": ["foo"]}
+```
+
+## Default Values
+
+```
+# Default value for missing array element
+["foo"] | bind(["string" | as("question"), "number" | as("answer") | default(42)])
+>> {question: "foo", answer: 42}
+```
+
+```
+# Default value for missing object properties
+{name: "John"} | bind({name: "string", age: "number" | default(null)})
+>> {name: "John", age: null}
+```
+
+## Rest Bindings
+
+```
+# Rest binding for array elements
+["foo", 42, 97] | bind(["string" | as("question"), rest("number") | as("answers")])
+>> {question: "foo", answers: [42, 97]}
+```
+
+```
+# Rest binding for object elements
+{foo: "bar", x: 1, y: 2} | bind({foo: "string", vars: rest("number")})
+>> {foo: "bar", vars: {x: 1, y: 2}}
 ```
