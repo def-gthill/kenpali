@@ -95,7 +95,7 @@ typeOf | bind("function")
 ```
 # Failed validation of a union
 null | bind(either("string", "number"))
-!! badValue {"value": null}
+!! wrongType {"value": null}
 ```
 
 ```
@@ -228,12 +228,30 @@ null | bind(either("string", "number"))
 !! missingElement {"value": ["foo"]}
 ```
 
+```
+# Explicit binding of uniform array elements
+["foo", "bar"] | bind(arrayOf("string" | as("word")))
+>> {word: ["foo", "bar"]}
+```
+
+```
+# Explicit binding of uniform array elements on an empty array
+[] | bind(arrayOf("string" | as("word")))
+>> {word: []}
+```
+
 ## Default Values
 
 ```
 # Default value for missing array element
 ["foo"] | bind(["string" | as("question"), "number" | as("answer") | default(42)])
 >> {question: "foo", answer: 42}
+```
+
+```
+# Default value for present array element
+["foo", 97] | bind(["string" | as("question"), "number" | as("answer") | default(42)])
+>> {question: "foo", answer: 97}
 ```
 
 ```
@@ -248,6 +266,12 @@ null | bind(either("string", "number"))
 # Rest binding for array elements
 ["foo", 42, 97] | bind(["string" | as("question"), rest("number") | as("answers")])
 >> {question: "foo", answers: [42, 97]}
+```
+
+```
+# Empty rest binding for array elements
+["foo"] | bind(["string" | as("question"), rest("number") | as("answers")])
+>> {question: "foo", answers: []}
 ```
 
 ```
