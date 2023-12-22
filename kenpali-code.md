@@ -335,24 +335,6 @@ foo(1, 2?, bar: 3, baz: 4?)
 ```
 
 ```
-# Error-passing arguments
-foo(1, 2!, 3!?, bar: 4, baz: 5!, bax: 6!?)
->> {
-    "calling": {"name": "foo"},
-    "args": [
-        {"literal": 1},
-        {"errorPassing": {"literal": 2}},
-        {"optional": {"errorPassing": {"literal": 3}}}
-    ],
-    "namedArgs": {
-        "bar": {"literal": 4},
-        "baz": {"errorPassing": {"literal": 5}},
-        "bax": {"optional": {"errorPassing": {"literal": 6}}}
-    }
-}
-```
-
-```
 # Calling the result of a function call
 foo(x)(y)
 >> {
@@ -361,6 +343,16 @@ foo(x)(y)
         "args": [{"name": "x"}]
     },
     "args": [{"name": "y"}]
+}
+```
+
+## Error Catching
+
+```
+# Error catching
+foo !
+>> {
+    "catching": {"name": "foo"}
 }
 ```
 

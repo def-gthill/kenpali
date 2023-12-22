@@ -279,3 +279,17 @@ null | bind(either("string", "number"))
 {foo: "bar", x: 1, y: 2} | bind({foo: "string", vars: rest("number")})
 >> {foo: "bar", vars: {x: 1, y: 2}}
 ```
+
+## Errors
+
+```
+# Error short-circuiting in array schema
+[plus("foo")] | bind(["any" | as("answer")])
+!! wrongArgumentType {"value": "foo"}
+```
+
+```
+# Error short-circuiting in array rest binding
+[plus("foo")] | bind([rest("any") | as("answers")])
+!! wrongArgumentType {"value": "foo"}
+```
