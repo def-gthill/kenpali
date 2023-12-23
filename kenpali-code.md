@@ -325,16 +325,6 @@ foo(1, 2, bar: 3, baz: 4)
 ```
 
 ```
-# Optional arguments
-foo(1, 2?, bar: 3, baz: 4?)
->> {
-    "calling": {"name": "foo"},
-    "args": [{"literal": 1}, {"optional": {"literal": 2}}],
-    "namedArgs": {"bar": {"literal": 3}, "baz": {"optional": {"literal": 4}}}
-}
-```
-
-```
 # Calling the result of a function call
 foo(x)(y)
 >> {

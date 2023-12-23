@@ -273,15 +273,6 @@ Examples:
 ```
 
 ```
-# One positional parameter, one optional positional argument
-{
-    "defining": {"foo": {"given": {"params": ["x"]}, "result": {"name": "x"}}},
-    "result": {"calling": {"name": "foo"}, "args": [{"optional": {"literal": 42}}]}
-}
->> 42
-```
-
-```
 # Dynamic positional argument array
 {
     "calling": {"name": "plus"},
