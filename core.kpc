@@ -70,7 +70,7 @@ isAtMost = (a, b) => or(
 isMoreThan = (a, b) => (b | isLessThan(a));
 isAtLeast = (a, b) => (b | isAtMost(a));
 butIf = (value, condition, ifTrue) => (
-    if(condition(value?), then: ifTrue(value?), else: value)
+    if(condition(value), then: ifTrue(value), else: value)
 );
 isEmpty = (coll) => (length(coll) | equals(0));
 dropFirst = (coll, n = 1) => slice(coll, increment(n) | to(length(coll)));
