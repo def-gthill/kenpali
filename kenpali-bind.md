@@ -141,7 +141,13 @@ null | bind(either("string", "number"))
 ```
 
 ```
-# Successful validation of a uniform object
+# Successful validation of a uniform object - values only
+{x: 42} | bind(objectOf(values: "number"))
+>> {}
+```
+
+```
+# Successful validation of a uniform object - keys and values
 {x: 42} | bind(objectOf(keys: is("string", where: (s) => (length(s) | equals(1))), values: "number"))
 >> {}
 ```
@@ -292,4 +298,51 @@ null | bind(either("string", "number"))
 # Error short-circuiting in array rest binding
 [plus("foo")] | bind([rest("any") | as("answers")])
 !! wrongArgumentType {"value": "foo"}
+```
+
+## Switch
+
+```
+# Switch on type
+foo = (x) => (
+    x | switch(
+        ["number", (n) => (n | plus(3))],
+        ["string", (s) => (s | length)],
+        ["boolean", (b) => if(b, then: 42, else: 86)],
+    )
+);
+[
+    foo(5),
+    foo("bar"),
+    foo(false),
+    foo(true),
+]
+>> [8, 3, 86, 42]
+```
+
+```
+# Switch with destructuring
+heightInMetres = (height) => (
+    height | switch(
+        [
+            {feet: "number", inches: "number"},
+            (feet:, inches:) => (
+                feet
+                | times(12)
+                | plus(inches)
+                | times(13)
+                | dividedBy(512)
+            )
+        ],
+        [
+            {cm: "number"},
+            (cm:) => (cm | dividedBy(100))
+        ]
+    )
+);
+[
+    heightInMetres({cm: 185}),
+    heightInMetres({feet: 6, inches: 1}),
+]
+>> [1.85, 1.853515625]
 ```
