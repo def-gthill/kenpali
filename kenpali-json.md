@@ -273,6 +273,28 @@ Examples:
 ```
 
 ```
+# Positional rest parameter
+{
+    "defining": {
+        "foo": {
+            "given": {
+                "restParam": "args"
+            },
+            "result": {
+                "calling": {"name": "length"},
+                "args": [{"name": "args"}]
+            }
+        }
+    },
+    "result": {
+        "calling": {"name": "foo"},
+        "args": [{"literal": 42}, {"literal": 97}]
+    }
+}
+>> 2
+```
+
+```
 # Dynamic positional argument array
 {
     "calling": {"name": "plus"},
@@ -301,6 +323,31 @@ Examples:
     }
 }
 >> 1
+```
+
+```
+# Named rest parameter
+{
+    "defining": {
+        "foo": {
+            "given": {
+                "namedRestParam": "namedArgs"
+            },
+            "result": {
+                "calling": {"name": "at"},
+                "args": [
+                    {"name": "namedArgs"},
+                    {"literal": "bar"}
+                ]
+            }
+        }
+    },
+    "result": {
+        "calling": {"name": "foo"},
+        "namedArgs": {"bar": {"literal": 42}}
+    }
+}
+>> 42
 ```
 
 Arguments to declared functions are evaluated *lazily*. If an argument isn't actually needed to find the function's result, it's never evaluated.

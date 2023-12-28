@@ -380,6 +380,20 @@ foo !
 ```
 
 ```
+# Positional rest parameter
+(*args) => length(args)
+>> {
+    "given": {
+        "restParam": "args"
+    },
+    "result": {
+        "calling": {"name": "length"},
+        "args": [{"name": "args"}]
+    }
+}
+```
+
+```
 # Named parameter
 (x, y:) => plus(x, y)
 >> {
@@ -408,6 +422,17 @@ foo !
         "calling": {"name": "plus"},
         "args": [{"name": "x"}, {"name": "y"}]
     }
+}
+```
+
+```
+# Named rest parameter
+(**namedArgs) => namedArgs
+>> {
+    "given": {
+        "namedRestParam": "namedArgs"
+    },
+    "result": {"name": "namedArgs"}
 }
 ```
 
