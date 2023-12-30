@@ -273,6 +273,33 @@ The `typeOf` function never returns `"object"` or `"function"`, since these term
 ```
 
 ```
+# Is number
+[
+    isNumber(null),
+    isNumber(false),
+    isNumber(true),
+    isNumber(42),
+    isNumber("foo"),
+    isNumber([1, 2, 3]),
+    isNumber({foo: 1, bar: 2}),
+    isNumber(typeOf),
+    isNumber((x) => x),
+    isNumber((1 @ 1)!),
+]
+>> [false, false, false, true, false, false, false, false, false, false]
+```
+
+```
+# To number
+[
+    toNumber("1"),
+    toNumber("-2.5"),
+    toNumber(42),
+]
+>> [1, -2.5, 42]
+```
+
+```
 # Is string
 [
     isString(null),
@@ -316,13 +343,139 @@ The `typeOf` function never returns `"object"` or `"function"`, since these term
 ```
 
 ```
-# To number
+# Is array
 [
-    toNumber("1"),
-    toNumber("-2.5"),
-    toNumber(42),
+    isArray(null),
+    isArray(false),
+    isArray(true),
+    isArray(42),
+    isArray("foo"),
+    isArray([1, 2, 3]),
+    isArray({foo: 1, bar: 2}),
+    isArray(typeOf),
+    isArray((x) => x),
+    isArray((1 @ 1)!),
 ]
->> [1, -2.5, 42]
+>> [false, false, false, false, false, true, false, false, false, false]
+```
+
+```
+# Is record
+[
+    isRecord(null),
+    isRecord(false),
+    isRecord(true),
+    isRecord(42),
+    isRecord("foo"),
+    isRecord([1, 2, 3]),
+    isRecord({foo: 1, bar: 2}),
+    isRecord(typeOf),
+    isRecord((x) => x),
+    isRecord((1 @ 1)!),
+]
+>> [false, false, false, false, false, false, true, false, false, false]
+```
+
+```
+# Is builtin
+[
+    isBuiltin(null),
+    isBuiltin(false),
+    isBuiltin(true),
+    isBuiltin(42),
+    isBuiltin("foo"),
+    isBuiltin([1, 2, 3]),
+    isBuiltin({foo: 1, bar: 2}),
+    isBuiltin(typeOf),
+    isBuiltin((x) => x),
+    isBuiltin((1 @ 1)!),
+]
+>> [false, false, false, false, false, false, false, true, false, false]
+```
+
+```
+# Is given
+[
+    isGiven(null),
+    isGiven(false),
+    isGiven(true),
+    isGiven(42),
+    isGiven("foo"),
+    isGiven([1, 2, 3]),
+    isGiven({foo: 1, bar: 2}),
+    isGiven(typeOf),
+    isGiven((x) => x),
+    isGiven((1 @ 1)!),
+]
+>> [false, false, false, false, false, false, false, false, true, false]
+```
+
+```
+# Is error
+[
+    isError(null),
+    isError(false),
+    isError(true),
+    isError(42),
+    isError("foo"),
+    isError([1, 2, 3]),
+    isError({foo: 1, bar: 2}),
+    isError(typeOf),
+    isError((x) => x),
+    isError((1 @ 1)!),
+]
+>> [false, false, false, false, false, false, false, false, false, true]
+```
+
+```
+# Is object
+[
+    isObject(null),
+    isObject(false),
+    isObject(true),
+    isObject(42),
+    isObject("foo"),
+    isObject([1, 2, 3]),
+    isObject({foo: 1, bar: 2}),
+    isObject(typeOf),
+    isObject((x) => x),
+    isObject((1 @ 1)!),
+]
+>> [false, false, false, false, false, false, true, false, true, true]
+```
+
+```
+# Is function
+[
+    isFunction(null),
+    isFunction(false),
+    isFunction(true),
+    isFunction(42),
+    isFunction("foo"),
+    isFunction([1, 2, 3]),
+    isFunction({foo: 1, bar: 2}),
+    isFunction(typeOf),
+    isFunction((x) => x),
+    isFunction((1 @ 1)!),
+]
+>> [false, false, false, false, false, false, false, true, true, false]
+```
+
+```
+# Is sequence
+[
+    isSequence(null),
+    isSequence(false),
+    isSequence(true),
+    isSequence(42),
+    isSequence("foo"),
+    isSequence([1, 2, 3]),
+    isSequence({foo: 1, bar: 2}),
+    isSequence(typeOf),
+    isSequence((x) => x),
+    isSequence((1 @ 1)!),
+]
+>> [false, false, false, false, true, true, false, false, false, false]
 ```
 
 ## Control Flow
