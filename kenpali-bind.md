@@ -289,6 +289,12 @@ null | bind(either("string", "number"))
 ## Errors
 
 ```
+# Error short-circuiting in type checking
+plus("foo") | bind("string")
+!! wrongArgumentType {"value": "foo"}
+```
+
+```
 # Error short-circuiting in array schema
 [plus("foo")] | bind(["any" | as("answer")])
 !! wrongArgumentType {"value": "foo"}
@@ -297,6 +303,12 @@ null | bind(either("string", "number"))
 ```
 # Error short-circuiting in array rest binding
 [plus("foo")] | bind([rest("any") | as("answers")])
+!! wrongArgumentType {"value": "foo"}
+```
+
+```
+# Error short-circuiting in union schema
+plus("foo") | bind(either("string", "number"))
 !! wrongArgumentType {"value": "foo"}
 ```
 
