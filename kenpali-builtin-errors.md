@@ -67,3 +67,11 @@ or(false, "foo")
 ["foo", "bar"] | at(3)
 !! indexOutOfBounds {"value": ["foo", "bar"], "length": 2, "index": 3}
 ```
+
+## Objects
+
+```
+# Indexing - key not present
+{"foo": 1} | at("bar")
+!! missingProperty {"value": {"foo": 1}, "key": "bar"}
+```
