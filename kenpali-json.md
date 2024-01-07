@@ -523,3 +523,14 @@ But as we see in the "unquote undoes an enclosing quote" example, unquoting a no
 }
 !! wrongArgumentType {"value": "foo", "expectedType": "number"}
 ```
+
+```
+# Error catching
+{
+    "catching": {
+        "calling": {"name": "plus"},
+        "args": [{"literal": "foo"}]
+    }
+}
+>> {"#error": "wrongArgumentType", value: "foo", expectedType: "number"}
+```

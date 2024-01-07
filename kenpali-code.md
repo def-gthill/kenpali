@@ -512,6 +512,22 @@ foo !
 }
 ```
 
+```
+# Error catching in pipeline
+1 | foo ! | bar
+>> {
+    "calling": {"name": "bar"},
+    "args": [
+        {
+            "catching": {
+                "calling": {"name": "foo"},
+                "args": [{"literal": 1}]
+            }
+        }
+    ]
+}
+```
+
 ## Indexing
 
 ```
