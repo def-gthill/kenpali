@@ -462,6 +462,16 @@ The `typeOf` function never returns `"object"` or `"function"`, since these term
 ```
 
 ```
+# To function
+[
+    toFunction(42)(97),
+    toFunction(toString)(97),
+    toFunction((x) => plus(x, 3))(97),
+]
+>> [42, "97", 100]
+```
+
+```
 # Is sequence
 [
     isSequence(null),

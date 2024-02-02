@@ -216,6 +216,15 @@ Examples:
 ## Defining and Calling Functions
 
 ```
+# No parameters, no arguments
+{
+    "defining": {"foo": {"given": {}, "result": {"literal": 42}}},
+    "result": {"calling": {"name": "foo"}}
+}
+>> 42
+```
+
+```
 # One positional parameter, one positional argument
 {
     "defining": {"foo": {"given": {"params": ["x"]}, "result": {"name": "x"}}},
@@ -376,37 +385,11 @@ Arguments to declared functions are evaluated *lazily*. If an argument isn't act
 ```
 
 ```
-# Calling a non-function with no arguments
+# Calling a non-function
 {
     "calling": {"literal": 42}
 }
->> 42
-```
-
-```
-# Calling a non-function with only optional arguments
-{
-    "calling": {"literal": 42},
-    "args": [{"optional": {"literal": "foo"}}],
-    "namedArgs": {"x": {"optional": {"literal": "bar"}}}
-}
->> 42
-```
-
-```
-# Non-functions don't evaluate arguments
-{
-    "calling": {"literal": 42},
-    "args": [{
-        "optional": {
-            "defining": {
-                "foo": {"name": "foo"}
-            },
-            "result": {"name": "foo"}
-        }
-    }]
-}
->> 42
+!! notCallable {"value": 42}
 ```
 
 A function body can reference names that were in scope when the function was defined, even if those names are out of scope when the function is called.

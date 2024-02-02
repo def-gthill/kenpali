@@ -120,6 +120,17 @@ characters("foobar")
 >> [false, true, true]
 ```
 
+## Control Flow
+
+```
+# But if
+[
+    42 | butIf((x) => (x | isMoreThan(10)), (x) => (x | minus(5))),
+    7 | butIf((x) => (x | isMoreThan(10)), (x) => (x | minus(5))),
+]
+>> [37, 7]
+```
+
 ## Arrays
 
 ```

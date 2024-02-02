@@ -349,6 +349,12 @@ foo !
 ## Function Definitions
 
 ```
+# No parameters
+() => 42
+>> {"given": {}, "result": {"literal": 42}}
+```
+
+```
 # One positional parameter
 (x) => plus(x, 3)
 >> {
