@@ -219,7 +219,7 @@ null | bind(either("string", "number"))
 ```
 # Explicit and implicit binding
 {name: "John", age: 42} | bind({name: "string", age: "number"} | as("person"))
->> {name: "John", age: 42, person: {name: "John", age: 42}}
+>> {person: {name: "John", age: 42}, name: "John", age: 42}
 ```
 
 ```
@@ -261,9 +261,15 @@ null | bind(either("string", "number"))
 ```
 
 ```
-# Default value for missing object properties
+# Default value for missing object property
 {name: "John"} | bind({name: "string", age: "number" | default(null)})
 >> {name: "John", age: null}
+```
+
+```
+# Default value for present object property
+{name: "John", age: 42} | bind({name: "string", age: "number" | default(null)})
+>> {name: "John", age: 42}
 ```
 
 ## Rest Bindings
