@@ -46,6 +46,32 @@ join(["foo", 1])
 !! badArgumentValue {"value": ["foo", 1]}
 ```
 
+## Comparison
+
+```
+# Less than - incomparable types
+{} | isLessThan(42)
+!! wrongArgumentType {"value": {}, "expectedType": {"#either": ["number", "string", "boolean", "array"]}}
+```
+
+```
+# Less than - incompatible types
+3 | isLessThan("4")
+!! wrongArgumentType {"value": "4", "expectedType": "number"}
+```
+
+```
+# Less than - incomparable types in array
+[1, 2, {}] | isLessThan([1, 2, 3])
+!! wrongArgumentType {"value": {}, "expectedType": {"#either": ["number", "string", "boolean", "array"]}}
+```
+
+```
+# Less than - incompatible types in array
+[1, 2, 3] | isLessThan([1, 2, "4"])
+!! wrongArgumentType {"value": "4", "expectedType": "number"}
+```
+
 ## Logic
 
 ```
