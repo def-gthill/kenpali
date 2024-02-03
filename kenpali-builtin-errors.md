@@ -31,11 +31,17 @@ negative("foo")
 ```
 # Indexing - wrong argument type
 42 @ 2
-!! wrongArgumentType {"value": 42, "expectedType": {"#either": ["string", "array", "object"]}}
+!! wrongArgumentType {"value": 42, "expectedType": {"#either": ["sequence", "object"]}}
 ```
 
 ```
-# Joining - wrong element type
+# Indexing strings - wrong index type
+"foo" @ "bar"
+!! wrongArgumentType {"value": "bar", "expectedType": "number"}
+```
+
+```
+# Joining strings - wrong element type
 join(["foo", 1])
 !! badArgumentValue {"value": ["foo", 1]}
 ```
@@ -54,24 +60,56 @@ or(false, "foo")
 !! wrongArgumentType {"value": "foo", "expectedType": "boolean"}
 ```
 
+## Types and Type Conversion
+
+```
+# To number - wrong argument type
+toNumber([42])
+!! wrongArgumentType {"value": [42], "expectedType": {"#either": ["string", "number"]}}
+```
+
+```
+# To number - non-numeric string
+toNumber("foo")
+!! notNumeric {"value": "foo"}
+```
+
+```
+# To number - string with non-numeric parts
+toNumber("42a")
+!! notNumeric {"value": "42a"}
+```
+
 ## Arrays
 
 ```
-# Indexing - index less than 1
-["foo", "bar"] | at(0)
+# Indexing arrays - wrong index type
+["foo", "bar"] @ "baz"
+!! wrongArgumentType {"value": "baz", "expectedType": "number"}
+```
+
+```
+# Indexing arrays - index less than 1
+["foo", "bar"] @ 0
 !! indexOutOfBounds {"value": ["foo", "bar"], "length": 2, "index": 0}
 ```
 
 ```
-# Indexing - index greater than length
-["foo", "bar"] | at(3)
+# Indexing arrays - index greater than length
+["foo", "bar"] @ 3
 !! indexOutOfBounds {"value": ["foo", "bar"], "length": 2, "index": 3}
 ```
 
 ## Objects
 
 ```
-# Indexing - key not present
-{"foo": 1} | at("bar")
+# Indexing objects - wrong index type
+{"foo": 1} @ 42
+!! wrongArgumentType {"value": 42, "expectedType": "string"}
+```
+
+```
+# Indexing objects - key not present
+{"foo": 1} @ "bar"
 !! missingProperty {"value": {"foo": 1}, "key": "bar"}
 ```
