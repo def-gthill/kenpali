@@ -190,6 +190,36 @@ string = "\"\\\/\b\f\n\r\t\u1234"
 ]
 ```
 
+```
+# At most (less than or equal)
+[
+    42 | isAtMost(43),
+    43 | isAtMost(43),
+    43 | isAtMost(42),
+]
+>> [true, true, false]
+```
+
+```
+# More than (greater than)
+[
+    42 | isMoreThan(43),
+    43 | isMoreThan(43),
+    43 | isMoreThan(42),
+]
+>> [false, false, true]
+```
+
+```
+# At least (greater than or equal)
+[
+    42 | isAtLeast(43),
+    43 | isAtLeast(43),
+    43 | isAtLeast(42),
+]
+>> [false, true, true]
+```
+
 ## Logic
 
 ```
