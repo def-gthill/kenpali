@@ -11,15 +11,39 @@ Builtins are functions that must be provided by the host platform.
 ```
 
 ```
+# Minus
+[5 | minus(2), 2 | minus(5)]
+>> [3, -3]
+```
+
+```
 # Negative
 [negative(42), negative(-1.5)]
 >> [-42, 1.5]
 ```
 
 ```
+# Increment
+[3 | increment, -3 | increment, 1.5 | increment]
+>> [4, -2, 2.5]
+```
+
+```
+# Decrement
+[3 | decrement, -3 | decrement, 1.5 | decrement]
+>> [2, -4, 0.5]
+```
+
+```
 # Times
 [times(), times(2), times(2, 3), times(2, 3, 4)]
 >> [1, 2, 6, 24]
+```
+
+```
+# Divided by
+[12 | dividedBy(3), 12 | dividedBy(8)]
+>> [4, 1.5]
 ```
 
 ```

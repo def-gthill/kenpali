@@ -5,12 +5,6 @@ The Core functions must be available to any Kenpali program, but they can be imp
 ## Arithmetic
 
 ```
-# Minus
-[minus(5, 2), minus(2, 5)]
->> [3, -3]
-```
-
-```
 # Sum
 sum(1 | to(10))
 >> 55
