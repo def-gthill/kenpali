@@ -10,6 +10,12 @@ The Core functions must be available to any Kenpali program, but they can be imp
 >> [3, -3]
 ```
 
+```
+# Sum
+sum(1 | to(10))
+>> 55
+```
+
 ## Strings
 
 ```
@@ -146,6 +152,18 @@ characters("foobar")
 ```
 
 ```
+# Ranges with step
+[
+    1 | to(10, by: 3),
+    5 | to(10, by: 2),
+]
+>> [
+    [1, 4, 7, 10],
+    [5, 7, 9],
+]
+```
+
+```
 # Ranges defined by size
 [
     1 | toSize(5),
@@ -196,15 +214,59 @@ characters("foobar")
 ```
 
 ```
+# Zipping
+[
+    [1, 2, 3] | zip(["one", "two", "three"]),
+    [1, 2, 3] | zip(["one", "two"]),
+]
+>> [
+    [[1, "one"], [2, "two"], [3, "three"]],
+    [[1, "one"], [2, "two"]],
+]
+```
+
+```
 # Counting
 [1, 10, 2, 9, 3, 12] | count((i) => (i | isLessThan(10)))
 >> 4
 ```
 
 ```
+# True for all elements
+[
+    [1, 2, 3] | forAll((n) => (n | isLessThan(10))),
+    [1, 42, 3] | forAll((n) => (n | isLessThan(10))),
+]
+>> [true, false]
+```
+
+```
+# True for some elements
+[
+    [41, 2, 43] | forSome((n) => (n | isLessThan(10))),
+    [41, 42, 43] | forSome((n) => (n | isLessThan(10))),
+]
+>> [true, false]
+```
+
+```
 # Flattening nested arrays
 [[1], [2, 3], [4, 5, [6]]] | flatten
 >> [1, 2, 3, 4, 5, [6]]
+```
+
+```
+# Chunking into arrays of a fixed size
+[
+    1 | to(9) | chunk(3),
+    1 | to(10) | chunk(3),
+    1 | to(11) | chunk(3),
+]
+>> [
+    [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+    [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]],
+    [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11]],
+]
 ```
 
 ## Objects
