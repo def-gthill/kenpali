@@ -24,7 +24,7 @@ hello("world")
 ```
 # Fizzbuzz
 fizzbuzz = (n) => (
-    1 | to(n) | forEach(
+    1 | to(n) | transform(
         (i) => (
             ""
             | butIf(i | isDivisibleBy(3), (s) => join([s, "Fizz"]))

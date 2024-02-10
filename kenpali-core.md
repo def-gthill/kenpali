@@ -165,7 +165,7 @@ characters("foobar")
 
 ```
 # Transforming
-[1, 2, 3] | forEach((i) => times(i, i))
+[1, 2, 3] | transform((i) => times(i, i))
 >> [1, 4, 9]
 ```
 
