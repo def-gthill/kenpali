@@ -519,6 +519,20 @@ foo !
 ```
 
 ```
+# Pipe in an arrow
+(x) => x | plus(3)
+>> {
+    "given": {
+        "params": ["x"]
+    },
+    "result": {
+        "calling": {"name": "plus"},
+        "args": [{"name": "x"}, {"literal": 3}]
+    }
+}
+```
+
+```
 # Error catching in pipeline
 1 | foo ! | bar
 >> {
