@@ -109,6 +109,26 @@ string = "\"\\\/\b\f\n\r\t\u1234"
 >> ["", "foo", "foobarbaz", "foo|bar|baz"]
 ```
 
+```
+# Converting to lowercase
+[
+    "FOO" | toLowerCase,
+    "foo" | toLowerCase,
+    "fOo42" | toLowerCase,
+]
+>> ["foo", "foo", "foo42"]
+```
+
+```
+# Converting to uppercase
+[
+    "FOO" | toUpperCase,
+    "foo" | toUpperCase,
+    "fOo42" | toUpperCase,
+]
+>> ["FOO", "FOO", "FOO42"]
+```
+
 ## Comparison
 
 ```
