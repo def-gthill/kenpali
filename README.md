@@ -11,3 +11,5 @@ Kenpali can be written in two main forms. *Kenpali Code* is designed for human p
 This repo contains specifications for both Kenpali Code and Kenpali JSON.
 
 For a working implementation of this specification, see the [Kenpali JS](https://github.com/def-gthill/kenpali-js) repo.
+
+To give Kenpali a try, see [the demo site](https://www.kenpali.org/)!
