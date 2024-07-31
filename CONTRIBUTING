@@ -1,0 +1,5 @@
+# Contributing to Kenpali
+
+Quality improvements are welcome—if you see a typo or want to add more test cases, go ahead and open a pull request!
+
+If you want to add a feature, please open an issue to discuss the proposed feature first, and don't be surprised if it gets rejected. Remember that *the whole point is minimalism*; any new feature is inherently contrary to that goal. To have a new feature accepted, you'll have to demonstrate that the benefits of the feature overwhelm the cost of its complexity.
