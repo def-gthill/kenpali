@@ -109,6 +109,18 @@ string = "\"\\\/\b\f\n\r\t\u1234"
 >> ["", "foo", "foobarbaz", "foo|bar|baz"]
 ```
 
+```
+# Converting a string to code points
+toCodePoints("foo\u1234")
+>> [102, 111, 111, 4660]
+```
+
+```
+# Converting code points to a string
+fromCodePoints([102, 111, 111, 4660])
+>> "foo\u1234"
+```
+
 ## Comparison
 
 ```
