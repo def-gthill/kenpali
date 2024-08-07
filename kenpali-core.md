@@ -76,18 +76,6 @@ characters("foobar")
 >> "foo\nbar\n\nbaz"
 ```
 
-```
-# Trimming whitespace
-[
-    "" | trim,
-    "  " | trim,
-    "foo" | trim,
-    "   foo    " | trim,
-    "  foo bar baz " | trim,
-]
->> ["", "", "foo", "foo", "foo bar baz"]
-```
-
 ## Control Flow
 
 ```
