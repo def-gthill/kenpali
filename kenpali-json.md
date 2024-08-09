@@ -143,6 +143,26 @@ Examples:
 >> [42]
 ```
 
+```
+# Array with spread
+{
+    "array": [
+        {"literal": 42},
+        {
+            "spread": {
+                "array": [
+                    {"literal": 1},
+                    {"literal": 2},
+                    {"literal": 3}
+                ]
+            }
+        },
+        {"literal": 97}
+    ]
+}
+>> [42, 1, 2, 3, 97]
+```
+
 ## Objects
 
 ```
@@ -211,6 +231,25 @@ Examples:
     }
 }
 >> {foo: 42}
+```
+
+```
+# Object with spread
+{
+    "object": [
+        ["answer", {"literal": 42}],
+        {
+            "spread": {
+                "object": [
+                    ["bar", {"literal": 1}],
+                    ["baz", {"literal": 2}]
+                ]
+            }
+        },
+        ["question", {"literal": 69}]
+    ]
+}
+>> {answer: 42, bar: 1, baz: 2, question: 69}
 ```
 
 ## Defining and Calling Functions
@@ -304,32 +343,38 @@ Examples:
 ```
 
 ```
-# Dynamic positional argument array
+# Spread positional argument
 {
     "calling": {"name": "plus"},
-    "args": {
-        "array": [
-            {"literal": 1},
-            {"literal": 2}
-        ]
-    }
+    "args": [
+        {
+            "spread": {
+                "array": [
+                    {"literal": 1},
+                    {"literal": 2}
+                ]
+            }
+        }
+    ]
 }
 >> 3
 ```
 
 ```
-# Dynamic named argument object
+# Spread named argument
 {
     "calling": {"name": "if"},
     "args": [{"literal": true}],
-    "namedArgs": {
-        "#all": {
-            "object": [
-                ["then", {"literal": 1}],
-                ["else", {"literal": 2}]
-            ]
+    "namedArgs": [
+        {
+            "spread": {
+                "object": [
+                    ["then", {"literal": 1}],
+                    ["else", {"literal": 2}]
+                ]
+            }
         }
-    }
+    ]
 }
 >> 1
 ```
@@ -353,7 +398,7 @@ Examples:
     },
     "result": {
         "calling": {"name": "foo"},
-        "namedArgs": {"bar": {"literal": 42}}
+        "namedArgs": [["bar", {"literal": 42}]]
     }
 }
 >> 42

@@ -117,15 +117,10 @@ foo = [1, 2, 3];
         }
     },
     "result": {
-        "calling": {"name": "flatten"},
-        "args": [
-            {
-                "array": [
-                    {"array": [{"literal": 42}]},
-                    {"name": "foo"},
-                    {"array": [{"literal": 97}]}
-                ]
-            }
+        "array": [
+            {"literal": 42},
+            {"spread": {"name": "foo"}},
+            {"literal": 97}
         ]
     }
 }
@@ -210,15 +205,10 @@ foo = {bar: 1, baz: 2};
         }
     },
     "result": {
-        "calling": {"name": "merge"},
-        "args": [
-            {
-                "array": [
-                    {"object": [["answer", {"literal": 42}]]},
-                    {"name": "foo"},
-                    {"object": [["question", {"literal": 69}]]}
-                ]
-            }
+        "object": [
+            ["answer", {"literal": 42}],
+            {"spread": {"name": "foo"}},
+            ["question", {"literal": 69}]
         ]
     }
 }
@@ -264,7 +254,7 @@ foo(1, 2)
 foo(*bar)
 >> {
     "calling": {"name": "foo"},
-    "args": {"name": "bar"}
+    "args": [{"spread": {"name": "bar"}}]
 }
 ```
 
@@ -273,17 +263,10 @@ foo(*bar)
 foo(1, *bar)
 >> {
     "calling": {"name": "foo"},
-    "args": {
-        "calling": {"name": "flatten"},
-        "args": [
-            {
-                "array": [
-                    {"array": [{"literal": 1}]},
-                    {"name": "bar"}
-                ]
-            }
-        ]
-    }
+    "args": [
+        {"literal": 1},
+        {"spread": {"name": "bar"}}
+    ]
 }
 ```
 
@@ -292,7 +275,7 @@ foo(1, *bar)
 foo(bar: 1)
 >> {
     "calling": {"name": "foo"},
-    "namedArgs": {"bar": {"literal": 1}}
+    "namedArgs": [["bar", {"literal": 1}]]
 }
 ```
 
@@ -301,7 +284,7 @@ foo(bar: 1)
 foo(bar: 1, baz: 2)
 >> {
     "calling": {"name": "foo"},
-    "namedArgs": {"bar": {"literal": 1}, "baz": {"literal": 2}}
+    "namedArgs": [["bar", {"literal": 1}], ["baz", {"literal": 2}]]
 }
 ```
 
@@ -310,7 +293,7 @@ foo(bar: 1, baz: 2)
 foo(**bar)
 >> {
     "calling": {"name": "foo"},
-    "namedArgs": {"#all": {"name": "bar"}}
+    "namedArgs": [{"spread": {"name": "bar"}}]
 }
 ```
 
@@ -320,7 +303,7 @@ foo(1, 2, bar: 3, baz: 4)
 >> {
     "calling": {"name": "foo"},
     "args": [{"literal": 1}, {"literal": 2}],
-    "namedArgs": {"bar": {"literal": 3}, "baz": {"literal": 4}}
+    "namedArgs": [["bar", {"literal": 3}], ["baz", {"literal": 4}]]
 }
 ```
 
@@ -487,7 +470,7 @@ foo !
 >> {
     "calling": {"name": "bar"},
     "args": [{"literal": 1}],
-    "namedArgs": {"foo": {"literal": 2}}
+    "namedArgs": [["foo", {"literal": 2}]]
 }
 ```
 
