@@ -107,15 +107,18 @@ f00
 foo = [1, 2, 3];
 [42, *foo, 97]
 >> {
-    "defining": {
-        "foo": {
-            "array": [
-                {"literal": 1},
-                {"literal": 2},
-                {"literal": 3}
-            ]
-        }
-    },
+    "defining": [
+        [
+            "foo",
+            {
+                "array": [
+                    {"literal": 1},
+                    {"literal": 2},
+                    {"literal": 3}
+                ]
+            }
+        ]
+    ],
     "result": {
         "array": [
             {"literal": 42},
@@ -196,14 +199,17 @@ If a key is a valid Kenpali name, the quotes can be omitted.
 foo = {bar: 1, baz: 2};
 {answer: 42, **foo, question: 69}
 >> {
-    "defining": {
-        "foo": {
-            "object": [
-                ["bar", {"literal": 1}],
-                ["baz", {"literal": 2}]
-            ]
-        }
-    },
+    "defining": [
+        [
+            "foo",
+            {
+                "object": [
+                    ["bar", {"literal": 1}],
+                    ["baz", {"literal": 2}]
+                ]
+            }
+        ]
+    ],
     "result": {
         "object": [
             ["answer", {"literal": 42}],
@@ -433,12 +439,15 @@ foo !
         "params": ["x"]
     },
     "result": {
-        "defining": {
-            "y": {
-                "calling": {"name": "plus"},
-                "args": [{"name": "x"}, {"literal": 3}]
-            }
-        },
+        "defining": [
+            [
+                "y",
+                {
+                    "calling": {"name": "plus"},
+                    "args": [{"name": "x"}, {"literal": 3}]
+                }
+            ]
+        ],
         "result": {"name": "y"}
     }
 }
@@ -736,9 +745,9 @@ x.<<y>>
 # Simple declaration
 foo = 42; foo
 >> {
-    "defining": {
-        "foo": {"literal": 42}
-    },
+    "defining": [
+        ["foo", {"literal": 42}]
+    ],
     "result": {"name": "foo"}
 }
 ```
@@ -747,14 +756,17 @@ foo = 42; foo
 # Nested scopes
 foo = (bar = 1; bar); foo
 >> {
-    "defining": {
-        "foo": {
-            "defining": {
-                "bar": {"literal": 1}
-            },
-            "result": {"name": "bar"}
-        }
-    },
+    "defining": [
+        [
+            "foo",
+            {
+                "defining": [
+                    ["bar", {"literal": 1}]
+                ],
+                "result": {"name": "bar"}
+            }
+        ]
+    ],
     "result": {"name": "foo"}
 }
 ```
@@ -765,48 +777,66 @@ foo = (bar = 1; bar); foo
 [spam, eggs] = [216, 729];
 plus(foo, bar, spam, eggs)
 >> {
-    "defining": {
-        "#array1": {
-            "array": [
-                {"literal": 42},
-                {"literal": 97}
-            ]
-        },
-        "foo": {
-            "calling": {"name": "at"},
-            "args": [
-                {"name": "#array1"},
-                {"literal": 1}
-            ]
-        },
-        "bar": {
-            "calling": {"name": "at"},
-            "args": [
-                {"name": "#array1"},
-                {"literal": 2}
-            ]
-        },
-        "#array2": {
-            "array": [
-                {"literal": 216},
-                {"literal": 729}
-            ]
-        },
-        "spam": {
-            "calling": {"name": "at"},
-            "args": [
-                {"name": "#array2"},
-                {"literal": 1}
-            ]
-        },
-        "eggs": {
-            "calling": {"name": "at"},
-            "args": [
-                {"name": "#array2"},
-                {"literal": 2}
-            ]
-        }
-    },
+    "defining": [
+        [
+            "#array1",
+            {
+                "array": [
+                    {"literal": 42},
+                    {"literal": 97}
+                ]
+            }
+        ],
+        [
+            "foo",
+            {
+                "calling": {"name": "at"},
+                "args": [
+                    {"name": "#array1"},
+                    {"literal": 1}
+                ]
+            }
+        ],
+        [
+            "bar",
+            {
+                "calling": {"name": "at"},
+                "args": [
+                    {"name": "#array1"},
+                    {"literal": 2}
+                ]
+            }
+        ],
+        [
+            "#array2",
+            {
+                "array": [
+                    {"literal": 216},
+                    {"literal": 729}
+                ]
+            }
+        ],
+        [
+            "spam",
+            {
+                "calling": {"name": "at"},
+                "args": [
+                    {"name": "#array2"},
+                    {"literal": 1}
+                ]
+            }
+        ],
+        [
+            "eggs",
+            {
+                "calling": {"name": "at"},
+                "args": [
+                    {"name": "#array2"},
+                    {"literal": 2}
+                ]
+            }
+        ]
+    ],
     "result": {
         "calling": {"name": "plus"},
         "args": [
@@ -824,45 +854,60 @@ plus(foo, bar, spam, eggs)
 [foo, [spam, eggs]] = [42, [97, 216]];
 plus(foo, spam, eggs)
 >> {
-    "defining": {
-        "#array1": {
-            "array": [
-                {"literal": 42},
-                {"array": [
-                    {"literal": 97},
-                    {"literal": 216}
-                ]}
-            ]
-        },
-        "foo": {
-            "calling": {"name": "at"},
-            "args": [
-                {"name": "#array1"},
-                {"literal": 1}
-            ]
-        },
-        "#array2": {
-            "calling": {"name": "at"},
-            "args": [
-                {"name": "#array1"},
-                {"literal": 2}
-            ]
-        },
-        "spam": {
-            "calling": {"name": "at"},
-            "args": [
-                {"name": "#array2"},
-                {"literal": 1}
-            ]
-        },
-        "eggs": {
-            "calling": {"name": "at"},
-            "args": [
-                {"name": "#array2"},
-                {"literal": 2}
-            ]
-        }
-    },
+    "defining": [
+        [
+            "#array1",
+            {
+                "array": [
+                    {"literal": 42},
+                    {"array": [
+                        {"literal": 97},
+                        {"literal": 216}
+                    ]}
+                ]
+            }
+        ],
+        [
+            "foo",
+            {
+                "calling": {"name": "at"},
+                "args": [
+                    {"name": "#array1"},
+                    {"literal": 1}
+                ]
+            }
+        ],
+        [
+            "#array2",
+            {
+                "calling": {"name": "at"},
+                "args": [
+                    {"name": "#array1"},
+                    {"literal": 2}
+                ]
+            }
+        ],
+        [
+            "spam",
+            {
+                "calling": {"name": "at"},
+                "args": [
+                    {"name": "#array2"},
+                    {"literal": 1}
+                ]
+            }
+        ],
+        [
+            "eggs",
+            {
+                "calling": {"name": "at"},
+                "args": [
+                    {"name": "#array2"},
+                    {"literal": 2}
+                ]
+            }
+        ]
+    ],
     "result": {
         "calling": {"name": "plus"},
         "args": [
