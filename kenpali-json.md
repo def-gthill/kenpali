@@ -41,7 +41,7 @@ Examples:
 ```
 # Binding a name
 {
-    "defining": {"foo": {"literal": 42}},
+    "defining": [["foo", {"literal": 42}]],
     "result": {"name": "foo"}
 }
 >> 42
@@ -50,11 +50,11 @@ Examples:
 ```
 # Binding multiple names
 {
-    "defining": {
-        "foo": {"name": "baz"},
-        "bar": {"literal": 42},
-        "baz": {"name": "bar"}
-    },
+    "defining": [
+        ["foo", {"name": "baz"}],
+        ["bar", {"literal": 42}],
+        ["baz", {"name": "bar"}]
+    ],
     "result": {"name": "foo"}
 }
 >> 42
@@ -63,14 +63,17 @@ Examples:
 ```
 # Scope
 {
-    "defining": {
-        "foo": {
-            "defining": {
-                "bar": {"literal": 42}
-            },
-            "result": {"literal": null}
-        }
-    },
+    "defining": [
+        [
+            "foo",
+            {
+                "defining": [
+                    ["bar", {"literal": 42}]
+                ],
+                "result": {"literal": null}
+            }
+        ]
+    ],
     "result": {"name": "bar"}
 }
 !! nameNotDefined {"name": "bar"}
@@ -79,13 +82,13 @@ Examples:
 ```
 # A name from an enclosing scope
 {
-    "defining": {
-        "foo": {"literal": 42}
-    },
+    "defining": [
+        ["foo", {"literal": 42}]
+    ],
     "result": {
-        "defining": {
-            "bar": {"literal": 73}
-        },
+        "defining": [
+            ["bar", {"literal": 73}]
+        ],
         "result": {"name": "foo"}
     }
 }
@@ -95,17 +98,42 @@ Examples:
 ```
 # Shadowing
 {
-    "defining": {
-        "foo": {"literal": 42}
-    },
+    "defining": [
+        ["foo", {"literal": 42}]
+    ],
     "result": {
-        "defining": {
-            "foo": {"literal": 73}
-        },
+        "defining": [
+            ["foo", {"literal": 73}]
+        ],
         "result": {"name": "foo"}
     }
 }
 >> 73
+```
+
+```
+# Array destructuring
+{
+    "defining": [
+        [
+            {"arrayPattern": ["foo", "bar"]},
+            {
+                "array": [
+                    {"literal": 42},
+                    {"literal": 97}
+                ]
+            }
+        ]
+    ],
+    "result": {
+        "calling": {"name": "plus"},
+        "args": [
+            {"name": "foo"},
+            {"name": "bar"}
+        ]
+    }
+}
+>> 139
 ```
 
 ## Arrays
@@ -137,7 +165,7 @@ Examples:
 ```
 # Array containing an expression to evaluate
 {
-    "defining": {"foo": {"literal": 42}},
+    "defining": [["foo", {"literal": 42}]],
     "result": {"array": [{"name": "foo"}]}
 }
 >> [42]
@@ -223,7 +251,10 @@ Examples:
 ```
 # Object with expression keys and values
 {
-    "defining": {"key": {"literal": "foo"}, "value": {"literal": 42}},
+    "defining": [
+        ["key", {"literal": "foo"}],
+        ["value", {"literal": 42}]
+    ],
     "result": {
         "object": [
             [{"name": "key"}, {"name": "value"}]
@@ -257,7 +288,9 @@ Examples:
 ```
 # No parameters, no arguments
 {
-    "defining": {"foo": {"given": {}, "result": {"literal": 42}}},
+    "defining": [
+        ["foo", {"given": {}, "result": {"literal": 42}}]
+    ],
     "result": {"calling": {"name": "foo"}}
 }
 >> 42
@@ -266,7 +299,9 @@ Examples:
 ```
 # One positional parameter, one positional argument
 {
-    "defining": {"foo": {"given": {"params": ["x"]}, "result": {"name": "x"}}},
+    "defining": [
+        ["foo", {"given": {"params": ["x"]}, "result": {"name": "x"}}]
+    ],
     "result": {"calling": {"name": "foo"}, "args": [{"literal": 42}]}
 }
 >> 42
@@ -275,7 +310,9 @@ Examples:
 ```
 # One positional parameter, no arguments
 {
-    "defining": {"foo": {"given": {"params": ["x"]}, "result": {"name": "x"}}},
+    "defining": [
+        ["foo", {"given": {"params": ["x"]}, "result": {"name": "x"}}]
+    ],
     "result": {"calling": {"name": "foo"}}
 }
 !! missingArgument {"name": "x"}
@@ -284,16 +321,19 @@ Examples:
 ```
 # One optional positional parameter, one positional argument
 {
-    "defining": {
-        "foo": {
-            "given": {
-                "params": [
-                    {"name": "x", "defaultValue": 73}
-                ]
-            },
-            "result": {"name": "x"}
-        }
-    },
+    "defining": [
+        [
+            "foo",
+            {
+                "given": {
+                    "params": [
+                        {"name": "x", "defaultValue": 73}
+                    ]
+                },
+                "result": {"name": "x"}
+            }
+        ]
+    ],
     "result": {"calling": {"name": "foo"}, "args": [{"literal": 42}]}
 }
 >> 42
@@ -302,19 +342,22 @@ Examples:
 ```
 # One optional positional parameter, no arguments
 {
-    "defining": {
-        "foo": {
-            "given": {
-                "params": [
-                    {
-                        "name": "x",
-                        "defaultValue": {"literal": 73}
-                    }
-                ]
-            },
-            "result": {"name": "x"}
-        }
-    },
+    "defining": [
+        [
+            "foo",
+            {
+                "given": {
+                    "params": [
+                        {
+                            "name": "x",
+                            "defaultValue": {"literal": 73}
+                        }
+                    ]
+                },
+                "result": {"name": "x"}
+            }
+        ]
+    ],
     "result": {"calling": {"name": "foo"}}
 }
 >> 73
@@ -323,17 +366,20 @@ Examples:
 ```
 # Positional rest parameter
 {
-    "defining": {
-        "foo": {
-            "given": {
-                "restParam": "args"
-            },
-            "result": {
-                "calling": {"name": "length"},
-                "args": [{"name": "args"}]
+    "defining": [
+        [
+            "foo",
+            {
+                "given": {
+                    "restParam": "args"
+                },
+                "result": {
+                    "calling": {"name": "length"},
+                    "args": [{"name": "args"}]
+                }
             }
-        }
-    },
+        ]
+    ],
     "result": {
         "calling": {"name": "foo"},
         "args": [{"literal": 42}, {"literal": 97}]
@@ -382,20 +428,23 @@ Examples:
 ```
 # Named rest parameter
 {
-    "defining": {
-        "foo": {
-            "given": {
-                "namedRestParam": "namedArgs"
-            },
-            "result": {
-                "calling": {"name": "at"},
-                "args": [
-                    {"name": "namedArgs"},
-                    {"literal": "bar"}
-                ]
+    "defining": [
+        [
+            "foo",
+            {
+                "given": {
+                    "namedRestParam": "namedArgs"
+                },
+                "result": {
+                    "calling": {"name": "at"},
+                    "args": [
+                        {"name": "namedArgs"},
+                        {"literal": "bar"}
+                    ]
+                }
             }
-        }
-    },
+        ]
+    ],
     "result": {
         "calling": {"name": "foo"},
         "namedArgs": [["bar", {"literal": 42}]]
@@ -409,17 +458,19 @@ Arguments to declared functions are evaluated *lazily*. If an argument isn't act
 ```
 # Unused arguments aren't evaluated
 {
-    "defining": {
-        "foo": {
-            "given": {"params": ["x", "y"]},
-            "result": {"name": "y"}
-        }
-    },
+    "defining": [
+        [
+            "foo", {
+                "given": {"params": ["x", "y"]},
+                "result": {"name": "y"}
+            }
+        ]
+    ],
     "result": {
         "calling": {"name": "foo"},
         "args": [
             {
-                "defining": {"bar": {"name": "bar"}},
+                "defining": [["bar", {"name": "bar"}]],
                 "result": {"name": "bar"}
             },
             {"literal": 42}
@@ -442,10 +493,10 @@ A function body can reference names that were in scope when the function was def
 ```
 # Closure
 {
-    "defining": {
-        "x": {"literal": 73},
-        "foo": {"given": {"params": ["y"]}, "result": {"name": "x"}}
-    },
+    "defining": [
+        ["x", {"literal": 73}],
+        ["foo", {"given": {"params": ["y"]}, "result": {"name": "x"}}]
+    ],
     "result": {"calling": {"name": "foo"}, "args": [{"literal": 42}]}
 }
 >> 73
@@ -456,13 +507,16 @@ On the other hand, names that are in scope when the function is called don't lea
 ```
 # Leakage
 {
-    "defining": {
-        "leaky": {"given": {"params": ["x"]}, "result": {"name": "intruder"}}
-    },
+    "defining": [
+        [
+            "leaky",
+            {"given": {"params": ["x"]}, "result": {"name": "intruder"}}
+        ]
+    ],
     "result": {
-        "defining": {
-            "intruder": {"literal": 42}
-        },
+        "defining": [
+            ["intruder", {"literal": 42}]
+        ],
         "result": {"calling": {"name": "leaky"}, "args": [{"literal": 73}]}
     }
 }
@@ -514,9 +568,9 @@ On the other hand, names that are in scope when the function is called don't lea
 ```
 # Using unquote to substitute in an AST node
 {
-    "defining": {
-        "expression": {"quote": {"literal": 1}}
-    },
+    "defining": [
+        ["expression", {"quote": {"literal": 1}}]
+    ],
     "result": {
         "quote": {
             "array": [

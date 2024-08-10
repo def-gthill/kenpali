@@ -774,65 +774,15 @@ foo = (bar = 1; bar); foo
 ```
 # Array destructuring declaration
 [foo, bar] = [42, 97];
-[spam, eggs] = [216, 729];
-plus(foo, bar, spam, eggs)
+plus(foo, bar)
 >> {
     "defining": [
         [
-            "#array1",
+            {"arrayPattern": ["foo", "bar"]},
             {
                 "array": [
                     {"literal": 42},
                     {"literal": 97}
-                ]
-            }
-        ],
-        [
-            "foo",
-            {
-                "calling": {"name": "at"},
-                "args": [
-                    {"name": "#array1"},
-                    {"literal": 1}
-                ]
-            }
-        ],
-        [
-            "bar",
-            {
-                "calling": {"name": "at"},
-                "args": [
-                    {"name": "#array1"},
-                    {"literal": 2}
-                ]
-            }
-        ],
-        [
-            "#array2",
-            {
-                "array": [
-                    {"literal": 216},
-                    {"literal": 729}
-                ]
-            }
-        ],
-        [
-            "spam",
-            {
-                "calling": {"name": "at"},
-                "args": [
-                    {"name": "#array2"},
-                    {"literal": 1}
-                ]
-            }
-        ],
-        [
-            "eggs",
-            {
-                "calling": {"name": "at"},
-                "args": [
-                    {"name": "#array2"},
-                    {"literal": 2}
                 ]
             }
         ]
@@ -841,9 +791,7 @@ plus(foo, bar, spam, eggs)
         "calling": {"name": "plus"},
         "args": [
             {"name": "foo"},
-            {"name": "bar"},
-            {"name": "spam"},
-            {"name": "eggs"}
+            {"name": "bar"}
         ]
     }
 }
@@ -856,7 +804,12 @@ plus(foo, spam, eggs)
 >> {
     "defining": [
         [
-            "#array1",
+            {
+                "arrayPattern": [
+                    "foo",
+                    {"arrayPattern": ["spam", "eggs"]}
+                ]
+            },
             {
                 "array": [
                     {"literal": 42},
@@ -864,46 +817,6 @@ plus(foo, spam, eggs)
                         {"literal": 97},
                         {"literal": 216}
                     ]}
-                ]
-            }
-        ],
-        [
-            "foo",
-            {
-                "calling": {"name": "at"},
-                "args": [
-                    {"name": "#array1"},
-                    {"literal": 1}
-                ]
-            }
-        ],
-        [
-            "#array2",
-            {
-                "calling": {"name": "at"},
-                "args": [
-                    {"name": "#array1"},
-                    {"literal": 2}
-                ]
-            }
-        ],
-        [
-            "spam",
-            {
-                "calling": {"name": "at"},
-                "args": [
-                    {"name": "#array2"},
-                    {"literal": 1}
-                ]
-            }
-        ],
-        [
-            "eggs",
-            {
-                "calling": {"name": "at"},
-                "args": [
-                    {"name": "#array2"},
-                    {"literal": 2}
                 ]
             }
         ]
@@ -914,6 +827,32 @@ plus(foo, spam, eggs)
             {"name": "foo"},
             {"name": "spam"},
             {"name": "eggs"}
+        ]
+    }
+}
+```
+
+```
+# Object destructuring declaration
+{foo:, bar:} = {foo: 42, bar: 97};
+plus(foo, bar)
+>> {
+    "defining": [
+        [
+            {"objectPattern": ["foo", "bar"]},
+            {
+                "object": [
+                    ["foo", {"literal": 42}],
+                    ["bar", {"literal": 97}]
+                ]
+            }
+        ]
+    ],
+    "result": {
+        "calling": {"name": "plus"},
+        "args": [
+            {"name": "foo"},
+            {"name": "bar"}
         ]
     }
 }
