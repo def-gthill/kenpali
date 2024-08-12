@@ -371,7 +371,7 @@ Examples:
             "foo",
             {
                 "given": {
-                    "restParam": "args"
+                    "params": [{"rest": "args"}]
                 },
                 "result": {
                     "calling": {"name": "length"},
@@ -433,7 +433,7 @@ Examples:
             "foo",
             {
                 "given": {
-                    "namedRestParam": "namedArgs"
+                    "namedParams": [{"rest": "namedArgs"}]
                 },
                 "result": {
                     "calling": {"name": "at"},

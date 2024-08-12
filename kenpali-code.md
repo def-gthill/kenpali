@@ -379,7 +379,7 @@ foo !
 (*args) => length(args)
 >> {
     "given": {
-        "restParam": "args"
+        "params": [{"rest": "args"}]
     },
     "result": {
         "calling": {"name": "length"},
@@ -425,7 +425,7 @@ foo !
 (**namedArgs) => namedArgs
 >> {
     "given": {
-        "namedRestParam": "namedArgs"
+        "namedParams": [{"rest": "namedArgs"}]
     },
     "result": {"name": "namedArgs"}
 }
