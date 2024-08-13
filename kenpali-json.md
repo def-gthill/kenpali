@@ -327,7 +327,10 @@ Examples:
             {
                 "given": {
                     "params": [
-                        {"name": "x", "defaultValue": 73}
+                        {
+                            "name": "x",
+                            "defaultValue": {"literal": 73}
+                        }
                     ]
                 },
                 "result": {"name": "x"}
