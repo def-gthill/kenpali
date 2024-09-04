@@ -191,6 +191,28 @@ Examples:
 >> [42, 1, 2, 3, 97]
 ```
 
+Elements of an array that are never accessed are never evaluated.
+
+```
+# Array laziness
+{
+    "calling": {"name": "at"},
+    "args": [
+        {
+            "array": [
+                {
+                    "defining": [["bar", {"name": "bar"}]],
+                    "result": {"name": "bar"}
+                },
+                {"literal": 42}
+            ]
+        },
+        {"literal": 2}
+    ]
+}
+>> 42
+```
+
 ## Objects
 
 ```
