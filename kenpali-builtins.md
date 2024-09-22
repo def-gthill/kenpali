@@ -592,35 +592,16 @@ twiddle = (x) => switch(
 >> ["Hello, world!", 47, null]
 ```
 
-The `repeat` function repeatedly updates a value by applying the specified function. When the `while` property becomes `false`, the `next` property is ignored, and the final result is the *previous* value.
-
 ```
-# Repeat
-repeat(
-    1,
-    (previous) => {
-        while: previous | isLessThan(1000),
-        next: previous | times(2),
-    }
-)
->> 1024
+# Following a stream to the end
+last([1, [2, [3, [4, null]]]])
+>> 4
 ```
 
-In contrast, when the `continueIf` property becomes `false`, the `next` property *is* the final result.
-
 ```
-# Repeat with Continue-If
-repeat(
-    1,
-    (previous) => (
-        next = previous | times(2);
-        {
-            next: next,
-            continueIf: next | isLessThan(1000),
-        }
-    )
-)
->> 1024
+# Collecting a stream into an array
+collect([1, [2, [3, [4, null]]]])
+>> [1, 2, 3, 4]
 ```
 
 ## Arrays
@@ -643,53 +624,6 @@ array = ["foo", "bar"]
     length(["foo", "bar", "baz"]),
 ]
 >> [0, 1, 3]
-```
-
-The `build` function generates an array by repeatedly applying a function to a start value. When the `while` property becomes `false`, the `out` and `next` properties are ignored; the final array will contain all *previous* values of `out`.
-
-```
-# Build
-build(
-    [1, 1],
-    (previous) => {
-        while: previous @ 1 | isLessThan(20),
-        out: previous @ 1,
-        next: [previous @ 2, plus(previous @ 1, previous @ 2)],
-    }
-)
->> [1, 1, 2, 3, 5, 8, 13]
-```
-
-In contrast, when the `continueIf` property becomes `false`, this `out` value will be the *last* value added to the array.
-
-```
-# Build with Continue-If
-build(
-    [1, 1],
-    (previous) => {
-        out: previous @ 1,
-        next: [previous @ 2, plus(previous @ 1, previous @ 2)],
-        continueIf: previous @ 2 | isLessThan(20),
-    }
-)
->> [1, 1, 2, 3, 5, 8, 13]
-```
-
-A `where` boolean property can also be provided; if
-it's false, this `out` value is skipped, but the internal state is still updated.
-
-```
-# Build with Where
-build(
-    [1, 1],
-    (previous) => {
-        while: previous @ 1 | isLessThan(20),
-        out: previous @ 1,
-        next: [previous @ 2, plus(previous @ 1, previous @ 2)],
-        where: previous @ 1 | isDivisibleBy(2) | not,
-    }
-)
->> [1, 1, 3, 5, 13]
 ```
 
 ## Objects

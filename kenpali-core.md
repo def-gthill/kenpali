@@ -87,43 +87,14 @@ characters("foobar")
 >> [37, 7]
 ```
 
+```
+# Streaming an array
+stream([1, 2, 3, 4])
+>> [1, [2, [3, [4, null]]]]
+```
+
 ## Arrays
 
-```
-# Ranges
-[
-    1 | to(5),
-    5 | to(10),
-]
->> [
-    [1, 2, 3, 4, 5],
-    [5, 6, 7, 8, 9, 10],
-]
-```
-
-```
-# Ranges with step
-[
-    1 | to(10, by: 3),
-    5 | to(10, by: 2),
-]
->> [
-    [1, 4, 7, 10],
-    [5, 7, 9],
-]
-```
-
-```
-# Ranges defined by size
-[
-    1 | toSize(5),
-    5 | toSize(6),
-]
->> [
-    [1, 2, 3, 4, 5],
-    [5, 6, 7, 8, 9, 10],
-]
-```
 
 ```
 # Slicing arrays
@@ -231,4 +202,42 @@ characters("foobar")
 # Merging
 [{foo: 1, bar: 2}, {bar: 3, baz: 4}] | merge
 >> {foo: 1, bar: 3, baz: 4}
+```
+
+## Streams
+
+```
+# Ranges
+[
+    1 | to(5) | collect,
+    5 | to(10) | collect,
+]
+>> [
+    [1, 2, 3, 4, 5],
+    [5, 6, 7, 8, 9, 10],
+]
+```
+
+```
+# Ranges with step
+[
+    1 | to(10, by: 3) | collect,
+    5 | to(10, by: 2) | collect,
+]
+>> [
+    [1, 4, 7, 10],
+    [5, 7, 9],
+]
+```
+
+```
+# Ranges defined by size
+[
+    1 | toSize(5) | collect,
+    5 | toSize(6) | collect,
+]
+>> [
+    [1, 2, 3, 4, 5],
+    [5, 6, 7, 8, 9, 10],
+]
 ```
