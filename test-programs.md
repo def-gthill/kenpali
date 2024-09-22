@@ -48,7 +48,7 @@ collatz = (n) => (
     n | build(
         (previous) => {
             next: collatzStep(previous),
-            out: previous,
+            out: [previous],
             continueIf: previous | isMoreThan(1),
         }
     )

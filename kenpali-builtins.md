@@ -645,7 +645,7 @@ array = ["foo", "bar"]
 >> [0, 1, 3]
 ```
 
-The `build` function generates an array by repeatedly applying a function to a start value. When the `while` property becomes `false`, the `out` and `next` properties are ignored; the final array will contain all *previous* values of `out`.
+The `build` function generates an array by repeatedly applying a function to a start value. When the `while` property becomes `false`, the `out` and `next` properties are ignored; the final array will contain all *previous* values returned in `out`.
 
 ```
 # Build
@@ -653,21 +653,21 @@ build(
     [1, 1],
     (previous) => {
         while: previous @ 1 | isLessThan(20),
-        out: previous @ 1,
+        out: [previous @ 1],
         next: [previous @ 2, plus(previous @ 1, previous @ 2)],
     }
 )
 >> [1, 1, 2, 3, 5, 8, 13]
 ```
 
-In contrast, when the `continueIf` property becomes `false`, this `out` value will be the *last* value added to the array.
+In contrast, when the `continueIf` property becomes `false`, these `out` values will be the *last* values added to the array.
 
 ```
 # Build with Continue-If
 build(
     [1, 1],
     (previous) => {
-        out: previous @ 1,
+        out: [previous @ 1],
         next: [previous @ 2, plus(previous @ 1, previous @ 2)],
         continueIf: previous @ 2 | isLessThan(20),
     }
@@ -675,21 +675,23 @@ build(
 >> [1, 1, 2, 3, 5, 8, 13]
 ```
 
-A `where` boolean property can also be provided; if
-it's false, this `out` value is skipped, but the internal state is still updated.
+Since the `out` property is an array, an iteration can add multiple values to the result, or skip adding values entirely.
 
 ```
-# Build with Where
+# Build with multiple outs
 build(
     [1, 1],
     (previous) => {
         while: previous @ 1 | isLessThan(20),
-        out: previous @ 1,
+        out: if(
+            previous @ 1 | isDivisibleBy(2),
+            then: [],
+            else: [previous @ 1, previous @ 1],
+        ),
         next: [previous @ 2, plus(previous @ 1, previous @ 2)],
-        where: previous @ 1 | isDivisibleBy(2) | not,
     }
 )
->> [1, 1, 3, 5, 13]
+>> [1, 1, 1, 1, 3, 3, 5, 5, 13, 13]
 ```
 
 ## Objects
