@@ -152,6 +152,12 @@ characters("foobar")
 ```
 
 ```
+# Rebuilding
+[1, 2, 3] | rebuild((i) => [i, times(i, i)])
+>> [1, 1, 2, 4, 3, 9]
+```
+
+```
 # Transforming
 [1, 2, 3] | transform((i) => times(i, i))
 >> [1, 4, 9]
