@@ -237,10 +237,10 @@ fromCodePoints([102, 111, 111, 4660])
 ```
 # And
 [
-    and(true, true),
-    and(true, false),
-    and(false, true),
-    and(false, false),
+    and(true, () => true),
+    and(true, () => false),
+    and(false, () => true),
+    and(false, () => false),
 ]
 >> [true, false, false, false]
 ```
@@ -248,8 +248,8 @@ fromCodePoints([102, 111, 111, 4660])
 ```
 # And short-circuiting
 [
-    and(false, [] @ 1),
-    and(false, (foo = foo; foo)),
+    and(false, () => [] @ 1),
+    and(false, () => (foo = foo; foo)),
 ]
 >> [false, false]
 ```
@@ -257,10 +257,10 @@ fromCodePoints([102, 111, 111, 4660])
 ```
 # Or
 [
-    or(true, true),
-    or(true, false),
-    or(false, true),
-    or(false, false),
+    or(true, () => true),
+    or(true, () => false),
+    or(false, () => true),
+    or(false, () => false),
 ]
 >> [true, true, true, false]
 ```
@@ -268,8 +268,8 @@ fromCodePoints([102, 111, 111, 4660])
 ```
 # Or short-circuiting
 [
-    or(true, [] @ 1),
-    or(true, (foo = foo; foo)),
+    or(true, () => [] @ 1),
+    or(true, () => (foo = foo; foo)),
 ]
 >> [true, true]
 ```
@@ -559,8 +559,8 @@ The `typeOf` function never returns `"object"` or `"function"`, since these term
 ```
 # If
 [
-    if(true, then: 1, else: 2),
-    if(false, then: 1, else: 2),
+    if(true, then: () => 1, else: () => 2),
+    if(false, then: () => 1, else: () => 2),
 ]
 >> [1, 2]
 ```
@@ -568,10 +568,10 @@ The `typeOf` function never returns `"object"` or `"function"`, since these term
 ```
 # If short-circuiting
 [
-    if(true, then: 1, else: [] @ 1),
-    if(true, then: 1, else: (foo = foo; foo)),
-    if(false, then: [] @ 1, else: 2),
-    if(false, then: (foo = foo; foo), else: 2),
+    if(true, then: () => 1, else: () => [] @ 1),
+    if(true, then: () => 1, else: () => (foo = foo; foo)),
+    if(false, then: () => [] @ 1, else: () => 2),
+    if(false, then: () => (foo = foo; foo), else: () => 2),
 ]
 >> [1, 1, 2, 2]
 ```
@@ -685,8 +685,8 @@ build(
         while: previous @ 1 | isLessThan(20),
         out: if(
             previous @ 1 | isDivisibleBy(2),
-            then: [],
-            else: [previous @ 1, previous @ 1],
+            then: () => [],
+            else: () => [previous @ 1, previous @ 1],
         ),
         next: [previous @ 2, plus(previous @ 1, previous @ 2)],
     }

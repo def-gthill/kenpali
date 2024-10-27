@@ -326,7 +326,7 @@ foo = (x) => (
     x | switch(
         ["number", (n) => (n | plus(3))],
         ["string", (s) => (s | length)],
-        ["boolean", (b) => if(b, then: 42, else: 86)],
+        ["boolean", (b) => if(b, then: () => 42, else: () => 86)],
     )
 );
 [

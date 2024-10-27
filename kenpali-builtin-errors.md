@@ -75,15 +75,39 @@ join(["foo", 1])
 ## Logic
 
 ```
-# And - wrong argument type
-and(true, "foo")
+# And - wrong first argument type
+and("foo", () => true)
 !! wrongArgumentType {"value": "foo", "expectedType": "boolean"}
 ```
 
 ```
-# Or - wrong argument type
-or(false, "foo")
+# And - second argument not a function
+and(true, true)
+!! wrongArgumentType {"value": true, "expectedType": "function"}
+```
+
+```
+# And - wrong callback return type
+and(true, () => "foo")
+!! wrongReturnType {"value": "foo", "expectedType": "boolean"}
+```
+
+```
+# Or - wrong first argument type
+or("foo", () => false)
 !! wrongArgumentType {"value": "foo", "expectedType": "boolean"}
+```
+
+```
+# Or - second arugment not a function
+or(false, false)
+!! wrongArgumentType {"value": false, "expectedType": "function"}
+```
+
+```
+# Or - wrong callback return type
+or(false, () => "foo")
+!! wrongReturnType {"value": "foo", "expectedType": "boolean"}
 ```
 
 ## Types and Type Conversion

@@ -29,7 +29,7 @@ fizzbuzz = (n) => (
             ""
             | butIf(i | isDivisibleBy(3), (s) => join([s, "Fizz"]))
             | butIf(i | isDivisibleBy(5), (s) => join([s, "Buzz"]))
-            | butIf(isEmpty, toString(i))
+            | butIf(isEmpty, () => toString(i))
         )
     )
 );
@@ -41,8 +41,8 @@ fizzbuzz(16)
 # Collatz
 collatzStep = (n) => if(
     n | isDivisibleBy(2),
-    then: n | dividedBy(2),
-    else: n | times(3) | plus(1),
+    then: () => n | dividedBy(2),
+    else: () => n | times(3) | plus(1),
 );
 collatz = (n) => (
     n | build(
@@ -64,7 +64,7 @@ collatz(7)
   next = numbers
     | where((n) => or(
        n | equals(numbers @ i),
-       not(n | isDivisibleBy(numbers @ i))
+       () => not(n | isDivisibleBy(numbers @ i))
     ));
   {
     while: not(next | equals(numbers)),

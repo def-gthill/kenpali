@@ -418,8 +418,8 @@ Examples:
         {
             "spread": {
                 "object": [
-                    ["then", {"literal": 1}],
-                    ["else", {"literal": 2}]
+                    ["then", {"given": {}, "result": {"literal": 1}}],
+                    ["else", {"given": {}, "result": {"literal": 2}}]
                 ]
             }
         }
@@ -451,33 +451,6 @@ Examples:
     "result": {
         "calling": {"name": "foo"},
         "namedArgs": [["bar", {"literal": 42}]]
-    }
-}
->> 42
-```
-
-Arguments to declared functions are evaluated *lazily*. If an argument isn't actually needed to find the function's result, it's never evaluated.
-
-```
-# Unused arguments aren't evaluated
-{
-    "defining": [
-        [
-            "foo", {
-                "given": {"params": ["x", "y"]},
-                "result": {"name": "y"}
-            }
-        ]
-    ],
-    "result": {
-        "calling": {"name": "foo"},
-        "args": [
-            {
-                "defining": [["bar", {"name": "bar"}]],
-                "result": {"name": "bar"}
-            },
-            {"literal": 42}
-        ]
     }
 }
 >> 42
