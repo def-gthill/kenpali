@@ -569,10 +569,23 @@ But as we see in the "unquote undoes an enclosing quote" example, unquoting a no
 ## Errors
 
 ```
-# Error short-circuiting
+# Error short-circuiting through function calls
 {
     "calling": {"name": "negative"},
     "args": [
+        {
+            "calling": {"name": "plus"},
+            "args": [{"literal": "foo"}]
+        }
+    ]
+}
+!! wrongArgumentType {"value": "foo", "expectedType": "number"}
+```
+
+```
+# Error short-circuiting through collections
+{
+    "array": [
         {
             "calling": {"name": "plus"},
             "args": [{"literal": "foo"}]
