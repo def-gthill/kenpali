@@ -592,35 +592,46 @@ twiddle = (x) => switch(
 >> ["Hello, world!", 47, null]
 ```
 
-The `repeat` function repeatedly updates a value by applying the specified function. When the `while` property becomes `false`, the `next` property is ignored, and the final result is the *previous* value.
+The `repeat` function repeatedly updates a value by applying the specified `next` function. The function is applied until the next application would cause the `while` function to return `false`, i.e. the result is the last value for which `while` returns `true`.
 
 ```
-# Repeat
-repeat(
+# Repeat with while
+powerOfTwo = (limit) => repeat(
     1,
-    (previous) => {
-        while: previous | isLessThan(1000),
-        next: previous | times(2),
-    }
-)
->> 1024
-```
-
-In contrast, when the `continueIf` property becomes `false`, the `next` property *is* the final result.
-
-```
-# Repeat with Continue-If
-repeat(
+    while: (n) => n | isLessThan(limit),
+    next: (n) => n | times(2),
+);
+[
+    powerOfTwo(1),
+    powerOfTwo(3),
+    powerOfTwo(1000),
+]
+>> [
     1,
-    (previous) => (
-        next = previous | times(2);
-        {
-            next: next,
-            continueIf: next | isLessThan(1000),
-        }
-    )
-)
->> 1024
+    2,
+    512,
+]
+```
+
+Alternatively, you can pass a `continueIf` function. Then the result is the first value for which `continueIf` returns `false`.
+
+```
+# Repeat with continue-if
+powerOfTwo = (limit) => repeat(
+    1,
+    next: (n) => n | times(2),
+    continueIf: (n) => n | isLessThan(limit),
+);
+[
+    powerOfTwo(1),
+    powerOfTwo(3),
+    powerOfTwo(1000),
+]
+>> [
+    1,
+    4,
+    1024,
+]
 ```
 
 ## Arrays
@@ -645,34 +656,50 @@ array = ["foo", "bar"]
 >> [0, 1, 3]
 ```
 
-The `build` function generates an array by repeatedly applying a function to a start value. When the `while` property becomes `false`, the `out` and `next` properties are ignored; the final array will contain all *previous* values returned in `out`.
+The `build` function generates an array by repeatedly applying a function to a start value, and transforming the resulting states into array elements.
+
+As with `repeat`, there are two ways of specifying when the loop should end. If you pass a `while` function, the result array will contain only elements produced from states for which the `while` function returns `true`.
 
 ```
 # Build
-build(
+fib = (limit) => build(
     [1, 1],
-    (previous) => {
-        while: previous @ 1 | isLessThan(20),
-        out: [previous @ 1],
-        next: [previous @ 2, plus(previous @ 1, previous @ 2)],
-    }
-)
->> [1, 1, 2, 3, 5, 8, 13]
+    while: (state) => state @ 1 | isLessThan(limit),
+    out: (state) => [state @ 1],
+    next: (state) => [state @ 2, sum(state)],
+);
+[
+    fib(1),
+    fib(2),
+    fib(20),
+]
+>> [
+    [],
+    [1, 1],
+    [1, 1, 2, 3, 5, 8, 13]
+]
 ```
 
-In contrast, when the `continueIf` property becomes `false`, these `out` values will be the *last* values added to the array.
+Or you can pass a `continueIf` function, in which case the result array will contain the elements produced from the first state for which `continueIf` returns `false`.
 
 ```
-# Build with Continue-If
-build(
+# Build with continue-if
+fib = (limit) => build(
     [1, 1],
-    (previous) => {
-        out: [previous @ 1],
-        next: [previous @ 2, plus(previous @ 1, previous @ 2)],
-        continueIf: previous @ 2 | isLessThan(20),
-    }
-)
->> [1, 1, 2, 3, 5, 8, 13]
+    out: (state) => [state @ 1],
+    next: (state) => [state @ 2, sum(state)],
+    continueIf: (state) => state @ 1 | isLessThan(limit),
+);
+[
+    fib(1),
+    fib(2),
+    fib(20),
+]
+>> [
+    [1],
+    [1, 1, 2],
+    [1, 1, 2, 3, 5, 8, 13, 21]
+]
 ```
 
 Since the `out` property is an array, an iteration can add multiple values to the result, or skip adding values entirely.
@@ -681,15 +708,13 @@ Since the `out` property is an array, an iteration can add multiple values to th
 # Build with multiple outs
 build(
     [1, 1],
-    (previous) => {
-        while: previous @ 1 | isLessThan(20),
-        out: if(
-            previous @ 1 | isDivisibleBy(2),
-            then: () => [],
-            else: () => [previous @ 1, previous @ 1],
-        ),
-        next: [previous @ 2, plus(previous @ 1, previous @ 2)],
-    }
+    while: (state) => state @ 1 | isLessThan(20),
+    out: (state) => if(
+        state @ 1 | isDivisibleBy(2),
+        then: () => [],
+        else: () => [state @ 1, state @ 1],
+    ),
+    next: (state) => [state @ 2, sum(state)],
 )
 >> [1, 1, 1, 1, 3, 3, 5, 5, 13, 13]
 ```

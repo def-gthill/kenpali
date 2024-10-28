@@ -44,13 +44,10 @@ collatzStep = (n) => if(
     then: () => n | dividedBy(2),
     else: () => n | times(3) | plus(1),
 );
-collatz = (n) => (
-    n | build(
-        (previous) => {
-            next: collatzStep(previous),
-            out: [previous],
-            continueIf: previous | isMoreThan(1),
-        }
+collatz = (start) => (
+    start | build(
+        next: collatzStep,
+        continueIf: (n) => n | isMoreThan(1),
     )
 );
 collatz(7)
@@ -59,17 +56,20 @@ collatz(7)
 
 ```
 # Primes
-[2 | to(100), 1] | repeat((args) => (
-  [numbers, i] = args;
-  next = numbers
-    | where((n) => or(
-       n | equals(numbers @ i),
-       () => not(n | isDivisibleBy(numbers @ i))
-    ));
-  {
-    while: not(next | equals(numbers)),
-    next: [next, increment(i)],
-  }
-)) @ 1
+{numbers: 2 | to(100), index: 1} | repeat(
+    while: (state) => state.index | isAtMost(length(state.numbers)),
+    next: (state) => (
+        {numbers:, index:} = state;
+        {
+            numbers: numbers | where(
+                (n) => or(
+                    n | equals(numbers @ index),
+                    () => not(n | isDivisibleBy(numbers @ index))
+                )
+            ),
+            index: increment(index),
+        }
+    )
+) @ "numbers"
 >> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
 ```
