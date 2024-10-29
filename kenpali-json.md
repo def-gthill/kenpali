@@ -583,7 +583,7 @@ But as we see in the "unquote undoes an enclosing quote" example, unquoting a no
 ```
 
 ```
-# Error short-circuiting through collections
+# Error short-circuiting through arrays
 {
     "array": [
         {
@@ -593,6 +593,22 @@ But as we see in the "unquote undoes an enclosing quote" example, unquoting a no
     ]
 }
 !! wrongArgumentType {"value": "foo", "expectedType": "number"}
+```
+
+```
+# Error short-circuiting through objects
+{
+    "object": [
+        [
+            "foo",
+            {
+                "calling": {"name": "plus"},
+                "args": [{"literal": "bar"}]
+            }
+        ]
+    ]
+}
+!! wrongArgumentType {"value": "bar", "expectedType": "number"}
 ```
 
 ```
