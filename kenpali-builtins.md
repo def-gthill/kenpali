@@ -299,10 +299,10 @@ fromCodePoints([102, 111, 111, 4660])
     typeOf((x) => x),
     typeOf((1 @ 1)!),
 ]
->> ["null", "boolean", "boolean", "number", "string", "array", "record", "builtin", "given", "error"]
+>> ["null", "boolean", "boolean", "number", "string", "array", "object", "builtin", "given", "error"]
 ```
 
-The `typeOf` function never returns `"object"` or `"function"`, since these terms aren't specific enough. The term "object" includes records, givens, and errors (i.e. anything that can be serialized to a JSON object), while the term "function" includes builtins and givens (i.e. anything that can be called).
+The `typeOf` function never returns `"function"`, since there are two distinct types of functions: _givens_ (functions defined within Kenpali) and _builtins_ (functions defined in the host language).
 
 ```
 # Is null
@@ -426,18 +426,18 @@ The `typeOf` function never returns `"object"` or `"function"`, since these term
 ```
 
 ```
-# Is record
+# Is object
 [
-    isRecord(null),
-    isRecord(false),
-    isRecord(true),
-    isRecord(42),
-    isRecord("foo"),
-    isRecord([1, 2, 3]),
-    isRecord({foo: 1, bar: 2}),
-    isRecord(typeOf),
-    isRecord((x) => x),
-    isRecord((1 @ 1)!),
+    isObject(null),
+    isObject(false),
+    isObject(true),
+    isObject(42),
+    isObject("foo"),
+    isObject([1, 2, 3]),
+    isObject({foo: 1, bar: 2}),
+    isObject(typeOf),
+    isObject((x) => x),
+    isObject((1 @ 1)!),
 ]
 >> [false, false, false, false, false, false, true, false, false, false]
 ```
@@ -491,23 +491,6 @@ The `typeOf` function never returns `"object"` or `"function"`, since these term
     isError((1 @ 1)!),
 ]
 >> [false, false, false, false, false, false, false, false, false, true]
-```
-
-```
-# Is object
-[
-    isObject(null),
-    isObject(false),
-    isObject(true),
-    isObject(42),
-    isObject("foo"),
-    isObject([1, 2, 3]),
-    isObject({foo: 1, bar: 2}),
-    isObject(typeOf),
-    isObject((x) => x),
-    isObject((1 @ 1)!),
-]
->> [false, false, false, false, false, false, true, false, false, false]
 ```
 
 ```
@@ -760,8 +743,8 @@ properties | toObject
     [1, 2, 3] | matches("string"),
     [1, 2, 3] | matches("array"),
     {foo: 1, bar: 2} | matches("array"),
-    {foo: 1, bar: 2} | matches("record"),
-    typeOf | matches("record"),
+    {foo: 1, bar: 2} | matches("object"),
+    typeOf | matches("object"),
     typeOf | matches("builtin"),
     ((x) => x) | matches("builtin"),
     ((x) => x) | matches("given"),
@@ -792,14 +775,8 @@ properties | toObject
 ```
 
 ```
-# Matching the supertypes "object", "function", "sequence", and "any"
+# Matching the supertypes "function", "sequence", and "any"
 [
-    "foo" | matches("object"),
-    [1, 2, 3] | matches("object"),
-    {foo: 1, bar: 2} | matches("object"),
-    typeOf | matches("object"),
-    ((x) => x) | matches("object"),
-    (1 @ 1)! | matches("object"),
     "foo" | matches("function"),
     [1, 2, 3] | matches("function"),
     {foo: 1, bar: 2} | matches("function"),
@@ -820,12 +797,6 @@ properties | toObject
     (1 @ 1)! | matches("any"),
 ]
 >> [
-    false,
-    false,
-    true,
-    false,
-    false,
-    false,
     false,
     false,
     false,
