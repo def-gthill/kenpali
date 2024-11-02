@@ -619,5 +619,5 @@ But as we see in the "unquote undoes an enclosing quote" example, unquoting a no
         "args": [{"literal": "foo"}]
     }
 }
->> {"#error": "wrongArgumentType", value: "foo", expectedType: "number"}
+>> error("wrongArgumentType", value: "foo", expectedType: "number")
 ```

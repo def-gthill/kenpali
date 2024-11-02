@@ -507,7 +507,7 @@ The `typeOf` function never returns `"object"` or `"function"`, since these term
     isObject((x) => x),
     isObject((1 @ 1)!),
 ]
->> [false, false, false, false, false, false, true, false, false, true]
+>> [false, false, false, false, false, false, true, false, false, false]
 ```
 
 ```
@@ -825,7 +825,7 @@ properties | toObject
     true,
     false,
     false,
-    true,
+    false,
     false,
     false,
     false,
