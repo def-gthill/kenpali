@@ -728,6 +728,14 @@ properties | toObject
 >> {foo: "bar", spam: "eggs"}
 ```
 
+## Errors
+
+```
+# Creation and conversion to object
+error("badIdea", foo: "bar", spam: "eggs") | toObject
+>> {error: "badIdea", details: {foo: "bar", spam: "eggs"}}
+```
+
 ## Validation
 
 ```
