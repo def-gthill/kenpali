@@ -879,7 +879,7 @@ sch = arrayOf("string");
 
 ```
 # Matching an array where each element has its own schema
-sch = ["string", "number", arrayOf("number")];
+sch = tupleLike(["string", "number", arrayOf("number")]);
 [
     ["foo", 42, [1, 2, 3]] | matches(sch),
     ["foo", 42, [], "extra"] | matches(sch),
@@ -921,7 +921,7 @@ sch = objectOf(keys: is("string", where: (s) => (length(s) | equals(1))), values
 
 ```
 # Matching an object with a specific structure
-person = {name: "string", age: optional("number")};
+person = recordLike({name: "string", age: optional("number")});
 [
     {name: "John", age: 42} | matches(person),
     {name: "John"} | matches(person),

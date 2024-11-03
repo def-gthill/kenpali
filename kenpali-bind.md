@@ -118,25 +118,25 @@ null | bind(either("string", "number"))
 
 ```
 # Successful validation of an array schema
-["foo", 42] | bind(["string", "number"])
+["foo", 42] | bind(tupleLike(["string", "number"]))
 >> {}
 ```
 
 ```
 # Failed validation of an array schema - not an array
-42 | bind(["string", "number"])
+42 | bind(tupleLike(["string", "number"]))
 !! wrongType {"value": 42, "expectedType": "array"}
 ```
 
 ```
 # Failed validation of an array schema - too short
-["foo"] | bind(["string", "number"])
+["foo"] | bind(tupleLike(["string", "number"]))
 !! missingElement {"value": ["foo"], "schema": ["string", "number"]}
 ```
 
 ```
 # Failed validation of an array schema - wrong element type
-["foo", "bar"] | bind(["string", "number"])
+["foo", "bar"] | bind(tupleLike(["string", "number"]))
 !! badElement {"value": ["foo", "bar"], "index": 2}
 ```
 
@@ -174,31 +174,31 @@ null | bind(either("string", "number"))
 
 ```
 # Automatic binding of object properties
-{name: "John", age: 42, job: "doctor"} | bind({name: "string", age: "number"})
+{name: "John", age: 42, job: "doctor"} | bind(recordLike({name: "string", age: "number"}))
 >> {name: "John", age: 42}
 ```
 
 ```
 # Failed object binding - not an object
-"foo" | bind({name: "string", age: "number"})
+"foo" | bind(recordLike({name: "string", age: "number"}))
 !! wrongType {"value": "foo", "expectedType": "object"}
 ```
 
 ```
 # Failed object binding - missing key
-{name: "John"} | bind({name: "string", age: "number"})
+{name: "John"} | bind(recordLike({name: "string", age: "number"}))
 !! missingProperty {"value": {"name": "John"}, "key": "age"}
 ```
 
 ```
 # Failed object binding - wrong property type
-{name: "John", age: "middle"} | bind({name: "string", age: "number"})
+{name: "John", age: "middle"} | bind(recordLike({name: "string", age: "number"}))
 !! badProperty {"value": {"name": "John", "age": "middle"}, "key": "age"}
 ```
 
 ```
 # Lifting bindings out of an array
-[{name: "John", age: 42}, {name: "Kate", age: 33}] | bind(arrayOf({name: "string", age: "number"}))
+[{name: "John", age: 42}, {name: "Kate", age: 33}] | bind(arrayOf(recordLike({name: "string", age: "number"})))
 >> {name: ["John", "Kate"], age: [42, 33]}
 ```
 
@@ -218,19 +218,19 @@ null | bind(either("string", "number"))
 
 ```
 # Explicit and implicit binding
-{name: "John", age: 42} | bind({name: "string", age: "number"} | as("person"))
+{name: "John", age: 42} | bind(recordLike({name: "string", age: "number"}) | as("person"))
 >> {person: {name: "John", age: 42}, name: "John", age: 42}
 ```
 
 ```
 # Explicit binding of array elements
-["foo", 42] | bind(["string" | as("question"), "number" | as("answer")])
+["foo", 42] | bind(tupleLike(["string" | as("question"), "number" | as("answer")]))
 >> {question: "foo", answer: 42}
 ```
 
 ```
 # Failed binding of array elements - missing element
-["foo"] | bind(["string" | as("question"), "number" | as("answer")])
+["foo"] | bind(tupleLike(["string" | as("question"), "number" | as("answer")]))
 !! missingElement {"value": ["foo"]}
 ```
 
@@ -250,25 +250,25 @@ null | bind(either("string", "number"))
 
 ```
 # Default value for missing array element
-["foo"] | bind(["string" | as("question"), "number" | as("answer") | default(42)])
+["foo"] | bind(tupleLike(["string" | as("question"), "number" | as("answer") | default(42)]))
 >> {question: "foo", answer: 42}
 ```
 
 ```
 # Default value for present array element
-["foo", 97] | bind(["string" | as("question"), "number" | as("answer") | default(42)])
+["foo", 97] | bind(tupleLike(["string" | as("question"), "number" | as("answer") | default(42)]))
 >> {question: "foo", answer: 97}
 ```
 
 ```
 # Default value for missing object property
-{name: "John"} | bind({name: "string", age: "number" | default(null)})
+{name: "John"} | bind(recordLike({name: "string", age: "number" | default(null)}))
 >> {name: "John", age: null}
 ```
 
 ```
 # Default value for present object property
-{name: "John", age: 42} | bind({name: "string", age: "number" | default(null)})
+{name: "John", age: 42} | bind(recordLike({name: "string", age: "number" | default(null)}))
 >> {name: "John", age: 42}
 ```
 
@@ -276,19 +276,19 @@ null | bind(either("string", "number"))
 
 ```
 # Rest binding for array elements
-["foo", 42, 97] | bind(["string" | as("question"), rest("number") | as("answers")])
+["foo", 42, 97] | bind(tupleLike(["string" | as("question"), rest("number") | as("answers")]))
 >> {question: "foo", answers: [42, 97]}
 ```
 
 ```
 # Empty rest binding for array elements
-["foo"] | bind(["string" | as("question"), rest("number") | as("answers")])
+["foo"] | bind(tupleLike(["string" | as("question"), rest("number") | as("answers")]))
 >> {question: "foo", answers: []}
 ```
 
 ```
 # Rest binding for object elements
-{foo: "bar", x: 1, y: 2} | bind({foo: "string", vars: rest("number")})
+{foo: "bar", x: 1, y: 2} | bind(recordLike({foo: "string", vars: rest("number")}))
 >> {foo: "bar", vars: {x: 1, y: 2}}
 ```
 
@@ -302,13 +302,13 @@ plus("foo") | bind("string")
 
 ```
 # Error short-circuiting in array schema
-[plus("foo")] | bind(["any" | as("answer")])
+[plus("foo")] | bind(tupleLike(["any" | as("answer")]))
 !! wrongArgumentType {"value": "foo"}
 ```
 
 ```
 # Error short-circuiting in array rest binding
-[plus("foo")] | bind([rest("any") | as("answers")])
+[plus("foo")] | bind(tupleLike([rest("any") | as("answers")]))
 !! wrongArgumentType {"value": "foo"}
 ```
 
@@ -343,7 +343,7 @@ foo = (x) => (
 heightInMetres = (height) => (
     height | switch(
         [
-            {feet: "number", inches: "number"},
+            recordLike({feet: "number", inches: "number"}),
             (feet:, inches:) => (
                 feet
                 | times(12)
@@ -353,7 +353,7 @@ heightInMetres = (height) => (
             )
         ],
         [
-            {cm: "number"},
+            recordLike({cm: "number"}),
             (cm:) => (cm | dividedBy(100))
         ]
     )

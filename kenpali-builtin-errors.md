@@ -31,7 +31,7 @@ negative("foo")
 ```
 # Indexing - wrong argument type
 42 @ 2
-!! wrongArgumentType {"value": 42, "expectedType": {"#either": ["sequence", "object"]}}
+!! wrongArgumentType {"value": 42, "expectedType": {"either": ["sequence", "object"]}}
 ```
 
 ```
@@ -51,7 +51,7 @@ join(["foo", 1])
 ```
 # Less than - incomparable types
 {} | isLessThan(42)
-!! wrongArgumentType {"value": {}, "expectedType": {"#either": ["number", "string", "boolean", "array"]}}
+!! wrongArgumentType {"value": {}, "expectedType": {"either": ["number", "string", "boolean", "array"]}}
 ```
 
 ```
@@ -63,7 +63,7 @@ join(["foo", 1])
 ```
 # Less than - incomparable types in array
 [1, 2, {}] | isLessThan([1, 2, 3])
-!! wrongArgumentType {"value": {}, "expectedType": {"#either": ["number", "string", "boolean", "array"]}}
+!! wrongArgumentType {"value": {}, "expectedType": {"either": ["number", "string", "boolean", "array"]}}
 ```
 
 ```
@@ -115,7 +115,7 @@ or(false, () => "foo")
 ```
 # To number - wrong argument type
 toNumber([42])
-!! wrongArgumentType {"value": [42], "expectedType": {"#either": ["string", "number"]}}
+!! wrongArgumentType {"value": [42], "expectedType": {"either": ["string", "number"]}}
 ```
 
 ```
