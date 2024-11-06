@@ -51,13 +51,26 @@ Examples:
 # Binding multiple names
 {
     "defining": [
+        ["bar", {"literal": 42}],
+        ["baz", {"name": "bar"}],
+        ["foo", {"name": "baz"}]
+    ],
+    "result": {"name": "foo"}
+}
+>> 42
+```
+
+```
+# Name used before assignment
+{
+    "defining": [
         ["foo", {"name": "baz"}],
         ["bar", {"literal": 42}],
         ["baz", {"name": "bar"}]
     ],
     "result": {"name": "foo"}
 }
->> 42
+!! nameUsedBeforeAssignment {"name": "baz"}
 ```
 
 ```
