@@ -380,6 +380,31 @@ Examples:
 ```
 
 ```
+# Default value referencing a name
+{
+    "defining": [
+        ["foo", {"literal": 73}],
+        [
+            "bar",
+            {
+                "given": {
+                    "params": [
+                        {
+                            "name": "x",
+                            "defaultValue": {"name": "foo"}
+                        }
+                    ]
+                },
+                "result": {"name": "x"}
+            }
+        ]
+    ],
+    "result": {"calling": {"name": "bar"}}
+}
+>> 73
+```
+
+```
 # Positional rest parameter
 {
     "defining": [
