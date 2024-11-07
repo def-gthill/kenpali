@@ -394,6 +394,7 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
     toString([1, 2, 3]),
     toString({foo: "bar", "spam!": "eggs"}),
     toString(toString),
+    toString((1 @ 1)!),
 ]
 >> [
     "null",
@@ -405,6 +406,7 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
     "[1, 2, 3]",
     "{foo: \"bar\", \"spam!\": \"eggs\"}",
     "function toString",
+    "error wrongArgumentType {value: 1, expectedType: {either: [\"sequence\", \"object\"]}}"
 ]
 ```
 
