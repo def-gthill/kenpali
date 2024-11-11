@@ -719,26 +719,6 @@ x.<<y>>
 }
 ```
 
-## Quoting and Unquoting
-
-```
-# Quoting
-'(1)'
->> {"quote": {"literal": 1}}
-```
-
-```
-# Unquoting
-<<1>>
->> {"unquote": {"literal": 1}}
-```
-
-```
-# Nested quoting and unquoting
-'('(<<<<1>>>>)')'
->> {"quote": {"quote": {"unquote": {"unquote": {"literal": 1}}}}}
-```
-
 ## Scopes
 
 ```
