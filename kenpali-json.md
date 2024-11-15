@@ -124,31 +124,6 @@ Examples:
 >> 73
 ```
 
-```
-# Array destructuring
-{
-    "defining": [
-        [
-            {"arrayPattern": ["foo", "bar"]},
-            {
-                "array": [
-                    {"literal": 42},
-                    {"literal": 97}
-                ]
-            }
-        ]
-    ],
-    "result": {
-        "calling": {"name": "plus"},
-        "args": [
-            {"name": "foo"},
-            {"name": "bar"}
-        ]
-    }
-}
->> 139
-```
-
 ## Arrays
 
 ```
@@ -202,6 +177,59 @@ Examples:
     ]
 }
 >> [42, 1, 2, 3, 97]
+```
+
+```
+# Array destructuring
+{
+    "defining": [
+        [
+            {"arrayPattern": ["foo", "bar"]},
+            {
+                "array": [
+                    {"literal": 42},
+                    {"literal": 97}
+                ]
+            }
+        ]
+    ],
+    "result": {
+        "array": [
+            {"name": "bar"},
+            {"name": "bar"},
+            {"name": "foo"}
+        ]
+    }
+}
+>> [97, 97, 42]
+```
+
+```
+# Array destructuring with rest
+{
+    "defining": [
+        [
+            {"arrayPattern": ["foo", {"rest": "bar"}, "baz"]},
+            {
+                "array": [
+                    {"literal": 42},
+                    {"literal": 1},
+                    {"literal": 2},
+                    {"literal": 3},
+                    {"literal": 97}
+                ]
+            }
+        ]
+    ],
+    "result": {
+        "array": [
+            {"name": "baz"},
+            {"name": "foo"},
+            {"name": "bar"}
+        ]
+    }
+}
+>> [97, 42, [1, 2, 3]]
 ```
 
 ## Objects
@@ -294,6 +322,56 @@ Examples:
     ]
 }
 >> {answer: 42, bar: 1, baz: 2, question: 69}
+```
+
+```
+# Object destructuring
+{
+    "defining": [
+        [
+            {"objectPattern": ["foo", "bar"]},
+            {
+                "object": [
+                    ["bar", {"literal": 42}],
+                    ["foo", {"literal": 97}]
+                ]
+            }
+        ]
+    ],
+    "result": {
+        "array": [
+            {"name": "foo"},
+            {"name": "foo"},
+            {"name": "bar"}
+        ]
+    }
+}
+>> [97, 97, 42]
+```
+
+```
+# Object destructuring with rest
+{
+    "defining": [
+        [
+            {"objectPattern": ["bar", {"rest": "others"}]},
+            {
+                "object": [
+                    ["baz", {"literal": 216}],
+                    ["bar", {"literal": 42}],
+                    ["foo", {"literal": 97}]
+                ]
+            }
+        ]
+    ],
+    "result": {
+        "array": [
+            {"name": "bar"},
+            {"name": "others"}
+        ]
+    }
+}
+>> [42, {baz: 216, foo: 97}]
 ```
 
 ## Defining and Calling Functions
@@ -414,10 +492,7 @@ Examples:
                 "given": {
                     "params": [{"rest": "args"}]
                 },
-                "result": {
-                    "calling": {"name": "length"},
-                    "args": [{"name": "args"}]
-                }
+                "result": {"name": "args"}
             }
         ]
     ],
@@ -426,44 +501,81 @@ Examples:
         "args": [{"literal": 42}, {"literal": 97}]
     }
 }
->> 2
+>> [42, 97]
 ```
 
 ```
 # Spread positional argument
 {
-    "calling": {"name": "plus"},
-    "args": [
-        {
-            "spread": {
-                "array": [
-                    {"literal": 1},
-                    {"literal": 2}
-                ]
+    "defining": [
+        [
+            "foo",
+            {
+                "given": {
+                    "params": ["bar", "baz"]
+                },
+                "result": {
+                    "array": [
+                        {"name": "baz"},
+                        {"name": "baz"},
+                        {"name": "bar"}
+                    ]
+                }
             }
-        }
-    ]
+        ]
+    ],
+    "result": {
+        "calling": {"name": "foo"},
+        "args": [
+            {
+                "spread": {
+                    "array": [
+                        {"literal": 42},
+                        {"literal": 97}
+                    ]
+                }
+            }
+        ]
+    }
 }
->> 3
+>> [97, 97, 42]
 ```
 
 ```
 # Spread named argument
 {
-    "calling": {"name": "if"},
-    "args": [{"literal": true}],
-    "namedArgs": [
-        {
-            "spread": {
-                "object": [
-                    ["then", {"given": {}, "result": {"literal": 1}}],
-                    ["else", {"given": {}, "result": {"literal": 2}}]
-                ]
+    "defining": [
+        [
+            "foo",
+            {
+                "given": {
+                    "namedParams": ["bar", "baz"]
+                },
+                "result": {
+                    "array": [
+                        {"name": "baz"},
+                        {"name": "baz"},
+                        {"name": "bar"}
+                    ]
+                }
             }
-        }
-    ]
+        ]
+    ],
+    "result": {
+        "calling": {"name": "foo"},
+        "namedArgs": [
+            {
+                "spread": {
+                    "object": [
+                        ["bar", {"literal": 42}],
+                        ["baz", {"literal": 97}]
+                    ]
+                }
+            }
+        ]
+    }
 }
->> 1
+>> [97, 97, 42]
 ```
 
 ```
@@ -476,22 +588,19 @@ Examples:
                 "given": {
                     "namedParams": [{"rest": "namedArgs"}]
                 },
-                "result": {
-                    "calling": {"name": "at"},
-                    "args": [
-                        {"name": "namedArgs"},
-                        {"literal": "bar"}
-                    ]
-                }
+                "result": {"name": "namedArgs"}
             }
         ]
     ],
     "result": {
         "calling": {"name": "foo"},
-        "namedArgs": [["bar", {"literal": 42}]]
+        "namedArgs": [
+            ["bar", {"literal": 42}],
+            ["baz", {"literal": 97}]
+        ]
     }
 }
->> 42
+>> {bar: 42, baz: 97}
 ```
 
 ```
@@ -502,18 +611,55 @@ Examples:
 !! notCallable {"value": 42}
 ```
 
+```
+# A name from an enclosing function
+{
+    "defining": [
+        ["x", {"literal": 73}],
+        [
+            "foo",
+            {
+                "given": {"params": ["y"]},
+                "result": {
+                    "array": [
+                        {"name": "x"},
+                        {"name": "y"}
+                    ]
+                }
+            }
+        ]
+    ],
+    "result": {"calling": {"name": "foo"}, "args": [{"literal": 42}]}
+
+}
+>> [73, 42]
+```
+
 A function body can reference names that were in scope when the function was defined, even if those names are out of scope when the function is called.
 
 ```
 # Closure
 {
-    "defining": [
-        ["x", {"literal": 73}],
-        ["foo", {"given": {"params": ["y"]}, "result": {"name": "x"}}]
-    ],
-    "result": {"calling": {"name": "foo"}, "args": [{"literal": 42}]}
+    "calling": {
+        "calling": {
+            "given": {},
+            "result": {
+                "defining": [["x", {"literal": 73}]],
+                "result": {
+                    "given": {"params": ["y"]},
+                    "result": {
+                        "array": [
+                            {"name": "x"},
+                            {"name": "y"}
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "args": [{"literal": 42}]
 }
->> 73
+>> [73, 42]
 ```
 
 On the other hand, names that are in scope when the function is called don't leak into the function body.
@@ -542,15 +688,20 @@ On the other hand, names that are in scope when the function is called don't lea
 ```
 # Error short-circuiting through function calls
 {
-    "calling": {"name": "negative"},
+    "calling": {
+        "given": {},
+        "result": {"literal": 42}
+    },
     "args": [
         {
-            "calling": {"name": "plus"},
-            "args": [{"literal": "foo"}]
+            "defining": [
+                [{"arrayPattern": ["foo"]}, {"array": []}]
+            ],
+            "result": {"name": "foo"}
         }
     ]
 }
-!! wrongArgumentType {"value": "foo", "expectedType": "number"}
+!! missingElement {"name": "foo"}
 ```
 
 ```
@@ -558,12 +709,14 @@ On the other hand, names that are in scope when the function is called don't lea
 {
     "array": [
         {
-            "calling": {"name": "plus"},
-            "args": [{"literal": "foo"}]
+            "defining": [
+                [{"arrayPattern": ["foo"]}, {"array": []}]
+            ],
+            "result": {"name": "foo"}
         }
     ]
 }
-!! wrongArgumentType {"value": "foo", "expectedType": "number"}
+!! missingElement {"name": "foo"}
 ```
 
 ```
@@ -573,22 +726,34 @@ On the other hand, names that are in scope when the function is called don't lea
         [
             "foo",
             {
-                "calling": {"name": "plus"},
-                "args": [{"literal": "bar"}]
+                "defining": [
+                    [{"arrayPattern": ["foo"]}, {"array": []}]
+                ],
+                "result": {"name": "foo"}
             }
         ]
     ]
 }
-!! wrongArgumentType {"value": "bar", "expectedType": "number"}
+!! missingElement {"name": "foo"}
 ```
 
 ```
 # Error catching
 {
-    "catching": {
-        "calling": {"name": "plus"},
-        "args": [{"literal": "foo"}]
-    }
+    "calling": {
+        "given": {},
+        "result": {"literal": 42}
+    },
+    "args": [
+        {
+            "catching": {
+                "defining": [
+                    [{"arrayPattern": ["foo"]}, {"array": []}]
+                ],
+                "result": {"name": "foo"}
+            }
+        }
+    ]
 }
->> error("wrongArgumentType", value: "foo", expectedType: "number")
+>> 42
 ```
