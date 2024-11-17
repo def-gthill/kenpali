@@ -78,7 +78,7 @@ Builtins are functions that must be provided by the host platform.
 
 ```
 # Indexing strings
-string = "foobar"
+string = "foobar";
 [
     string @ 1,
     string @ 4,
@@ -567,7 +567,7 @@ twiddle = (x) => switch(
     x,
     ["string" | as("s"), (s:) => join(["Hello, ", s, "!"])],
     ["number" | as("n"), (n:) => (n | plus(5))],
-    ["any", null]
+    ["any", () => null]
 );
 [
     twiddle("world"),
@@ -651,7 +651,7 @@ fib = (limit) => build(
     [1, 1],
     while: (state) => state @ 1 | isLessThan(limit),
     out: (state) => [state @ 1],
-    next: (state) => [state @ 2, sum(state)],
+    next: (state) => [state @ 2, plus(*state)],
 );
 [
     fib(1),
@@ -672,7 +672,7 @@ Or you can pass a `continueIf` function, in which case the result array will con
 fib = (limit) => build(
     [1, 1],
     out: (state) => [state @ 1],
-    next: (state) => [state @ 2, sum(state)],
+    next: (state) => [state @ 2, plus(*state)],
     continueIf: (state) => state @ 1 | isLessThan(limit),
 );
 [
@@ -695,11 +695,11 @@ build(
     [1, 1],
     while: (state) => state @ 1 | isLessThan(20),
     out: (state) => if(
-        state @ 1 | isDivisibleBy(2),
+        state @ 1 | divideWithRemainder(2) @ "remainder" | equals(0),
         then: () => [],
         else: () => [state @ 1, state @ 1],
     ),
-    next: (state) => [state @ 2, sum(state)],
+    next: (state) => [state @ 2, plus(*state)],
 )
 >> [1, 1, 1, 1, 3, 3, 5, 5, 13, 13]
 ```
