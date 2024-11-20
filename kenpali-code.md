@@ -543,17 +543,14 @@ foo !
 ## Indexing
 
 ```
-# Indexing with @
+# Indexing
 ["foo", "bar"] @ 2
 >> {
-    "calling": {"name": "at"},
-    "args": [
-        {"array": [
-            {"literal": "foo"},
-            {"literal": "bar"}
-        ]},
-        {"literal": 2}
-    ]
+    "indexing": {"array": [
+        {"literal": "foo"},
+        {"literal": "bar"}
+    ]},
+    "at": {"literal": 2}
 }
 ```
 
@@ -566,156 +563,46 @@ foo !
             "calling": {"name": "f"},
             "args": [
                 {
-                    "calling": {"name": "at"},
-                    "args": [
-                        {"name": "x"},
-                        {"literal": 1}
-                    ]
+                    "indexing": {"name": "x"},
+                    "at": {"literal": 1}
                 }
             ]
         },
         {
-            "calling": {"name": "at"},
-            "args": [
-                {
-                    "calling": {"name": "f"},
-                    "args": [{"name": "x"}]
-                },
-                {"literal": 1}
-            ]
-        }
-    ]
-}
-```
-
-```
-# Indexing with .
-foo.bar
->> {
-    "calling": {"name": "at"},
-    "args": [
-        {"name": "foo"},
-        {"literal": "bar"}
-    ]
-}
-```
-
-```
-# Correct precedence of . and |
-[x.y | f, x | y.f]
->> {
-    "array": [
-        {
-            "calling": {"name": "f"},
-            "args": [
-                {
-                    "calling": {"name": "at"},
-                    "args": [
-                        {"name": "x"},
-                        {"literal": "y"}
-                    ]
-                }
-            ]
-        },
-        {
-            "calling": {
-                "calling": {"name": "at"},
-                "args": [
-                    {"name": "y"},
-                    {"literal": "f"}
-                ]
+            "indexing": {
+                "calling": {"name": "f"},
+                "args": [{"name": "x"}]
             },
-            "args": [{"name": "x"}]
+            "at": {"literal": 1}
         }
     ]
 }
 ```
 
 ```
-# Correct precedence of . and function calls
-[x.f(y), f(x).y]
+# Indexing with a bare name
+x @ y
 >> {
-    "array": [
-        {
-            "calling": {
-                "calling": {"name": "at"},
-                "args": [
-                    {"name": "x"},
-                    {"literal": "f"}
-                ]
-            },
-            "args": [{"name": "y"}]
-        },
-        {
-            "calling": {"name": "at"},
-            "args": [
-                {
-                    "calling": {"name": "f"},
-                    "args": [{"name": "x"}]
-                },
-                {"literal": "y"}
-            ]
-        }
-    ]
+    "indexing": {"name": "x"},
+    "at": {"literal": "y"}
 }
 ```
 
 ```
-# Indexing an expression with .
-(x | f).y
+# Explicit string indexing
+x @ "y"
 >> {
-    "calling": {"name": "at"},
-    "args": [
-        {
-            "calling": {"name": "f"},
-            "args": [
-                {"name": "x"}
-            ]
-        },
-        {"literal": "y"}
-    ]
+    "indexing": {"name": "x"},
+    "at": {"literal": "y"}
 }
 ```
 
 ```
-# Chaining indexing with .
-x.y.z
+# Dynamic indexing
+x @ <<y>>
 >> {
-    "calling": {"name": "at"},
-    "args": [
-        {
-            "calling": {"name": "at"},
-            "args": [
-                {"name": "x"},
-                {"literal": "y"}
-            ]
-        },
-        {"literal": "z"}
-    ]
-}
-```
-
-```
-# Explicit string indexing with .
-x."y"
->> {
-    "calling": {"name": "at"},
-    "args": [
-        {"name": "x"},
-        {"literal": "y"}
-    ]
-}
-```
-
-```
-# Dynamic indexing with .
-x.<<y>>
->> {
-    "calling": {"name": "at"},
-    "args": [
-        {"name": "x"},
-        {"name": "y"}
-    ]
+    "indexing": {"name": "x"},
+    "at": {"name": "y"}
 }
 ```
 
@@ -835,5 +722,28 @@ plus(foo, bar)
             {"name": "bar"}
         ]
     }
+}
+```
+
+# Modules
+
+```
+# Importing a module
+++foo;
+foo
+>> {
+    "defining": [
+        {"importing": "foo"}
+    ],
+    "result": {"name": "foo"}
+}
+```
+
+```
+# Accessing a name in a module
+foo.bar
+>> {
+    "name": "bar",
+    "from": "foo"
 }
 ```
