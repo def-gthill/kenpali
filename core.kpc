@@ -1,6 +1,6 @@
 sum = (numbers) => plus(*numbers);
 isDivisibleBy = (a, b) => (
-    divideWithRemainder(a, b).remainder | equals(0)
+    divideWithRemainder(a, b) @ remainder: | equals(0)
 );
 characters = (string) => (
     1 | to(length(string)) | transform((i) => (string @ i))
@@ -80,7 +80,7 @@ chunk = (array, size) => (
     starts | transform((start) => (array | slice(start | toSize(size))))
 );
 properties = (object) => (
-    object | keys | transform((key) => [key, object.<<key>>])
+    object | keys | transform((key) => [key, object @ key])
 );
 merge = (objects) => (
     objects | transform(properties) | flatten | toObject

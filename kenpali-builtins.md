@@ -77,28 +77,6 @@ Builtins are functions that must be provided by the host platform.
 ```
 
 ```
-# Indexing strings
-string = "foobar";
-[
-    string @ 1,
-    string @ 4,
-    string @ 6,
-]
->> ["f", "b", "r"]
-```
-
-```
-# Indexing strings with escapes
-string = "\"\\\/\b\f\n\r\t\u1234"
-[
-    string @ 1,
-    string @ 5,
-    string @ 9,
-]
->> ["\"", "\f", "\u1234"]
-```
-
-```
 # Joining strings
 [
     join([]),
@@ -406,7 +384,7 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
     "[1, 2, 3]",
     "{foo: \"bar\", \"spam!\": \"eggs\"}",
     "function toString",
-    "error wrongArgumentType {value: 1, expectedType: {either: [\"sequence\", \"object\"]}}"
+    "error wrongType {value: 1, expectedType: {either: [\"string\", \"array\", \"object\"]}}"
 ]
 ```
 
@@ -622,16 +600,6 @@ powerOfTwo = (limit) => repeat(
 ## Arrays
 
 ```
-# Indexing arrays
-array = ["foo", "bar"]
-[
-    array | at(2),
-    array | at(1),
-]
->> ["bar", "foo"]
-```
-
-```
 # Array length
 [
     length([]),
@@ -705,16 +673,6 @@ build(
 ```
 
 ## Objects
-
-```
-# Indexing objects
-object = {foo: "bar", spam: "eggs"};
-[
-    object | at("spam"),
-    object | at("foo"),
-]
->> ["eggs", "bar"]
-```
 
 ```
 # Object keys

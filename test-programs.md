@@ -57,19 +57,19 @@ collatz(7)
 ```
 # Primes
 {numbers: 2 | to(100), index: 1} | repeat(
-    while: (state) => state.index | isAtMost(length(state.numbers)),
+    while: (state) => state @ index: | isAtMost(state @ numbers: | length),
     next: (state) => (
         {numbers:, index:} = state;
         {
             numbers: numbers | where(
                 (n) => or(
                     n | equals(numbers @ index),
-                    () => not(n | isDivisibleBy(numbers @ index))
+                    () => n | isDivisibleBy(numbers @ index) | not
                 )
             ),
             index: increment(index),
         }
     )
-) @ "numbers"
+) @ numbers:
 >> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
 ```

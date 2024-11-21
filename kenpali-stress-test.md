@@ -53,3 +53,17 @@ foo = () => (
 foo()()()
 >> 42
 ```
+
+## Indexing
+
+
+```
+# Indexing strings with escapes
+string = "\"\\\/\b\f\n\r\t\u1234"
+[
+    string @ 1,
+    string @ 5,
+    string @ 9,
+]
+>> ["\"", "\f", "\u1234"]
+```

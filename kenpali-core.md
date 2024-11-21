@@ -10,6 +10,16 @@ sum(1 | to(10))
 >> 55
 ```
 
+```
+# Divisible by
+[
+    10 | isDivisibleBy(5),
+    10 | isDivisibleBy(3),
+    9 | isDivisibleBy(3),
+]
+>> [true, false, true]
+```
+
 ## Strings
 
 ```

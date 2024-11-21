@@ -683,6 +683,132 @@ On the other hand, names that are in scope when the function is called don't lea
 !! nameNotDefined {"name": "intruder"}
 ```
 
+## Indexing
+
+```
+# Indexing strings
+{
+    "indexing": {"literal": "foobar"},
+    "at": {"literal": 4}
+}
+>> "b"
+```
+
+```
+# Indexing strings - wrong index type
+{
+    "indexing": {"literal": "foobar"},
+    "at": {"literal": "baz"}
+}
+!! wrongType {"value": "baz", "expectedType": "number"}
+```
+
+```
+# Indexing arrays
+{
+    "indexing": {
+        "array": [
+            {"literal": "foo"},
+            {"literal": "bar"}
+        ]
+    },
+    "at": {"literal": 2}
+}
+>> "bar"
+```
+
+```
+# Indexing arrays - wrong index type
+{
+    "indexing": {
+        "array": [
+            {"literal": "foo"},
+            {"literal": "bar"}
+        ]
+    },
+    "at": {"literal": "baz"}
+}
+!! wrongType {"value": "baz", "expectedType": "number"}
+```
+
+```
+# Indexing arrays - index less than 1
+{
+    "indexing": {
+        "array": [
+            {"literal": "foo"},
+            {"literal": "bar"}
+        ]
+    },
+    "at": {"literal": 0}
+}
+!! indexOutOfBounds {"value": ["foo", "bar"], "length": 2, "index": 0}
+```
+
+```
+# Indexing arrays - index greater than length
+{
+    "indexing": {
+        "array": [
+            {"literal": "foo"},
+            {"literal": "bar"}
+        ]
+    },
+    "at": {"literal": 3}
+}
+!! indexOutOfBounds {"value": ["foo", "bar"], "length": 2, "index": 3}
+```
+
+```
+# Indexing objects
+{
+    "indexing": {
+        "object": [
+            ["foo", {"literal": "bar"}],
+            ["spam", {"literal": "eggs"}]
+        ]
+    },
+    "at": {"literal": "spam"}
+}
+>> "eggs"
+```
+
+```
+# Indexing objects - wrong index type
+{
+    "indexing": {
+        "object": [
+            ["foo", {"literal": "bar"}],
+            ["spam", {"literal": "eggs"}]
+        ]
+    },
+    "at": {"literal": 42}
+}
+!! wrongType {"value": 42, "expectedType": "string"}
+```
+
+```
+{
+    "indexing": {
+        "object": [
+            ["foo", {"literal": "bar"}],
+            ["spam", {"literal": "eggs"}]
+        ]
+    },
+    "at": {"literal": "baz"}
+}
+!! missingProperty {"value": {foo: "bar", spam: "eggs"}, "key": "baz"}
+```
+
+```
+# Indexing something non-indexable
+{
+    "indexing": {"literal": 42},
+    "at": {"literal": 2}
+}
+!! wrongType {"value": 42, "expectedType": {"either": ["string", "array", "object"]}}
+```
+
 ## Errors
 
 ```

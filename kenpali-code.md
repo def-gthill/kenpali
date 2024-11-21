@@ -580,8 +580,8 @@ foo !
 ```
 
 ```
-# Indexing with a bare name
-x @ y
+# Indexing with a property name
+x @ y:
 >> {
     "indexing": {"name": "x"},
     "at": {"literal": "y"}
@@ -589,20 +589,11 @@ x @ y
 ```
 
 ```
-# Explicit string indexing
+# Indexing with an explicit string
 x @ "y"
 >> {
     "indexing": {"name": "x"},
     "at": {"literal": "y"}
-}
-```
-
-```
-# Dynamic indexing
-x @ <<y>>
->> {
-    "indexing": {"name": "x"},
-    "at": {"name": "y"}
 }
 ```
 
@@ -725,7 +716,7 @@ plus(foo, bar)
 }
 ```
 
-# Modules
+## Modules
 
 ```
 # Importing a module
