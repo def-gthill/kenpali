@@ -719,18 +719,6 @@ plus(foo, bar)
 ## Modules
 
 ```
-# Importing a module
-++foo;
-foo
->> {
-    "defining": [
-        {"importing": "foo"}
-    ],
-    "result": {"name": "foo"}
-}
-```
-
-```
 # Accessing a name in a module
 foo.bar
 >> {
