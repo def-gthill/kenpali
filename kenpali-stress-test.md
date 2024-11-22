@@ -67,3 +67,19 @@ string = "\"\\\/\b\f\n\r\t\u1234"
 ]
 >> ["\"", "\f", "\u1234"]
 ```
+
+## Forward Pipe
+
+```
+# Correct argument injection with multiple calls
+foo = (a, b = 4) => (c, d = 5) => [a, b, c, d];
+1 | foo(2)(3)
+>> [1, 2, 3, 5]
+```
+
+```
+# Blocking argument injection with multiple calls
+foo = (a, b = 4) => (c, d = 5) => [a, b, c, d];
+1 | (foo(2))(3)
+>> [2, 4, 1, 3]
+```
