@@ -539,22 +539,6 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
 >> [1, 1, 2, 2]
 ```
 
-```
-# Switch
-twiddle = (x) => switch(
-    x,
-    ["string" | as("s"), (s:) => join(["Hello, ", s, "!"])],
-    ["number" | as("n"), (n:) => (n | plus(5))],
-    ["any", () => null]
-);
-[
-    twiddle("world"),
-    twiddle(42),
-    twiddle([]),
-]
->> ["Hello, world!", 47, null]
-```
-
 The `repeat` function repeatedly updates a value by applying the specified `next` function. The function is applied until the next application would cause the `while` function to return `false`, i.e. the result is the last value for which `while` returns `true`.
 
 ```
