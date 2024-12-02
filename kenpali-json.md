@@ -393,7 +393,10 @@ Examples:
     "defining": [
         ["foo", {"given": {"params": ["x"]}, "result": {"name": "x"}}]
     ],
-    "result": {"calling": {"name": "foo"}, "args": [{"literal": 42}]}
+    "result": {
+        "calling": {"name": "foo"},
+        "args": [{"literal": 42}]
+    }
 }
 >> 42
 ```
@@ -542,6 +545,70 @@ Examples:
 ```
 
 ```
+# One named parameter, one argument with that name
+{
+    "defining": [
+        ["foo", {"given": {"namedParams": ["x"]}, "result": {"name": "x"}}]
+    ],
+    "result": {
+        "calling": {"name": "foo"},
+        "namedArgs": [["x", {"literal": 42}]]
+    }
+}
+>> 42
+```
+
+```
+# One named parameter, no arguments
+{
+    "defining": [
+        ["foo", {"given": {"namedParams": ["x"]}, "result": {"name": "x"}}]
+    ],
+    "result": {"calling": {"name": "foo"}}
+}
+!! missingArgument {"name": "x"}
+```
+
+```
+# One named parameter, one positional argument
+{
+    "defining": [
+        ["foo", {"given": {"namedParams": ["x"]}, "result": {"name": "x"}}]
+    ],
+    "result": {
+        "calling": {"name": "foo"},
+        "args": [{"literal": 42}]
+    }
+}
+!! missingArgument {"name": "x"}
+```
+
+```
+# Named rest parameter
+{
+    "defining": [
+        [
+            "foo",
+            {
+                "given": {
+                    "namedParams": [{"rest": "namedArgs"}]
+                },
+                "result": {"name": "namedArgs"}
+            }
+        ]
+    ],
+    "result": {
+        "calling": {"name": "foo"},
+        "namedArgs": [
+            ["bar", {"literal": 42}],
+            ["baz", {"literal": 97}]
+        ]
+    }
+}
+>> {bar: 42, baz: 97}
+```
+
+```
 # Spread named argument
 {
     "defining": [
@@ -576,31 +643,6 @@ Examples:
     }
 }
 >> [97, 97, 42]
-```
-
-```
-# Named rest parameter
-{
-    "defining": [
-        [
-            "foo",
-            {
-                "given": {
-                    "namedParams": [{"rest": "namedArgs"}]
-                },
-                "result": {"name": "namedArgs"}
-            }
-        ]
-    ],
-    "result": {
-        "calling": {"name": "foo"},
-        "namedArgs": [
-            ["bar", {"literal": 42}],
-            ["baz", {"literal": 97}]
-        ]
-    }
-}
->> {bar: 42, baz: 97}
 ```
 
 ```
