@@ -20,6 +20,15 @@ sum(1 | to(10))
 >> [true, false, true]
 ```
 
+```
+# Absolute value
+[
+    42 | absolute,
+    -42 | absolute,
+]
+>> [42, 42]
+```
+
 ## Strings
 
 ```
@@ -55,22 +64,6 @@ characters("foobar")
     "obar",
     "fooba",
     "foob",
-]
-```
-
-```
-# Splitting on a delimiter
-[
-    "foo,bar,,baz" | split(","),
-    "foo=>bar=>=>baz" | split("=>"),
-    "foo||bar||||baz" | split("||"),
-    "|foo||bar|" | split("|"),
-]
->> [
-    ["foo", "bar", "", "baz"],
-    ["foo", "bar", "", "baz"],
-    ["foo", "bar", "", "baz"],
-    ["", "foo", "", "bar", ""],
 ]
 ```
 
@@ -189,6 +182,12 @@ characters("foobar")
     [[1, "one"], [2, "two"], [3, "three"]],
     [[1, "one"], [2, "two"]],
 ]
+```
+
+```
+# Unzipping
+[[1, "one"], [2, "two"], [3, "three"]] | unzip
+>> [[1, 2, 3], ["one", "two", "three"]]
 ```
 
 ```

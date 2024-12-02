@@ -82,9 +82,25 @@ Builtins are functions that must be provided by the host platform.
     join([]),
     join(["foo"]),
     join(["foo", "bar", "baz"]),
-    join(["foo", "bar", "baz"], with: "|"),
+    join(["foo", "bar", "baz"], on: "|"),
 ]
 >> ["", "foo", "foobarbaz", "foo|bar|baz"]
+```
+
+```
+# Splitting on a delimiter
+[
+    "foo,bar,,baz" | split(on: ","),
+    "foo=>bar=>=>baz" | split(on: "=>"),
+    "foo||bar||||baz" | split(on: "||"),
+    "|foo||bar|" | split(on: "|"),
+]
+>> [
+    ["foo", "bar", "", "baz"],
+    ["foo", "bar", "", "baz"],
+    ["foo", "bar", "", "baz"],
+    ["", "foo", "", "bar", ""],
+]
 ```
 
 ```
@@ -647,13 +663,26 @@ build(
     [1, 1],
     while: (state) => state @ 1 | isLessThan(20),
     out: (state) => if(
-        state @ 1 | divideWithRemainder(2) @ "remainder" | equals(0),
+        state @ 1 | divideWithRemainder(2) @ remainder: | equals(0),
         then: () => [],
         else: () => [state @ 1, state @ 1],
     ),
     next: (state) => [state @ 2, plus(*state)],
 )
 >> [1, 1, 1, 1, 3, 3, 5, 5, 13, 13]
+```
+
+```
+# Sorting in natural order
+["foo", "bar", "spam", "eggs"] | sort
+>> ["bar", "eggs", "foo", "spam"]
+```
+
+```
+# Sorting by sort key
+["foo", "bar", "spam", "eggs"]
+| sort(by: (word) => [word | length, word])
+>> ["bar", "foo", "eggs", "spam"]
 ```
 
 ## Objects
@@ -670,6 +699,35 @@ object | keys
 properties = [["foo", "bar"], ["spam", "eggs"]];
 properties | toObject
 >> {foo: "bar", spam: "eggs"}
+```
+
+```
+# Indexing with default
+object = {foo: "bar", spam: "eggs"};
+[
+    object | at("foo", default: "nothing"),
+    object | at("baz", default: "nothing"),
+]
+>> ["bar", "nothing"]
+```
+
+```
+# Building a map
+buildMap(
+    [1, 1],
+    while: (state) => state @ 1 | isLessThan(20),
+    keys: (state) => [
+        if(
+            state @ 1 | divideWithRemainder(2) @ remainder: | equals(0),
+            then: () => "even",
+            else: () => "odd",
+        )
+    ],
+    new: (state) => state @ 1,
+    update: (state, existing) => existing | plus(state @ 1),
+    next: (state) => [state @ 2, plus(*state)]
+)
+>> {odd: 23, even: 10}
 ```
 
 ## Errors

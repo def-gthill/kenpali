@@ -2,38 +2,12 @@ sum = (numbers) => plus(*numbers);
 isDivisibleBy = (a, b) => (
     divideWithRemainder(a, b) @ remainder: | equals(0)
 );
+absolute = (n) => n | butIf(n | isLessThan(0), () => negative(n));
 characters = (string) => (
     1 | to(length(string)) | transform((i) => (string @ i))
 );
-split = (string, delimiter) => (
-    delimiterMatched = (i) => (
-        string
-        | slice(i | toSize(length(delimiter)))
-        | equals(delimiter)
-    );
-    delimiterLocations = 1 | build(
-        while: (i) => i | isAtMost(length(string)),
-        next: (i) => if(
-            delimiterMatched(i),
-            then: () => i | plus(length(delimiter)),
-            else: () => i | increment
-        ),
-        out: (i) => if(delimiterMatched(i), then: () => [i], else: () => []),
-    );
-    startIndices = [
-        1,
-        *delimiterLocations | transform((i) => (i | plus(length(delimiter)))),
-    ];
-    endIndices = [
-        *delimiterLocations | transform(decrement),
-        length(string),
-    ];
-    1 | to(length(startIndices)) | transform(
-        (i) => (string | slice(startIndices @ i | to(endIndices @ i)))
-    )
-);
-splitLines = (string) => (string | split("\n"));
-joinLines = (strings) => (strings | join(with: "\n"));
+splitLines = (string) => (string | split(on: "\n"));
+joinLines = (strings) => (strings | join(on: "\n"));
 butIf = (value, condition, ifTrue) => (
     if(toFunction(condition)(value), then: () => ifTrue(value), else: () => value)
 );
@@ -69,6 +43,11 @@ zip = (*arrays) => (
         while: (i) => arrays | forAll((array) => (i | isAtMost(length(array)))),
         next: increment,
         out: (i) => [arrays | transform((array) => (array @ i))]
+    )
+);
+unzip = (array) => (
+    1 | to(array @ 1 | length) | transform(
+        (i) => array | transform((entry) => entry @ i)
     )
 );
 count = (array, condition) => (array | where(condition) | length);
