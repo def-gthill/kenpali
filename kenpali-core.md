@@ -79,6 +79,31 @@ characters("foobar")
 >> "foo\nbar\n\nbaz"
 ```
 
+## Comparison
+
+```
+# Between
+foo = (n) => n | isBetween(42, 97);
+[
+    foo(1),
+    foo(41),
+    foo(42),
+    foo(64),
+    foo(97),
+    foo(98),
+    foo(216),
+]
+>> [
+    false,
+    false,
+    true,
+    true,
+    true,
+    false,
+    false,
+]
+```
+
 ## Control Flow
 
 ```

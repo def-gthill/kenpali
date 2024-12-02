@@ -11,12 +11,15 @@ joinLines = (strings) => (strings | join(on: "\n"));
 butIf = (value, condition, ifTrue) => (
     if(toFunction(condition)(value), then: () => ifTrue(value), else: () => value)
 );
+isBetween = (n, lower, upper) => (
+    n | isAtLeast(lower) | and(() => n | isAtMost(upper))
+);
 isEmpty = (coll) => (length(coll) | equals(0));
 dropFirst = (coll, n = 1) => slice(coll, increment(n) | to(length(coll)));
 dropLast = (coll, n = 1) => slice(coll, 1 | to(length(coll) | minus(n)));
 slice = (coll, indices) => (
     result = indices
-        | where((index) => and(index | isAtLeast(1), () => index | isAtMost(length(coll))))
+        | where((index) => index | isBetween(1, coll | length))
         | transform((index) => (coll @ index));
     result | butIf(isString(coll), () => join(result))
 );
