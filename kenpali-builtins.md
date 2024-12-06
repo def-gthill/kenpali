@@ -730,6 +730,58 @@ buildMap(
 >> {odd: 23, even: 10}
 ```
 
+## Mutable Objects
+
+```
+# Mutable array
+array = ["foo", "bar", "baz"] | mutableArray
+@ append:("spam")
+@ append:("eggs")
+@ append:("foo")
+@ set:(2, "toast")
+@ storeAt:("sausages", 4);
+[
+    array @ elements:(),
+    array @ at:(1),
+    array @ at:(-2),
+    array @ pop:(),
+    array @ elements:(),
+]
+>> [
+    ["foo", "toast", "baz", "sausages", "eggs", "foo"],
+    "foo",
+    "eggs",
+    "foo",
+    ["foo", "toast", "baz", "sausages", "eggs"]
+]
+```
+
+```
+# Mutable set
+set = ["foo", "bar", "baz"] | mutableSet
+@ add:("spam")
+@ add:("eggs")
+@ add:("foo")
+@ remove:("bar")
+@ remove:("quux");
+[
+    set @ elements:(),
+    set @ has:("foo"),
+    set @ has:("bar"),
+    set @ has:("baz"),
+    set @ has:("spam"),
+    set @ has:("gorp"),
+]
+>> [
+    ["foo", "baz", "spam", "eggs"],
+    true,
+    false,
+    true,
+    true,
+    false,
+]
+```
+
 ## Errors
 
 ```

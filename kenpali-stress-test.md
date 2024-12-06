@@ -59,7 +59,7 @@ foo()()()
 
 ```
 # Indexing strings with escapes
-string = "\"\\\/\b\f\n\r\t\u1234"
+string = "\"\\\/\b\f\n\r\t\u1234";
 [
     string @ 1,
     string @ 5,
