@@ -973,6 +973,61 @@ object = {foo: "bar", spam: "eggs"};
 
 ## Sets and Maps
 
+```
+# Set
+set = ["foo", "bar", "baz"] | newSet;
+[
+    set @ size:(),
+    set @ elements:(),
+    set @ has:("foo"),
+    set @ has:("baz"),
+    set @ has:("spam"),
+]
+>> [
+    3,
+    ["foo", "bar", "baz"],
+    true,
+    true,
+    false,
+]
+```
+
+```
+# Map
+map = [["foo", 42], ["bar", 97]] | newMap;
+[
+    map @ size:(),
+    map @ keys:(),
+    map @ values:(),
+    map @ entries:(),
+    map @ has:("foo"),
+    map @ has:("spam"),
+    map @ at:("foo"),
+    map @ at:("bar", default: 216),
+    map @ at:("spam", default: 216),
+]
+>> [
+    2,
+    ["foo", "bar"],
+    [42, 97],
+    [["foo", 42], ["bar", 97]],
+    true,
+    false,
+    42,
+    97,
+    216,
+]
+```
+
+```
+# Grouping
+[["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]] | group @ entries:()
+>> [
+    ["foo", [42, 216, 729]],
+    ["bar", [97]],
+    ["spam", [57]],
+]
+```
 
 ## Mutable Objects
 
@@ -985,17 +1040,21 @@ array = ["foo", "bar", "baz"] | mutableArray
 @ set:(2, "toast")
 @ storeAt:("sausages", 4);
 [
+    array @ size:(),
     array @ elements:(),
     array @ at:(1),
     array @ at:(-2),
     array @ pop:(),
+    array @ size:(),
     array @ elements:(),
 ]
 >> [
+    6,
     ["foo", "toast", "baz", "sausages", "eggs", "foo"],
     "foo",
     "eggs",
     "foo",
+    5,
     ["foo", "toast", "baz", "sausages", "eggs"]
 ]
 ```
@@ -1009,6 +1068,7 @@ set = ["foo", "bar", "baz"] | mutableSet
 @ remove:("bar")
 @ remove:("quux");
 [
+    set @ size:(),
     set @ elements:(),
     set @ has:("foo"),
     set @ has:("bar"),
@@ -1017,12 +1077,43 @@ set = ["foo", "bar", "baz"] | mutableSet
     set @ has:("gorp"),
 ]
 >> [
+    4,
     ["foo", "baz", "spam", "eggs"],
     true,
     false,
     true,
     true,
     false,
+]
+```
+
+```
+# Mutable map
+map = [["foo", 42], ["bar", 97]] | mutableMap
+@ set:("eggs", 216)
+@ storeAt:(729, "foo")
+@ remove:("bar");
+[
+    map @ size:(),
+    map @ keys:(),
+    map @ values:(),
+    map @ entries:(),
+    map @ has:("foo"),
+    map @ has:("bar"),
+    map @ at:("foo"),
+    map @ at:("eggs", default: 57),
+    map @ at:("bar", default: 57),
+]
+>> [
+    2,
+    ["foo", "eggs"],
+    [729, 216],
+    [["foo", 729], ["eggs", 216]],
+    true,
+    false,
+    729,
+    216,
+    57,
 ]
 ```
 
