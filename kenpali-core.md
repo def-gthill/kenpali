@@ -993,6 +993,33 @@ set = ["foo", "bar", "baz"] | newSet;
 ```
 
 ```
+# Collections as set keys
+set = [["foo"], {foo: 42, bar: 97}] | newSet;
+[
+    set @ has:(["foo"]),
+    set @ has:({foo: 42, bar: 97}),
+    set @ has:({bar: 97, foo: 42}),
+    set @ has:("foo"),
+    set @ has:("[\"foo\"]"),
+    set @ has:(["fob"]),
+    set @ has:({foo: 42}),
+    set @ has:({fob: 42, bar: 97}),
+    set @ has:({foo: 43, bar: 97}),
+]
+>> [
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+]
+```
+
+```
 # Map
 map = [["foo", 42], ["bar", 97]] | newMap;
 [
