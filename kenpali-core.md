@@ -703,6 +703,22 @@ powerOfTwo = (limit) => repeat(
 ]
 ```
 
+```
+# Repeat - next isn't called if continue-if is false
+mySum = (array) => [1, 0] | repeat(
+    next: (state) => (
+        [i, total] = state;
+        [i | increment, total | plus(array @ i)]
+    ),
+    continueIf: (state) => (
+        [i, total] = state;
+        i | isAtMost(array | length)
+    ),
+) @ 2;
+mySum([1, 2, 3])
+>> 6
+```
+
 ## Arrays
 
 ```
@@ -801,6 +817,17 @@ build(
     [5, 7, 9],
 ]
 ```
+
+```
+# Ranges with negative step
+[
+    5 | to(1, by: -1),
+    10 | to(5, by: -2),
+]
+>> [
+    [5, 4, 3, 2, 1],
+    [10, 8, 6],
+]
 ```
 
 ```
