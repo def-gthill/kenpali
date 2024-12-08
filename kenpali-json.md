@@ -760,6 +760,20 @@ On the other hand, names that are in scope when the function is called don't lea
 ```
 
 ```
+# Indexing arrays - index from end
+{
+    "indexing": {
+        "array": [
+            {"literal": "foo"},
+            {"literal": "bar"}
+        ]
+    },
+    "at": {"literal": -2}
+}
+>> "foo"
+```
+
+```
 # Indexing arrays - wrong index type
 {
     "indexing": {
@@ -774,7 +788,21 @@ On the other hand, names that are in scope when the function is called don't lea
 ```
 
 ```
-# Indexing arrays - index less than 1
+# Indexing arrays - index less than minus length
+{
+    "indexing": {
+        "array": [
+            {"literal": "foo"},
+            {"literal": "bar"}
+        ]
+    },
+    "at": {"literal": -3}
+}
+!! indexOutOfBounds {"value": ["foo", "bar"], "length": 2, "index": -3}
+```
+
+```
+# Indexing arrays - index 0
 {
     "indexing": {
         "array": [

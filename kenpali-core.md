@@ -1047,6 +1047,37 @@ map = [["foo", 42], ["bar", 97]] | newMap;
 ```
 
 ```
+# Collections as map keys
+map = [[["foo"], 42], [{foo: 42, bar: 97}, 97]] | newMap;
+[
+    map @ has:(["foo"]),
+    map @ has:({foo: 42, bar: 97}),
+    map @ has:({bar: 97, foo: 42}),
+    map @ has:("foo"),
+    map @ has:("[\"foo\"]"),
+    map @ has:(["fob"]),
+    map @ has:({foo: 42}),
+    map @ has:({fob: 42, bar: 97}),
+    map @ has:({foo: 43, bar: 97}),
+    map @ at:(["foo"]),
+    map @ at:({bar: 97, foo: 42}),
+]
+>> [
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    42,
+    97,
+]
+```
+
+```
 # Grouping
 [["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]] | group @ entries:()
 >> [
@@ -1115,6 +1146,33 @@ set = ["foo", "bar", "baz"] | mutableSet
 ```
 
 ```
+# Collections as mutable set keys
+set = [["foo"]] | mutableSet;
+[
+    set @ has:(["foo"]),
+    set @ has:("foo"),
+    set @ has:("[\"foo\"]"),
+    set @ has:(["fob"]),
+    set
+    @ add:({foo: 42, bar: 97})
+    @ has:({foo: 42, bar: 97}),
+    set @ has:({bar: 97, foo: 42}),
+    set @ has:({fob: 42, bar: 97}),
+    set @ has:({foo: 43, bar: 97}),
+]
+>> [
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+]
+```
+
+```
 # Mutable map
 map = [["foo", 42], ["bar", 97]] | mutableMap
 @ set:("eggs", 216)
@@ -1141,6 +1199,37 @@ map = [["foo", 42], ["bar", 97]] | mutableMap
     729,
     216,
     57,
+]
+```
+
+```
+# Collections as mutable map keys
+map = [[["foo"], 42]] | mutableMap;
+[
+    map @ has:(["foo"]),
+    map @ has:("foo"),
+    map @ has:("[\"foo\"]"),
+    map @ has:(["fob"]),
+    map @ at:(["foo"]),
+    map
+    @ set:({foo: 42, bar: 97}, 97)
+    @ has:({foo: 42, bar: 97}),
+    map @ has:({bar: 97, foo: 42}),
+    map @ has:({fob: 42, bar: 97}),
+    map @ has:({foo: 43, bar: 97}),
+    map @ at:({bar: 97, foo: 42}),
+]
+>> [
+    true,
+    false,
+    false,
+    false,
+    42,
+    true,
+    true,
+    false,
+    false,
+    97,
 ]
 ```
 
