@@ -117,3 +117,15 @@ toNumber("foo")
 toNumber("42a")
 !! notNumeric {"value": "42a"}
 ```
+
+## Arrays
+
+```
+# Non-array returned from build
+1 | build(
+    while: (n) => n | isLessThan(10),
+    out: (n) => n,
+    next: (n) => n | increment,
+)
+!! wrongReturnType {"value": 1, "expectedType": "array"}
+```
