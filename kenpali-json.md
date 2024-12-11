@@ -646,6 +646,43 @@ Examples:
 ```
 
 ```
+# Array destructuring in parameters
+{
+    "defining": [
+        [
+            "foo",
+            {
+                "given": {
+                    "params": [
+                        {"arrayPattern": ["foo", "bar"]}
+                    ]
+                },
+                "result": {
+                    "array": [
+                        {"name": "bar"},
+                        {"name": "bar"},
+                        {"name": "foo"}
+                    ]
+                }
+            }
+        ]
+    ],
+    "result": {
+        "calling": {"name": "foo"},
+        "args": [
+            {
+                "array": [
+                    {"literal": 42},
+                    {"literal": 97}
+                ]
+            }
+        ]
+    }
+}
+>> [97, 97, 42]
+```
+
+```
 # Calling a non-function
 {
     "calling": {"literal": 42}

@@ -432,6 +432,19 @@ foo !
 ```
 
 ```
+# Array destructuring in parameters
+([foo, bar]) => foo
+>> {
+    "given": {
+        "params": [
+            {"arrayPattern": ["foo", "bar"]}
+        ]
+    },
+    "result": {"name": "foo"}
+}
+```
+
+```
 # Scope in function body
 (x) => (y = plus(x, 3); y)
 >> {

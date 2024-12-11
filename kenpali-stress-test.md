@@ -56,6 +56,13 @@ foo = (a, b = 1, *c, d = 2) => [a, b, c, d];
 ]
 ```
 
+```
+# Destructuring parameter with a default value
+foo = ({bar:, baz:} = {bar: 42, baz: 97}) => [bar, baz];
+foo()
+>> [42, 97]
+```
+
 In this example, `x` has already gone out of scope by the time `baz` is *declared*, so `baz` can't just capture `x` at declaration time.
 
 ```
