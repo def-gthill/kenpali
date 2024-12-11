@@ -1,5 +1,23 @@
 # Kenpali Stress Test
 
+## Arrays
+
+```
+# Destructuring an array with an object pattern
+{foo:, bar:} = [1, 2];
+foo
+!! wrongType {"value": [1, 2], "expectedType": "object"}
+```
+
+## Objects
+
+```
+# Destructuring an object with an array pattern
+[foo, bar] = {foo: 42, bar: 97};
+foo
+!! wrongType {"value": {"foo": 42, "bar": 97}, "expectedType": "array"}
+```
+
 ## Defining and Calling Functions
 
 ```
