@@ -744,14 +744,14 @@ frobnicate();
 ```
 # Assignment as the scope result
 foo = 42
-!! missingDefinitionSeparator {"line": 1, "column": 9}
+!! missingStatementSeparator {"line": 1, "column": 9}
 ```
 
 ```
 # Chained assignment
 foo = bar = 42;
 foo
-!! missingDefinitionSeparator {"line": 1, "column": 11}
+!! missingStatementSeparator {"line": 1, "column": 11}
 ```
 
 ## Modules
