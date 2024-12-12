@@ -124,6 +124,17 @@ Examples:
 >> 73
 ```
 
+```
+# Expression statements
+{
+    "defining": [
+        [null, {"literal": 42}]
+    ],
+    "result": {"literal": 73}
+}
+>> 73
+```
+
 ## Arrays
 
 ```

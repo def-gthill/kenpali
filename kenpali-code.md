@@ -729,6 +729,31 @@ plus(foo, bar)
 }
 ```
 
+```
+# Expression statements
+frobnicate();
+42
+>> {
+    "defining": [
+        [null, {"calling": {"name": "frobnicate"}}]
+    ],
+    "result": {"literal": 42}
+}
+```
+
+```
+# Assignment as the scope result
+foo = 42
+!! missingDefinitionSeparator {"line": 1, "column": 9}
+```
+
+```
+# Chained assignment
+foo = bar = 42;
+foo
+!! missingDefinitionSeparator {"line": 1, "column": 11}
+```
+
 ## Modules
 
 ```
