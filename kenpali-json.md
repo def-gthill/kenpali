@@ -74,6 +74,18 @@ Examples:
 ```
 
 ```
+# Name declared more than once in the same scope
+{
+    "defining": [
+        ["foo", {"literal": 42}],
+        ["foo", {"literal": 97}]
+    ],
+    "result": {"name": "foo"}
+}
+!! duplicateName {"name": "foo"}
+```
+
+```
 # Scope
 {
     "defining": [
