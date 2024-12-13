@@ -451,9 +451,10 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
 [
     toNumber("1"),
     toNumber("-2.5"),
+    toNumber("05"),
     toNumber(42),
 ]
->> [1, -2.5, 42]
+>> [1, -2.5, 5, 42]
 ```
 
 ```
