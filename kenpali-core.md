@@ -1279,6 +1279,16 @@ map = [[["foo"], 42]] | mutableMap;
 ]
 ```
 
+```
+# Doing side effects on an expression result as it flies by
+array = mutableArray();
+[
+    42 | also((n) => array @ append:(n)),
+    array @ elements:(),
+]
+>> [42, [42]]
+```
+
 ## Errors
 
 ```
