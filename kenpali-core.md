@@ -949,6 +949,12 @@ build(
 ```
 
 ```
+# Reversing
+["foo", "bar", "spam", "eggs"] | reverse
+>> ["eggs", "spam", "bar", "foo"]
+```
+
+```
 # Sorting in natural order
 ["foo", "bar", "spam", "eggs"] | sort
 >> ["bar", "eggs", "foo", "spam"]
