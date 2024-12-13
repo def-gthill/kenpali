@@ -1124,6 +1124,17 @@ map = [[["foo"], 42], [{foo: 42, bar: 97}, 97]] | newMap;
 ## Mutable Objects
 
 ```
+# Variable
+var = variable(42);
+[
+    var @ get:(),
+    var @ set:(73),
+    var @ get:(),
+]
+>> [42, 73, 73]
+```
+
+```
 # Mutable array
 array = ["foo", "bar", "baz"] | mutableArray
 @ append:("spam")
