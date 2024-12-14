@@ -1126,11 +1126,41 @@ map = [[["foo"], 42], [{foo: 42, bar: 97}, 97]] | newMap;
 
 ```
 # Grouping
-[["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]] | group @ entries:()
+[["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]] | group
 >> [
     ["foo", [42, 216, 729]],
     ["bar", [97]],
     ["spam", [57]],
+]
+```
+
+```
+# Grouping with aggregation
+[["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]]
+| group(onGroup: length)
+>> [
+    ["foo", 3],
+    ["bar", 1],
+    ["spam", 1],
+]
+```
+
+```
+# Grouping by a key function
+["foo", "bar", "spam", "eggs"] | groupBy(length)
+>> [
+    [3, ["foo", "bar"]],
+    [4, ["spam", "eggs"]],
+]
+```
+
+```
+# Grouping by a key function with aggregation
+["foo", "bar", "spam", "eggs"]
+| groupBy(length, onGroup: least)
+>> [
+    [3, "bar"],
+    [4, "eggs"],
 ]
 ```
 
