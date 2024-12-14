@@ -63,6 +63,15 @@ foo()
 >> [42, 97]
 ```
 
+```
+# Rest in object destructure in parameter
+foo = ({**rest, bar:}) => (
+  rest
+);
+foo({bar: 42, baz: 97})
+>> {baz: 97}
+```
+
 In this example, `x` has already gone out of scope by the time `baz` is *declared*, so `baz` can't just capture `x` at declaration time.
 
 ```
