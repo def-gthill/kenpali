@@ -38,6 +38,12 @@ true
 >> {"literal": "foobar"}
 ```
 
+```
+# Raw literal string
+`f\o\o\b\a\r`
+>> {"literal": "f\\o\\o\\b\\a\\r"}
+```
+
 ## Names
 
 ```
