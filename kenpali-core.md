@@ -515,6 +515,26 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
 ```
 
 ```
+# To string on givens
+foo = () => (
+    bar = () => 42;
+    () => bar
+);
+[
+    (() => 42) | toString,
+    foo | toString,
+    foo() | toString,
+    foo()() | toString,
+]
+>> [
+    "function $1",
+    "function foo",
+    "function foo/$1",
+    "function foo/bar",
+]
+```
+
+```
 # Is array
 [
     isArray(null),
