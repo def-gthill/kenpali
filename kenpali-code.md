@@ -736,6 +736,37 @@ plus(foo, bar)
 ```
 
 ```
+# Object destructuring with aliases
+{foo: spam, bar: eggs} = {foo: 42, bar: 97};
+plus(spam, eggs)
+>> {
+    "defining": [
+        [
+            {
+                "objectPattern": [
+                    {"name": "spam", "property": "foo"},
+                    {"name": "eggs", "property": "bar"}
+                ]
+            },
+            {
+                "object": [
+                    ["foo", {"literal": 42}],
+                    ["bar", {"literal": 97}]
+                ]
+            }
+        ]
+    ],
+    "result": {
+        "calling": {"name": "plus"},
+        "args": [
+            {"name": "spam"},
+            {"name": "eggs"}
+        ]
+    }
+}
+```
+
+```
 # Expression statements
 frobnicate();
 42

@@ -397,6 +397,36 @@ Examples:
 >> [42, {baz: 216, foo: 97}]
 ```
 
+```
+# Object destructuring with aliases
+{
+    "defining": [
+        [
+            {
+                "objectPattern": [
+                    {"name": "spam", "property": "foo"},
+                    {"name": "eggs", "property": "bar"}
+                ]
+            },
+            {
+                "object": [
+                    ["foo", {"literal": 42}],
+                    ["bar", {"literal": 97}]
+                ]
+            }
+        ]
+    ],
+    "result": {
+        "array": [
+            {"name": "eggs"},
+            {"name": "eggs"},
+            {"name": "spam"}
+        ]
+    }
+}
+>> [97, 97, 42]
+```
+
 ## Defining and Calling Functions
 
 ```
