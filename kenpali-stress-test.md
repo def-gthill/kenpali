@@ -117,3 +117,15 @@ foo = (a, b = 4) => (c, d = 5) => [a, b, c, d];
 1 | (foo(2))(3)
 >> [2, 4, 1, 3]
 ```
+
+## Sets and Maps
+
+```
+# Set-has as while
+set = [1, 2, 3, 4, 42] | newSet;
+1 | repeat(
+    while: set @ has:,
+    next: increment
+)
+>> 4
+```
