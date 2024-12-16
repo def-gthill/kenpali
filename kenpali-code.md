@@ -438,6 +438,21 @@ foo !
 ```
 
 ```
+# Named parameter with alias
+(x, y: z) => plus(x, z)
+>> {
+    "given": {
+        "params": ["x"],
+        "namedParams": [{"name": "z", "property": "y"}]
+    },
+    "result": {
+        "calling": {"name": "plus"},
+        "args": [{"name": "x"}, {"name": "z"}]
+    }
+}
+```
+
+```
 # Array destructuring in parameters
 ([foo, bar]) => foo
 >> {
