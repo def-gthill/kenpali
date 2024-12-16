@@ -168,6 +168,25 @@ If a key is a valid Kenpali name, the quotes can be omitted.
 ```
 
 ```
+# Object taking properties from names
+foo = "bar";
+spam = "eggs";
+{foo:, spam:}
+>> {
+    "defining": [
+        ["foo", {"literal": "bar"}],
+        ["spam", {"literal": "eggs"}]
+    ],
+    "result": {
+        "object": [
+            ["foo", {"name": "foo"}],
+            ["spam", {"name": "spam"}]
+        ]
+    }
+}
+```
+
+```
 # Object with values of mixed types
 {foo: null, bar: 1, baz: [2]}
 >> {
