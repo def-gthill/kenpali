@@ -196,7 +196,7 @@ If a key is a valid Kenpali name, the quotes can be omitted.
 
 ```
 # Object with expression keys and values
-{<<key>>: value}
+{(key): value}
 >> {"object": [[{"name": "key"}, {"name": "value"}]]}
 ```
 
