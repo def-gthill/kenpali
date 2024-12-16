@@ -9,6 +9,20 @@ foo
 !! wrongType {"value": [1, 2], "expectedType": "object"}
 ```
 
+```
+# Nested array destructure with a default
+[foo, [bar, baz] = [42, 73]] = [216];
+[bar, foo, baz]
+>> [42, 216, 73]
+```
+
+```
+# Nested destructure of array rest
+[foo, *[bar, baz], quux] = [42, 57, 73, 97, 216];
+[bar, foo, quux, baz]
+>> [57, 42, 216, 73]
+```
+
 ## Objects
 
 ```
@@ -16,6 +30,13 @@ foo
 [foo, bar] = {foo: 42, bar: 97};
 foo
 !! wrongType {"value": {"foo": 42, "bar": 97}, "expectedType": "array"}
+```
+
+```
+# Nested object destructure with a default
+{foo:, bar: [baz, quux] = [42, 73]} = {foo: 216};
+[foo, quux, baz]
+>> [216, 73, 42]
 ```
 
 ## Defining and Calling Functions
