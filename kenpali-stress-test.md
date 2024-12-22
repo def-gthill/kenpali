@@ -150,3 +150,30 @@ set = [1, 2, 3, 4, 42] | newSet;
 )
 >> 4
 ```
+
+## Errors
+
+```
+# Error thrown after catching
+1 @ 1 ! @ 1
+!! wrongType {"expectedType": {"either": ["string", "array", "object"]}}
+```
+
+```
+# Stack traces
+bar = () => (
+  (() => 1 @ 1)()
+);
+foo = () => bar();
+main = () => (
+  baz = () => foo();
+  baz() ! | toObject @ calls:
+);
+main()
+>> [
+    {function: "bar/$anon1"},
+    {function: "bar"},
+    {function: "foo"},
+    {function: "main/baz"},
+]
+```

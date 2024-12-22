@@ -527,9 +527,9 @@ foo = () => (
     foo()() | toString,
 ]
 >> [
-    "function $1",
+    "function $anon1",
     "function foo",
-    "function foo/$1",
+    "function foo/$anon1",
     "function foo/bar",
 ]
 ```
@@ -1355,8 +1355,9 @@ array = mutableArray();
 
 ```
 # Creation and conversion to object
-error("badIdea", foo: "bar", spam: "eggs") | toObject
->> {error: "badIdea", details: {foo: "bar", spam: "eggs"}}
+{error: errorType, details:} = error("badIdea", foo: "bar", spam: "eggs") | toObject;
+[errorType, details]
+>> ["badIdea", {foo: "bar", spam: "eggs"}]
 ```
 
 ## Validation
