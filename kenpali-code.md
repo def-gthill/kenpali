@@ -320,6 +320,15 @@ foo(bar: 1, baz: 2)
 ```
 
 ```
+# Named arguments from names
+foo(bar:, baz:)
+>> {
+    "calling": {"name": "foo"},
+    "namedArgs": [["bar", {"name": "bar"}], ["baz", {"name": "baz"}]]
+}
+```
+
+```
 # Spread named arguments
 foo(**bar)
 >> {
