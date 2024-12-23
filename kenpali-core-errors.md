@@ -1,4 +1,4 @@
-# Kenpali Builtin Error-Checking Specification
+# Kenpali Core Error-Checking Specification
 
 All builtins must validate their arguments, and return appropriate error values if any arguments are invalid.
 
@@ -128,4 +128,24 @@ toNumber("42a")
     next: (n) => n | increment,
 )
 !! wrongReturnType {"value": 1, "expectedType": "array"}
+```
+
+## Mutable Objects
+
+```
+# Mutable array - reading a bad index
+["foo", "bar", "baz"] | mutableArray @ at:(4)
+!! indexOutOfBounds {"length": 3, "index": 4}
+```
+
+```
+# Mutable array - writing to a bad index
+["foo", "bar", "baz"] | mutableArray @ set:(4, "spam")
+!! indexOutOfBounds {"length": 3, "index": 4}
+```
+
+```
+# Mutable array - pop on an empty array
+[] | mutableArray @ pop:()
+!! indexOutOfBounds {"length": 0, "index": -1}
 ```

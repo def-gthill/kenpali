@@ -1020,8 +1020,8 @@ properties | toObject
 # Indexing with default
 object = {foo: "bar", spam: "eggs"};
 [
-    object | at("foo", default: "nothing"),
-    object | at("baz", default: "nothing"),
+    object | at("foo", default: () => "nothing"),
+    object | at("baz", default: () => "nothing"),
 ]
 >> ["bar", "nothing"]
 ```
@@ -1097,8 +1097,8 @@ map = [["foo", 42], ["bar", 97]] | newMap;
     map @ has:("foo"),
     map @ has:("spam"),
     map @ at:("foo"),
-    map @ at:("bar", default: 216),
-    map @ at:("spam", default: 216),
+    map @ at:("bar", default: () => 216),
+    map @ at:("spam", default: () => 216),
 ]
 >> [
     2,
@@ -1209,6 +1209,8 @@ array = ["foo", "bar", "baz"] | mutableArray
     array @ size:(),
     array @ elements:(),
     array @ at:(1),
+    array @ at:(1, default: () => "boo"),
+    array @ at:(7, default: () => "boo"),
     array @ at:(-2),
     array @ pop:(),
     array @ size:(),
@@ -1218,6 +1220,8 @@ array = ["foo", "bar", "baz"] | mutableArray
     6,
     ["foo", "toast", "baz", "sausages", "eggs", "foo"],
     "foo",
+    "foo",
+    "boo",
     "eggs",
     "foo",
     5,
@@ -1294,8 +1298,8 @@ map = [["foo", 42], ["bar", 97]] | mutableMap
     map @ has:("foo"),
     map @ has:("bar"),
     map @ at:("foo"),
-    map @ at:("eggs", default: 57),
-    map @ at:("bar", default: 57),
+    map @ at:("eggs", default: () => 57),
+    map @ at:("bar", default: () => 57),
 ]
 >> [
     2,
