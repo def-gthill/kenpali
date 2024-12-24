@@ -602,6 +602,24 @@ foo !
 }
 ```
 
+```
+# Point-free pipeline starting with |
+| foo | bar(2)
+>> {
+    "given": {"params": ["pipelineArg"]},
+    "result": {
+        "calling": {"name": "bar"},
+        "args": [
+            {
+                "calling": {"name": "foo"},
+                "args": [{"name": "pipelineArg"}]
+            },
+            {"literal": 2}
+        ]
+    }
+}
+```
+
 ## Indexing
 
 ```
