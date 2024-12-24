@@ -994,6 +994,12 @@ build(
 ```
 
 ```
+# Sorting arrays lexicographically
+[[10, 2], [2, 1], [11, 3]] | sort
+>> [[2, 1], [10, 2], [11, 3]]
+```
+
+```
 # Sorting by sort key
 ["foo", "bar", "spam", "eggs"]
 | sort(by: (word) => [word | length, word])
