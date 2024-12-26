@@ -932,9 +932,45 @@ build(
 ```
 
 ```
-# Unzipping
-[[1, "one"], [2, "two"], [3, "three"]] | unzip
+# Zipping - filling missing elements
+zipFilling = (*args) => (
+    zip(
+        *args,
+        fillWith: ((arrayNumber:, elementNumber:) => [arrayNumber, elementNumber])
+    )
+);
+[
+    [1, 2, 3] | zipFilling(["one", "two", "three"]),
+    [1, 2, 3] | zipFilling(["one", "two"]),
+]
+>> [
+    [[1, "one"], [2, "two"], [3, "three"]],
+    [[1, "one"], [2, "two"], [3, [2, 3]]],
+]
+```
+
+```
+# Transposing
+[[1, "one"], [2, "two"], [3, "three"]] | transpose
 >> [[1, 2, 3], ["one", "two", "three"]]
+```
+
+```
+# Transposing - ragged arrays
+[[42, 97, 216, 729], ["foo", "bar"], ["spam", "eggs", "cheese"]] | transpose
+>> [[42, "foo", "spam"], [97, "bar", "eggs"]]
+```
+
+```
+# Transposing - filling missing elements
+[[42, 97, 216, 729], ["foo", "bar"], ["spam", "eggs", "cheese"]]
+| transpose(fillWith: (arrayNumber:, elementNumber:) => [arrayNumber, elementNumber])
+>> [
+    [42, "foo", "spam"],
+    [97, "bar", "eggs"],
+    [216, [2, 3], "cheese"],
+    [729, [2, 4], [3, 4]],
+]
 ```
 
 ```
