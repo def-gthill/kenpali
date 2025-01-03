@@ -987,7 +987,7 @@ On the other hand, names that are in scope when the function is called don't lea
         }
     ]
 }
-!! missingElement {"name": "foo"}
+!! missingElement {"value": [], "name": "foo"}
 ```
 
 ```
@@ -1002,7 +1002,7 @@ On the other hand, names that are in scope when the function is called don't lea
         }
     ]
 }
-!! missingElement {"name": "foo"}
+!! missingElement {"value": [], "name": "foo"}
 ```
 
 ```
@@ -1020,7 +1020,7 @@ On the other hand, names that are in scope when the function is called don't lea
         ]
     ]
 }
-!! missingElement {"name": "foo"}
+!! missingElement {"value": [], "name": "foo"}
 ```
 
 ```
