@@ -32,6 +32,7 @@ fizzbuzz = (n) => (
             | butIf(isEmpty, () => toString(i))
         )
     )
+    | toArray
 );
 fizzbuzz(16)
 >> ["1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz", "13", "14", "FizzBuzz", "16"]
@@ -49,6 +50,7 @@ collatz = (start) => (
         next: collatzStep,
         continueIf: (n) => n | isMoreThan(1),
     )
+    | toArray
 );
 collatz(7)
 >> [7, 22, 11, 34, 17, 52, 26, 13, 40, 20, 10, 5, 16, 8, 4, 2, 1]
@@ -56,16 +58,20 @@ collatz(7)
 
 ```
 # Primes
-{numbers: 2 | to(100), index: 1} | repeat(
+{numbers: 2 | to(100) | toArray, index: 1} | repeat(
     while: (state) => state @ index: | isAtMost(state @ numbers: | length),
     next: (state) => (
         {numbers:, index:} = state;
         {
-            numbers: numbers | where(
-                (n) => or(
-                    n | equals(numbers @ index),
-                    () => n | isDivisibleBy(numbers @ index) | not
+            numbers: (
+                numbers
+                | where(
+                    (n) => or(
+                        n | equals(numbers @ index),
+                        () => n | isDivisibleBy(numbers @ index) | not
+                    )
                 )
+                | toArray
             ),
             index: increment(index),
         }

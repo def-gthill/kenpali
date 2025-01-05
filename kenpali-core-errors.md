@@ -127,7 +127,7 @@ toNumber("42a")
     out: (n) => n,
     next: (n) => n | increment,
 )
-!! wrongReturnType {"value": 1, "expectedType": "array"}
+!! wrongReturnType {"value": 1, "expectedType": {"either": ["array", "stream"]}}
 ```
 
 ## Mutable Objects

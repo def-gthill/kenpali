@@ -115,12 +115,6 @@ fromCodePoints([102, 111, 111, 4660])
 ```
 
 ```
-# Array of characters in a string
-characters("foobar")
->> ["f", "o", "o", "b", "a", "r"]
-```
-
-```
 # Joining strings
 [
     join([]),
@@ -397,12 +391,13 @@ foo = (n) => n | isBetween(42, 97);
     typeOf(42),
     typeOf("foo"),
     typeOf([1, 2, 3]),
+    typeOf(1 | to(3)),
     typeOf({foo: 1, bar: 2}),
     typeOf(typeOf),
     typeOf((x) => x),
     typeOf((1 @ 1)!),
 ]
->> ["null", "boolean", "boolean", "number", "string", "array", "object", "builtin", "given", "error"]
+>> ["null", "boolean", "boolean", "number", "string", "array", "stream", "object", "builtin", "given", "error"]
 ```
 
 The `typeOf` function never returns `"function"`, since there are two distinct types of functions: _givens_ (functions defined within Kenpali) and _builtins_ (functions defined in the host language).
@@ -416,12 +411,13 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
     isNull(42),
     isNull("foo"),
     isNull([1, 2, 3]),
+    isNull(1 | to(3)),
     isNull({foo: 1, bar: 2}),
     isNull(typeOf),
     isNull((x) => x),
     isNull((1 @ 1)!),
 ]
->> [true, false, false, false, false, false, false, false, false, false]
+>> [true, false, false, false, false, false, false, false, false, false, false]
 ```
 
 ```
@@ -433,12 +429,13 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
     isBoolean(42),
     isBoolean("foo"),
     isBoolean([1, 2, 3]),
+    isBoolean(1 | to(3)),
     isBoolean({foo: 1, bar: 2}),
     isBoolean(typeOf),
     isBoolean((x) => x),
     isBoolean((1 @ 1)!),
 ]
->> [false, true, true, false, false, false, false, false, false, false]
+>> [false, true, true, false, false, false, false, false, false, false, false]
 ```
 
 ```
@@ -450,12 +447,13 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
     isNumber(42),
     isNumber("foo"),
     isNumber([1, 2, 3]),
+    isNumber(1 | to(3)),
     isNumber({foo: 1, bar: 2}),
     isNumber(typeOf),
     isNumber((x) => x),
     isNumber((1 @ 1)!),
 ]
->> [false, false, false, true, false, false, false, false, false, false]
+>> [false, false, false, true, false, false, false, false, false, false, false]
 ```
 
 ```
@@ -478,12 +476,13 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
     isString(42),
     isString("foo"),
     isString([1, 2, 3]),
+    isString(1 | to(3)),
     isString({foo: 1, bar: 2}),
     isString(typeOf),
     isString((x) => x),
     isString((1 @ 1)!),
 ]
->> [false, false, false, false, true, false, false, false, false, false]
+>> [false, false, false, false, true, false, false, false, false, false, false]
 ```
 
 ```
@@ -496,6 +495,8 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
     toString(-2.5),
     toString("foo"),
     toString([1, 2, 3]),
+    toString(1 | to(3)),
+    toString(1 | to(4)),
     toString({foo: "bar", "spam!": "eggs"}),
     toString(toString),
     toString((1 @ 1)!),
@@ -508,6 +509,8 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
     "-2.5",
     "\"foo\"",
     "[1, 2, 3]",
+    "stream [1, 2, 3]",
+    "stream [1, 2, 3...]",
     "{foo: \"bar\", \"spam!\": \"eggs\"}",
     "function toString",
     "error wrongType {value: 1, expectedType: {either: [\"string\", \"array\", \"object\"]}}"
@@ -543,12 +546,31 @@ foo = () => (
     isArray(42),
     isArray("foo"),
     isArray([1, 2, 3]),
+    isArray(1 | to(3)),
     isArray({foo: 1, bar: 2}),
     isArray(typeOf),
     isArray((x) => x),
     isArray((1 @ 1)!),
 ]
->> [false, false, false, false, false, true, false, false, false, false]
+>> [false, false, false, false, false, true, false, false, false, false, false]
+```
+
+```
+# Is stream
+[
+    isStream(null),
+    isStream(false),
+    isStream(true),
+    isStream(42),
+    isStream("foo"),
+    isStream([1, 2, 3]),
+    isStream(1 | to(3)),
+    isStream({foo: 1, bar: 2}),
+    isStream(typeOf),
+    isStream((x) => x),
+    isStream((1 @ 1)!),
+]
+>> [false, false, false, false, false, false, true, false, false, false, false]
 ```
 
 ```
@@ -560,12 +582,13 @@ foo = () => (
     isObject(42),
     isObject("foo"),
     isObject([1, 2, 3]),
+    isObject(1 | to(3)),
     isObject({foo: 1, bar: 2}),
     isObject(typeOf),
     isObject((x) => x),
     isObject((1 @ 1)!),
 ]
->> [false, false, false, false, false, false, true, false, false, false]
+>> [false, false, false, false, false, false, false, true, false, false, false]
 ```
 
 ```
@@ -577,12 +600,13 @@ foo = () => (
     isBuiltin(42),
     isBuiltin("foo"),
     isBuiltin([1, 2, 3]),
+    isBuiltin(1 | to(3)),
     isBuiltin({foo: 1, bar: 2}),
     isBuiltin(typeOf),
     isBuiltin((x) => x),
     isBuiltin((1 @ 1)!),
 ]
->> [false, false, false, false, false, false, false, true, false, false]
+>> [false, false, false, false, false, false, false, false, true, false, false]
 ```
 
 ```
@@ -594,12 +618,13 @@ foo = () => (
     isGiven(42),
     isGiven("foo"),
     isGiven([1, 2, 3]),
+    isGiven(1 | to(3)),
     isGiven({foo: 1, bar: 2}),
     isGiven(typeOf),
     isGiven((x) => x),
     isGiven((1 @ 1)!),
 ]
->> [false, false, false, false, false, false, false, false, true, false]
+>> [false, false, false, false, false, false, false, false, false, true, false]
 ```
 
 ```
@@ -611,12 +636,13 @@ foo = () => (
     isError(42),
     isError("foo"),
     isError([1, 2, 3]),
+    isError(1 | to(3)),
     isError({foo: 1, bar: 2}),
     isError(typeOf),
     isError((x) => x),
     isError((1 @ 1)!),
 ]
->> [false, false, false, false, false, false, false, false, false, true]
+>> [false, false, false, false, false, false, false, false, false, false, true]
 ```
 
 ```
@@ -628,12 +654,13 @@ foo = () => (
     isFunction(42),
     isFunction("foo"),
     isFunction([1, 2, 3]),
+    isFunction(1 | to(3)),
     isFunction({foo: 1, bar: 2}),
     isFunction(typeOf),
     isFunction((x) => x),
     isFunction((1 @ 1)!),
 ]
->> [false, false, false, false, false, false, false, true, true, false]
+>> [false, false, false, false, false, false, false, false, true, true, false]
 ```
 
 ```
@@ -655,12 +682,13 @@ foo = () => (
     isSequence(42),
     isSequence("foo"),
     isSequence([1, 2, 3]),
+    isSequence(1 | to(3)),
     isSequence({foo: 1, bar: 2}),
     isSequence(typeOf),
     isSequence((x) => x),
     isSequence((1 @ 1)!),
 ]
->> [false, false, false, false, true, true, false, false, false, false]
+>> [false, false, false, false, true, true, true, false, false, false, false]
 ```
 
 ## Control Flow
@@ -764,117 +792,6 @@ mySum([1, 2, 3])
 >> [0, 1, 3]
 ```
 
-The `build` function generates an array by repeatedly applying a function to a start value, and transforming the resulting states into array elements.
-
-As with `repeat`, there are two ways of specifying when the loop should end. If you pass a `while` function, the result array will contain only elements produced from states for which the `while` function returns `true`.
-
-```
-# Build
-fib = (limit) => build(
-    [1, 1],
-    while: (state) => state @ 1 | isLessThan(limit),
-    out: (state) => [state @ 1],
-    next: (state) => [state @ 2, plus(*state)],
-);
-[
-    fib(1),
-    fib(2),
-    fib(20),
-]
->> [
-    [],
-    [1, 1],
-    [1, 1, 2, 3, 5, 8, 13]
-]
-```
-
-Or you can pass a `continueIf` function, in which case the result array will contain the elements produced from the first state for which `continueIf` returns `false`.
-
-```
-# Build with continue-if
-fib = (limit) => build(
-    [1, 1],
-    out: (state) => [state @ 1],
-    next: (state) => [state @ 2, plus(*state)],
-    continueIf: (state) => state @ 1 | isLessThan(limit),
-);
-[
-    fib(1),
-    fib(2),
-    fib(20),
-]
->> [
-    [1],
-    [1, 1, 2],
-    [1, 1, 2, 3, 5, 8, 13, 21]
-]
-```
-
-Since the `out` property is an array, an iteration can add multiple values to the result, or skip adding values entirely.
-
-```
-# Build with multiple outs
-build(
-    [1, 1],
-    while: (state) => state @ 1 | isLessThan(20),
-    out: (state) => if(
-        state @ 1 | divideWithRemainder(2) @ remainder: | equals(0),
-        then: () => [],
-        else: () => [state @ 1, state @ 1],
-    ),
-    next: (state) => [state @ 2, plus(*state)],
-)
->> [1, 1, 1, 1, 3, 3, 5, 5, 13, 13]
-```
-
-```
-# Ranges
-[
-    1 | to(5),
-    5 | to(10),
-]
->> [
-    [1, 2, 3, 4, 5],
-    [5, 6, 7, 8, 9, 10],
-]
-```
-
-```
-# Ranges with step
-[
-    1 | to(10, by: 3),
-    5 | to(10, by: 2),
-]
->> [
-    [1, 4, 7, 10],
-    [5, 7, 9],
-]
-```
-
-```
-# Ranges with negative step
-[
-    5 | to(1, by: -1),
-    10 | to(5, by: -2),
-]
->> [
-    [5, 4, 3, 2, 1],
-    [10, 8, 6],
-]
-```
-
-```
-# Ranges defined by size
-[
-    1 | toSize(5),
-    5 | toSize(6),
-]
->> [
-    [1, 2, 3, 4, 5],
-    [5, 6, 7, 8, 9, 10],
-]
-```
-
 ```
 # Slicing arrays
 [
@@ -886,66 +803,14 @@ build(
 ```
 
 ```
-# Dropping leading and trailing elements
+# Dropping trailing elements
 [
-    [42, 97, 6, 12, 64] | dropFirst,
-    [42, 97, 6, 12, 64] | dropFirst(3),
     [42, 97, 6, 12, 64] | dropLast,
     [42, 97, 6, 12, 64] | dropLast(3),
 ]
 >> [
-    [97, 6, 12, 64],
-    [12, 64],
     [42, 97, 6, 12],
     [42, 97],
-]
-```
-
-```
-# Rebuilding
-[1, 2, 3] | rebuild((i) => [i, times(i, i)])
->> [1, 1, 2, 4, 3, 9]
-```
-
-```
-# Transforming
-[1, 2, 3] | transform((i) => times(i, i))
->> [1, 4, 9]
-```
-
-```
-# Filtering
-[1, 10, 2, 9, 3, 12] | where((i) => (i | isLessThan(10)))
->> [1, 2, 9, 3]
-```
-
-```
-# Zipping
-[
-    [1, 2, 3] | zip(["one", "two", "three"]),
-    [1, 2, 3] | zip(["one", "two"]),
-]
->> [
-    [[1, "one"], [2, "two"], [3, "three"]],
-    [[1, "one"], [2, "two"]],
-]
-```
-
-```
-# Zipping - filling missing elements
-zipFilling = (*args) => (
-    zip(
-        *args,
-        fillWith: ((arrayNumber:, elementNumber:) => [arrayNumber, elementNumber])
-    )
-);
-[
-    [1, 2, 3] | zipFilling(["one", "two", "three"]),
-    [1, 2, 3] | zipFilling(["one", "two"]),
-]
->> [
-    [[1, "one"], [2, "two"], [3, "three"]],
-    [[1, "one"], [2, "two"], [3, [2, 3]]],
 ]
 ```
 
@@ -998,26 +863,6 @@ zipFilling = (*args) => (
 ```
 
 ```
-# Flattening nested arrays
-[[1], [2, 3], [4, 5, [6]]] | flatten
->> [1, 2, 3, 4, 5, [6]]
-```
-
-```
-# Chunking into arrays of a fixed size
-[
-    1 | to(9) | chunk(3),
-    1 | to(10) | chunk(3),
-    1 | to(11) | chunk(3),
-]
->> [
-    [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
-    [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]],
-    [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11]],
-]
-```
-
-```
 # Reversing
 ["foo", "bar", "spam", "eggs"] | reverse
 >> ["eggs", "spam", "bar", "foo"]
@@ -1040,6 +885,201 @@ zipFilling = (*args) => (
 ["foo", "bar", "spam", "eggs"]
 | sort(by: (word) => [word | length, word])
 >> ["bar", "foo", "eggs", "spam"]
+```
+
+## Streams
+
+The `build` function generates a stream by repeatedly applying a function to a start value, and transforming the resulting states into stream elements.
+
+As with `repeat`, there are two ways of specifying when the loop should end. If you pass a `while` function, the result stream will contain only elements produced from states for which the `while` function returns `true`.
+
+```
+# Build
+fib = (limit) => build(
+    [1, 1],
+    while: (state) => state @ 1 | isLessThan(limit),
+    out: (state) => [state @ 1],
+    next: (state) => [state @ 2, plus(*state)],
+);
+[
+    fib(1) | toArray,
+    fib(2) | toArray,
+    fib(20) | toArray,
+]
+>> [
+    [],
+    [1, 1],
+    [1, 1, 2, 3, 5, 8, 13]
+]
+```
+
+Or you can pass a `continueIf` function, in which case the result stream will contain the elements produced from the first state for which `continueIf` returns `false`.
+
+```
+# Build with continue-if
+fib = (limit) => build(
+    [1, 1],
+    out: (state) => [state @ 1],
+    next: (state) => [state @ 2, plus(*state)],
+    continueIf: (state) => state @ 1 | isLessThan(limit),
+);
+[
+    fib(1) | toArray,
+    fib(2) | toArray,
+    fib(20) | toArray,
+]
+>> [
+    [1],
+    [1, 1, 2],
+    [1, 1, 2, 3, 5, 8, 13, 21]
+]
+```
+
+Since the `out` property is an array (or stream), an iteration can add multiple values to the result, or skip adding values entirely.
+
+```
+# Build with multiple outs
+build(
+    [1, 1],
+    while: (state) => state @ 1 | isLessThan(20),
+    out: (state) => if(
+        state @ 1 | divideWithRemainder(2) @ remainder: | equals(0),
+        then: () => [],
+        else: () => [state @ 1, state @ 1],
+    ),
+    next: (state) => [state @ 2, plus(*state)],
+)
+| toArray
+>> [1, 1, 1, 1, 3, 3, 5, 5, 13, 13]
+```
+
+```
+# Ranges
+[
+    1 | to(5) | toArray,
+    5 | to(10) | toArray,
+]
+>> [
+    [1, 2, 3, 4, 5],
+    [5, 6, 7, 8, 9, 10],
+]
+```
+
+```
+# Ranges with step
+[
+    1 | to(10, by: 3) | toArray,
+    5 | to(10, by: 2) | toArray,
+]
+>> [
+    [1, 4, 7, 10],
+    [5, 7, 9],
+]
+```
+
+```
+# Ranges with negative step
+[
+    5 | to(1, by: -1) | toArray,
+    10 | to(5, by: -2) | toArray,
+]
+>> [
+    [5, 4, 3, 2, 1],
+    [10, 8, 6],
+]
+```
+
+```
+# Ranges defined by size
+[
+    1 | toSize(5) | toArray,
+    5 | toSize(6) | toArray,
+]
+>> [
+    [1, 2, 3, 4, 5],
+    [5, 6, 7, 8, 9, 10],
+]
+```
+
+```
+# Dropping leading elements
+[
+    [42, 97, 6, 12, 64] | dropFirst | toArray,
+    [42, 97, 6, 12, 64] | dropFirst(3) | toArray,
+]
+>> [
+    [97, 6, 12, 64],
+    [12, 64],
+]
+```
+
+```
+# Rebuilding
+[1, 2, 3] | rebuild((i) => [i, times(i, i)]) | toArray
+>> [1, 1, 2, 4, 3, 9]
+```
+
+```
+# Transforming
+[1, 2, 3] | transform((i) => times(i, i)) | toArray
+>> [1, 4, 9]
+```
+
+```
+# Filtering
+[1, 10, 2, 9, 3, 12] | where((i) => (i | isLessThan(10))) | toArray
+>> [1, 2, 9, 3]
+```
+
+```
+# Zipping
+[
+    [1, 2, 3] | zip(["one", "two", "three"]),
+    [1, 2, 3] | zip(["one", "two"]),
+] | toArray
+>> [
+    [[1, "one"], [2, "two"], [3, "three"]],
+    [[1, "one"], [2, "two"]],
+]
+```
+
+```
+# Zipping - filling missing elements
+zipFilling = (*args) => (
+    zip(
+        *args,
+        fillWith: ((arrayNumber:, elementNumber:) => [arrayNumber, elementNumber])
+    )
+    | toArray
+);
+[
+    [1, 2, 3] | zipFilling(["one", "two", "three"]),
+    [1, 2, 3] | zipFilling(["one", "two"]),
+]
+>> [
+    [[1, "one"], [2, "two"], [3, "three"]],
+    [[1, "one"], [2, "two"], [3, [2, 3]]],
+]
+```
+
+```
+# Flattening nested arrays
+[[1], [2, 3], [4, 5, [6]]] | flatten | toArray
+>> [1, 2, 3, 4, 5, [6]]
+```
+
+```
+# Chunking into arrays of a fixed size
+[
+    1 | to(9) | chunk(3) | toArray,
+    1 | to(10) | chunk(3) | toArray,
+    1 | to(11) | chunk(3) | toArray,
+]
+>> [
+    [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+    [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]],
+    [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11]],
+]
 ```
 
 ## Objects
