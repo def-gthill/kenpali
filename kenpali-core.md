@@ -780,7 +780,141 @@ mySum([1, 2, 3])
 >> 6
 ```
 
-## Arrays
+## Stream Builders
+
+These functions build up new streams from scalar inputs.
+
+The `build` function generates a stream by repeatedly applying a function to a start value, and transforming the resulting states into stream elements.
+
+As with `repeat`, there are two ways of specifying when the loop should end. If you pass a `while` function, the result stream will contain only elements produced from states for which the `while` function returns `true`.
+
+```
+# Build
+fib = (limit) => [1, 1] | build(
+    while: ([current, next]) => current | isLessThan(limit),
+    out: ([current, next]) => [current],
+    next: ([current, next]) => [next, current | plus(next)],
+);
+[
+    fib(1) | isStream,
+    fib(1) | toArray,
+    fib(2) | toArray,
+    fib(20) | toArray,
+]
+>> [
+    true,
+    [],
+    [1, 1],
+    [1, 1, 2, 3, 5, 8, 13]
+]
+```
+
+Or you can pass a `continueIf` function, in which case the result stream will contain the elements produced from the first state for which `continueIf` returns `false`.
+
+```
+# Build with continue-if
+fib = (limit) => [1, 1] | build(
+    out: ([current, next]) => [current],
+    next: ([current, next]) => [next, current | plus(next)],
+    continueIf: ([current, next]) => current | isLessThan(limit),
+);
+[
+    fib(1) | toArray,
+    fib(2) | toArray,
+    fib(20) | toArray,
+]
+>> [
+    [1],
+    [1, 1, 2],
+    [1, 1, 2, 3, 5, 8, 13, 21]
+]
+```
+
+You can omit both the `while` and `continueIf` functions to create an infinite stream.
+
+```
+# Build with no stopping condition
+fib = [1, 1] | build(
+    out: ([current, next]) => [current],
+    next: ([current, next]) => [next, current | plus(next)],
+);
+[
+    fib @ 1,
+    fib @ 3,
+    fib @ 8,
+]
+>> [1, 2, 21]
+```
+
+Since the `out` property is an array (or stream), an iteration can add multiple values to the result, or skip adding values entirely.
+
+```
+# Build with multiple outs
+build(
+    [1, 1],
+    while: (state) => state @ 1 | isLessThan(20),
+    out: (state) => if(
+        state @ 1 | divideWithRemainder(2) @ remainder: | equals(0),
+        then: () => [],
+        else: () => [state @ 1, state @ 1],
+    ),
+    next: (state) => [state @ 2, plus(*state)],
+)
+| toArray
+>> [1, 1, 1, 1, 3, 3, 5, 5, 13, 13]
+```
+
+```
+# Ranges
+[
+    1 | to(5) | toArray,
+    5 | to(10) | toArray,
+]
+>> [
+    [1, 2, 3, 4, 5],
+    [5, 6, 7, 8, 9, 10],
+]
+```
+
+```
+# Ranges with step
+[
+    1 | to(10, by: 3) | toArray,
+    5 | to(10, by: 2) | toArray,
+]
+>> [
+    [1, 4, 7, 10],
+    [5, 7, 9],
+]
+```
+
+```
+# Ranges with negative step
+[
+    5 | to(1, by: -1) | toArray,
+    10 | to(5, by: -2) | toArray,
+]
+>> [
+    [5, 4, 3, 2, 1],
+    [10, 8, 6],
+]
+```
+
+```
+# Ranges defined by size
+[
+    1 | toSize(5) | toArray,
+    5 | toSize(6) | toArray,
+]
+>> [
+    [1, 2, 3, 4, 5],
+    [5, 6, 7, 8, 9, 10],
+]
+```
+
+## Stream Collapsers
+
+These functions exhaust an input stream to produce a scalar output or side effect. They loop forever if given an infinite stream.
 
 ```
 # Array length
@@ -790,16 +924,6 @@ mySum([1, 2, 3])
     length(["foo", "bar", "baz"]),
 ]
 >> [0, 1, 3]
-```
-
-```
-# Slicing arrays
-[
-    [42, 97, 6, 12, 64] | slice(2 | to(4)),
-]
->> [
-    [97, 6, 12],
-]
 ```
 
 ```
@@ -887,119 +1011,9 @@ mySum([1, 2, 3])
 >> ["bar", "foo", "eggs", "spam"]
 ```
 
-## Streams
+## Stream Rebuilders
 
-The `build` function generates a stream by repeatedly applying a function to a start value, and transforming the resulting states into stream elements.
-
-As with `repeat`, there are two ways of specifying when the loop should end. If you pass a `while` function, the result stream will contain only elements produced from states for which the `while` function returns `true`.
-
-```
-# Build
-fib = (limit) => build(
-    [1, 1],
-    while: (state) => state @ 1 | isLessThan(limit),
-    out: (state) => [state @ 1],
-    next: (state) => [state @ 2, plus(*state)],
-);
-[
-    fib(1) | toArray,
-    fib(2) | toArray,
-    fib(20) | toArray,
-]
->> [
-    [],
-    [1, 1],
-    [1, 1, 2, 3, 5, 8, 13]
-]
-```
-
-Or you can pass a `continueIf` function, in which case the result stream will contain the elements produced from the first state for which `continueIf` returns `false`.
-
-```
-# Build with continue-if
-fib = (limit) => build(
-    [1, 1],
-    out: (state) => [state @ 1],
-    next: (state) => [state @ 2, plus(*state)],
-    continueIf: (state) => state @ 1 | isLessThan(limit),
-);
-[
-    fib(1) | toArray,
-    fib(2) | toArray,
-    fib(20) | toArray,
-]
->> [
-    [1],
-    [1, 1, 2],
-    [1, 1, 2, 3, 5, 8, 13, 21]
-]
-```
-
-Since the `out` property is an array (or stream), an iteration can add multiple values to the result, or skip adding values entirely.
-
-```
-# Build with multiple outs
-build(
-    [1, 1],
-    while: (state) => state @ 1 | isLessThan(20),
-    out: (state) => if(
-        state @ 1 | divideWithRemainder(2) @ remainder: | equals(0),
-        then: () => [],
-        else: () => [state @ 1, state @ 1],
-    ),
-    next: (state) => [state @ 2, plus(*state)],
-)
-| toArray
->> [1, 1, 1, 1, 3, 3, 5, 5, 13, 13]
-```
-
-```
-# Ranges
-[
-    1 | to(5) | toArray,
-    5 | to(10) | toArray,
-]
->> [
-    [1, 2, 3, 4, 5],
-    [5, 6, 7, 8, 9, 10],
-]
-```
-
-```
-# Ranges with step
-[
-    1 | to(10, by: 3) | toArray,
-    5 | to(10, by: 2) | toArray,
-]
->> [
-    [1, 4, 7, 10],
-    [5, 7, 9],
-]
-```
-
-```
-# Ranges with negative step
-[
-    5 | to(1, by: -1) | toArray,
-    10 | to(5, by: -2) | toArray,
-]
->> [
-    [5, 4, 3, 2, 1],
-    [10, 8, 6],
-]
-```
-
-```
-# Ranges defined by size
-[
-    1 | toSize(5) | toArray,
-    5 | toSize(6) | toArray,
-]
->> [
-    [1, 2, 3, 4, 5],
-    [5, 6, 7, 8, 9, 10],
-]
-```
+These functions create new streams that depend on existing ones, preserving stream laziness.
 
 ```
 # Dropping leading elements
@@ -1010,6 +1024,16 @@ build(
 >> [
     [97, 6, 12, 64],
     [12, 64],
+]
+```
+
+```
+# Slicing arrays
+[
+    [42, 97, 6, 12, 64] | slice(2 | to(4)),
+]
+>> [
+    [97, 6, 12],
 ]
 ```
 

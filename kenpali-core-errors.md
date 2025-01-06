@@ -118,10 +118,10 @@ toNumber("42a")
 !! notNumeric {"value": "42a"}
 ```
 
-## Arrays
+## Stream Builders
 
 ```
-# Non-array returned from build
+# Non-sequence returned from build
 1 | build(
     while: (n) => n | isLessThan(10),
     out: (n) => n,
