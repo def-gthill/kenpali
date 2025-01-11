@@ -118,18 +118,6 @@ toNumber("42a")
 !! notNumeric {"value": "42a"}
 ```
 
-## Stream Builders
-
-```
-# Non-sequence returned from build
-1 | build(
-    while: (n) => n | isLessThan(10),
-    out: (n) => n,
-    next: (n) => n | increment,
-)
-!! wrongReturnType {"value": 1, "expectedType": {"either": ["array", "stream"]}}
-```
-
 ## Mutable Objects
 
 ```

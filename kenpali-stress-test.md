@@ -23,6 +23,23 @@ foo
 >> [57, 42, 216, 73]
 ```
 
+## Streams
+
+```
+# Stream values are locked in by the first traversal
+answer = variable(42);
+stream = 1 | build(
+    while: | isAtMost(3),
+    next: | increment,
+    out: | plus(answer @ get:()),
+);
+before = stream | toArray;
+answer @ set:(73);
+after = stream | toArray;
+[before, after]
+>> [[43, 44, 45], [43, 44, 45]]
+```
+
 ## Objects
 
 ```

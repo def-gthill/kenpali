@@ -791,8 +791,8 @@ As with `repeat`, there are two ways of specifying when the loop should end. If 
 ```
 # Build
 fib = (limit) => [1, 1] | build(
-    while: ([current, next]) => current | isLessThan(limit),
-    out: ([current, next]) => [current],
+    while: ([current]) => current | isLessThan(limit),
+    out: ([current]) => current,
     next: ([current, next]) => [next, current | plus(next)],
 );
 [
@@ -809,14 +809,14 @@ fib = (limit) => [1, 1] | build(
 ]
 ```
 
-Or you can pass a `continueIf` function, in which case the result stream will contain the elements produced from the first state for which `continueIf` returns `false`.
+Or you can pass a `continueIf` function, in which case the result stream will contain the element produced from the first state for which `continueIf` returns `false`.
 
 ```
 # Build with continue-if
 fib = (limit) => [1, 1] | build(
-    out: ([current, next]) => [current],
+    out: ([current]) => current,
     next: ([current, next]) => [next, current | plus(next)],
-    continueIf: ([current, next]) => current | isLessThan(limit),
+    continueIf: ([current]) => current | isLessThan(limit),
 );
 [
     fib(1) | toArray,
@@ -835,7 +835,7 @@ You can omit both the `while` and `continueIf` functions to create an infinite s
 ```
 # Build with no stopping condition
 fib = [1, 1] | build(
-    out: ([current, next]) => [current],
+    out: ([current, next]) => current,
     next: ([current, next]) => [next, current | plus(next)],
 );
 [
@@ -846,31 +846,15 @@ fib = [1, 1] | build(
 >> [1, 2, 21]
 ```
 
-Since the `out` property is an array (or stream), an iteration can add multiple values to the result, or skip adding values entirely.
-
-```
-# Build with multiple outs
-build(
-    [1, 1],
-    while: (state) => state @ 1 | isLessThan(20),
-    out: (state) => if(
-        state @ 1 | divideWithRemainder(2) @ remainder: | equals(0),
-        then: () => [],
-        else: () => [state @ 1, state @ 1],
-    ),
-    next: (state) => [state @ 2, plus(*state)],
-)
-| toArray
->> [1, 1, 1, 1, 3, 3, 5, 5, 13, 13]
-```
-
 ```
 # Ranges
 [
+    1 | to(5) | isStream,
     1 | to(5) | toArray,
     5 | to(10) | toArray,
 ]
 >> [
+    true,
     [1, 2, 3, 4, 5],
     [5, 6, 7, 8, 9, 10],
 ]
@@ -903,10 +887,12 @@ build(
 ```
 # Ranges defined by size
 [
+    1 | toSize(5) | isStream,
     1 | toSize(5) | toArray,
     5 | toSize(6) | toArray,
 ]
 >> [
+    true,
     [1, 2, 3, 4, 5],
     [5, 6, 7, 8, 9, 10],
 ]
@@ -916,14 +902,64 @@ build(
 
 These functions exhaust an input stream to produce a scalar output or side effect. They loop forever if given an infinite stream.
 
+The `collapse` function combines each element of the input stream with an internal state in turn, returning the final state.
+
 ```
-# Array length
+# Collapse
+fromBinary = (digits) => digits | collapse(
+    start: 0,
+    next: (state, digit) => state | times(2) | plus(digit),
+);
+[1, 0, 1, 0, 1, 0] | fromBinary
+>> 42
+```
+
+The `collapse` function automatically stops if it reaches the end of the input stream, but it also accepts the same `while` and `continueIf` arguments that `repeat` and `build` do, allowing you to specify additional stopping criteria.
+
+```
+# Collapse with while
+blackjackSafe = (cards) => cards | collapse(
+    start: 0,
+    while: (state) => state | isAtMost(21),
+    next: (state, card) => state | plus(card),
+);
+[2, 8, 9, 3, 7] | blackjackSafe
+>> 19
+```
+
+```
+# Collapse with continueIf
+blackjackBust = (cards) => cards | collapse(
+    start: 0,
+    next: (state, card) => state | plus(card),
+    continueIf: (state) => state | isAtMost(21),
+);
+[2, 8, 9, 3, 7] | blackjackBust
+>> 22
+```
+
+```
+# Sequence length
 [
     length([]),
     length(["foo"]),
     length(["foo", "bar", "baz"]),
+    length(1 | to(0)),
+    length(1 | to(5)),
 ]
->> [0, 1, 3]
+>> [0, 1, 3, 0, 5]
+```
+
+```
+# Keeping trailing elements
+[
+    [42, 97, 6, 12, 64] | keepLast(3),
+    1 | to(5) | keepLast(3),
+]
+>> [
+    [6, 12, 64],
+    [3, 4, 5],
+]
 ```
 
 ```
@@ -931,17 +967,27 @@ These functions exhaust an input stream to produce a scalar output or side effec
 [
     [42, 97, 6, 12, 64] | dropLast,
     [42, 97, 6, 12, 64] | dropLast(3),
+    1 | to(5) | dropLast,
+    1 | to(5) | dropLast(3),
 ]
 >> [
     [42, 97, 6, 12],
     [42, 97],
+    [1, 2, 3, 4],
+    [1, 2],
 ]
 ```
 
 ```
 # Transposing
-[[1, "one"], [2, "two"], [3, "three"]] | transpose
->> [[1, 2, 3], ["one", "two", "three"]]
+[
+    [[1, "one"], [2, "two"], [3, "three"]] | transpose,
+    [[1, "one"], [2, "two"], [3, "three"]] | toStream | transpose,
+]
+>> [
+    [[1, 2, 3], ["one", "two", "three"]],
+    [[1, 2, 3], ["one", "two", "three"]],
+]
 ```
 
 ```
@@ -964,8 +1010,11 @@ These functions exhaust an input stream to produce a scalar output or side effec
 
 ```
 # Counting
-[1, 10, 2, 9, 3, 12] | count((i) => (i | isLessThan(10)))
->> 4
+[
+    [1, 10, 2, 9, 3, 12] | count((i) => (i | isLessThan(10))),
+    [1, 10, 2, 9, 3, 12] | toStream | count((i) => (i | isLessThan(10))),
+]
+>> [4, 4]
 ```
 
 ```
@@ -973,8 +1022,10 @@ These functions exhaust an input stream to produce a scalar output or side effec
 [
     [1, 2, 3] | forAll((n) => (n | isLessThan(10))),
     [1, 42, 3] | forAll((n) => (n | isLessThan(10))),
+    [1, 2, 3] | toStream | forAll((n) => (n | isLessThan(10))),
+    [1, 42, 3] | toStream | forAll((n) => (n | isLessThan(10))),
 ]
->> [true, false]
+>> [true, false, true, false]
 ```
 
 ```
@@ -982,20 +1033,34 @@ These functions exhaust an input stream to produce a scalar output or side effec
 [
     [41, 2, 43] | forSome((n) => (n | isLessThan(10))),
     [41, 42, 43] | forSome((n) => (n | isLessThan(10))),
+    [41, 2, 43] | toStream | forSome((n) => (n | isLessThan(10))),
+    [41, 42, 43] | toStream | forSome((n) => (n | isLessThan(10))),
 ]
->> [true, false]
+>> [true, false, true, false]
 ```
 
 ```
 # Reversing
-["foo", "bar", "spam", "eggs"] | reverse
->> ["eggs", "spam", "bar", "foo"]
+[
+    ["foo", "bar", "spam", "eggs"] | reverse,
+    ["foo", "bar", "spam", "eggs"] | toStream | reverse,
+]
+>> [
+    ["eggs", "spam", "bar", "foo"],
+    ["eggs", "spam", "bar", "foo"],
+]
 ```
 
 ```
 # Sorting in natural order
-["foo", "bar", "spam", "eggs"] | sort
->> ["bar", "eggs", "foo", "spam"]
+[
+    ["foo", "bar", "spam", "eggs"] | sort,
+    ["foo", "bar", "spam", "eggs"] | sort,
+]
+>> [
+    ["bar", "eggs", "foo", "spam"],
+    ["bar", "eggs", "foo", "spam"],
+]
 ```
 
 ```
@@ -1011,19 +1076,39 @@ These functions exhaust an input stream to produce a scalar output or side effec
 >> ["bar", "foo", "eggs", "spam"]
 ```
 
+## Stream Accessors
+
+These functions calculate a scalar value from a stream, but only access a finite number of elements to do so. Therefore, they are safe to call even on infinite streams.
+
 ## Stream Rebuilders
 
 These functions create new streams that depend on existing ones, preserving stream laziness.
+
+```
+# Keeping leading elements
+[
+    [42, 97, 6, 12, 64] | keepFirst(3) | isStream,
+    [42, 97, 6, 12, 64] | keepFirst(3) | toArray,
+    1 | build(next: | times(2)) | keepFirst(3) | toArray,
+]
+>> [
+    true,
+    [42, 97, 6],
+    [1, 2, 4],
+]
+```
 
 ```
 # Dropping leading elements
 [
     [42, 97, 6, 12, 64] | dropFirst | toArray,
     [42, 97, 6, 12, 64] | dropFirst(3) | toArray,
+    1 | build(next: | times(2)) | dropFirst(3) | keepFirst(3) | toArray,
 ]
 >> [
     [97, 6, 12, 64],
     [12, 64],
+    [8, 16, 32],
 ]
 ```
 
