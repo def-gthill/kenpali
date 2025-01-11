@@ -1123,12 +1123,6 @@ These functions create new streams that depend on existing ones, preserving stre
 ```
 
 ```
-# Rebuilding
-[1, 2, 3] | rebuild((i) => [i, times(i, i)]) | toArray
->> [1, 1, 2, 4, 3, 9]
-```
-
-```
 # Transforming
 [1, 2, 3] | transform((i) => times(i, i)) | toArray
 >> [1, 4, 9]
