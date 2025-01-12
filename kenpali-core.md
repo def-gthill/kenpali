@@ -854,6 +854,25 @@ powersOfTwo = 1 | build(| times(2));
 These functions exhaust an input stream to produce a scalar output or side effect. They loop forever if given an infinite stream.
 
 ```
+# Indexing with a negative index
+[
+    ["foo", "bar", "baz"] @ -2,
+    1 | to(5) @ -2,
+]
+>> ["bar", 4]
+```
+
+```
+# Last element
+[
+    ["foo"] | last,
+    ["foo", "bar", "baz"] | last,
+    1 | to(5) | last,
+]
+>> ["foo", "baz", 5]
+```
+
+```
 # Sequence length
 [
     length([]),
