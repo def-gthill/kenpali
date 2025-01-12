@@ -1085,6 +1085,30 @@ These functions calculate a scalar value from a stream, but only access a finite
 These functions create new streams that depend on existing ones, preserving stream laziness.
 
 ```
+# Transforming
+[1, 2, 3] | transform((i) => times(i, i)) | toArray
+>> [1, 4, 9]
+```
+
+```
+# Transforming with state
+[2, 8, 9, 3, 7]
+| transform((number, back: index) => number | times(index))
+| withState(start: 1, next: | times(2))
+| toArray
+>> [2, 16, 36, 24, 112]
+```
+
+```
+# Transforming with running
+[2, 8, 9, 3, 7]
+| transform((number, back: total) => total | times(10) | plus(number))
+| withRunning(start: 0)
+| toArray
+>> [0, 2, 28, 289, 2893, 28937]
+```
+
+```
 # Keeping leading elements
 [
     [42, 97, 6, 12, 64] | keepFirst(3) | isStream,
@@ -1120,12 +1144,6 @@ These functions create new streams that depend on existing ones, preserving stre
 >> [
     [97, 6, 12],
 ]
-```
-
-```
-# Transforming
-[1, 2, 3] | transform((i) => times(i, i)) | toArray
->> [1, 4, 9]
 ```
 
 ```
