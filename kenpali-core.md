@@ -853,42 +853,6 @@ powersOfTwo = 1 | build(| times(2));
 
 These functions exhaust an input stream to produce a scalar output or side effect. They loop forever if given an infinite stream.
 
-The `collapse` function combines each element of the input stream with an internal state in turn, returning the final state.
-
-```
-# Collapse
-fromBinary = (digits) => digits | collapse(
-    start: 0,
-    next: (state, digit) => state | times(2) | plus(digit),
-);
-[1, 0, 1, 0, 1, 0] | fromBinary
->> 42
-```
-
-The `collapse` function automatically stops if it reaches the end of the input stream, but it also accepts the same `while` and `continueIf` arguments that `repeat` and `build` do, allowing you to specify additional stopping criteria.
-
-```
-# Collapse with while
-blackjackSafe = (cards) => cards | collapse(
-    start: 0,
-    while: (state) => state | isAtMost(21),
-    next: (state, card) => state | plus(card),
-);
-[2, 8, 9, 3, 7] | blackjackSafe
->> 19
-```
-
-```
-# Collapse with continueIf
-blackjackBust = (cards) => cards | collapse(
-    start: 0,
-    next: (state, card) => state | plus(card),
-    continueIf: (state) => state | isAtMost(21),
-);
-[2, 8, 9, 3, 7] | blackjackBust
->> 22
-```
-
 ```
 # Sequence length
 [
