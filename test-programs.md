@@ -46,10 +46,9 @@ collatzStep = (n) => if(
     else: () => n | times(3) | plus(1),
 );
 collatz = (start) => (
-    start | build(
-        next: collatzStep,
-        continueIf: (n) => n | isMoreThan(1),
-    )
+    start
+    | build(collatzStep)
+    | continueIf(| isMoreThan(1))
     | toArray
 );
 collatz(7)

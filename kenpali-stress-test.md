@@ -28,11 +28,7 @@ foo
 ```
 # Stream values are locked in by the first traversal
 answer = variable(42);
-stream = 1 | build(
-    while: | isAtMost(3),
-    next: | increment,
-    out: | plus(answer @ get:()),
-);
+stream = 1 | to(3) | transform(| plus(answer @ get:()));
 before = stream | toArray;
 answer @ set:(73);
 after = stream | toArray;

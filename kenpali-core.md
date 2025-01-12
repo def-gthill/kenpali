@@ -784,66 +784,17 @@ mySum([1, 2, 3])
 
 These functions build up new streams from scalar inputs.
 
-The `build` function generates a stream by repeatedly applying a function to a start value, and transforming the resulting states into stream elements.
-
-As with `repeat`, there are two ways of specifying when the loop should end. If you pass a `while` function, the result stream will contain only elements produced from states for which the `while` function returns `true`.
+The `build` function generates a stream by repeatedly applying a function to a start value.
 
 ```
 # Build
-fib = (limit) => [1, 1] | build(
-    while: ([current]) => current | isLessThan(limit),
-    out: ([current]) => current,
-    next: ([current, next]) => [next, current | plus(next)],
-);
+powersOfTwo = 1 | build(| times(2));
 [
-    fib(1) | isStream,
-    fib(1) | toArray,
-    fib(2) | toArray,
-    fib(20) | toArray,
+    powersOfTwo @ 1,
+    powersOfTwo @ 3,
+    powersOfTwo @ 8,
 ]
->> [
-    true,
-    [],
-    [1, 1],
-    [1, 1, 2, 3, 5, 8, 13]
-]
-```
-
-Or you can pass a `continueIf` function, in which case the result stream will contain the element produced from the first state for which `continueIf` returns `false`.
-
-```
-# Build with continue-if
-fib = (limit) => [1, 1] | build(
-    out: ([current]) => current,
-    next: ([current, next]) => [next, current | plus(next)],
-    continueIf: ([current]) => current | isLessThan(limit),
-);
-[
-    fib(1) | toArray,
-    fib(2) | toArray,
-    fib(20) | toArray,
-]
->> [
-    [1],
-    [1, 1, 2],
-    [1, 1, 2, 3, 5, 8, 13, 21]
-]
-```
-
-You can omit both the `while` and `continueIf` functions to create an infinite stream.
-
-```
-# Build with no stopping condition
-fib = [1, 1] | build(
-    out: ([current, next]) => current,
-    next: ([current, next]) => [next, current | plus(next)],
-);
-[
-    fib @ 1,
-    fib @ 3,
-    fib @ 8,
-]
->> [1, 2, 21]
+>> [1, 4, 128]
 ```
 
 ```
@@ -1113,7 +1064,7 @@ These functions create new streams that depend on existing ones, preserving stre
 [
     [42, 97, 6, 12, 64] | keepFirst(3) | isStream,
     [42, 97, 6, 12, 64] | keepFirst(3) | toArray,
-    1 | build(next: | times(2)) | keepFirst(3) | toArray,
+    1 | build(| times(2)) | keepFirst(3) | toArray,
 ]
 >> [
     true,
@@ -1127,7 +1078,7 @@ These functions create new streams that depend on existing ones, preserving stre
 [
     [42, 97, 6, 12, 64] | dropFirst | toArray,
     [42, 97, 6, 12, 64] | dropFirst(3) | toArray,
-    1 | build(next: | times(2)) | dropFirst(3) | keepFirst(3) | toArray,
+    1 | build(| times(2)) | dropFirst(3) | keepFirst(3) | toArray,
 ]
 >> [
     [97, 6, 12, 64],
@@ -1144,6 +1095,28 @@ These functions create new streams that depend on existing ones, preserving stre
 >> [
     [97, 6, 12],
 ]
+```
+
+The `while` function stops the stream as soon as the specified condition becomes false. The resulting stream contains only elements that satisfy the condition.
+
+```
+# While
+1
+| build(| times(2))
+| while(| isLessThan(100))
+| toArray
+>> [1, 2, 4, 8, 16, 32, 64]
+```
+
+The `continueIf` function is like `while`, except it includes one extra element—the first element that doesn't satisfy the condition. This make some stopping conditions easier to express.
+
+```
+# Continue-If
+1
+| build(| times(2))
+| continueIf(| isLessThan(100))
+| toArray
+>> [1, 2, 4, 8, 16, 32, 64, 128]
 ```
 
 ```
