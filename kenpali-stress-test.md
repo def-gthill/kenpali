@@ -155,13 +155,10 @@ foo = (a, b = 4) => (c, d = 5) => [a, b, c, d];
 ## Sets and Maps
 
 ```
-# Set-has as while
+# Set-has as callback
 set = [1, 2, 3, 4, 42] | newSet;
-1 | repeat(
-    while: set @ has:,
-    next: increment
-)
->> 4
+[3, 8, 4, 42, 57] | where(set @ has:) | toArray
+>> [3, 4, 42]
 ```
 
 ## Errors

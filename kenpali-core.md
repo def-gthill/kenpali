@@ -722,64 +722,6 @@ foo = () => (
 >> [37, 7]
 ```
 
-The `repeat` function repeatedly updates a value by applying the specified `next` function. The function is applied until the next application would cause the `while` function to return `false`, i.e. the result is the last value for which `while` returns `true`.
-
-```
-# Repeat with while
-powerOfTwo = (limit) => repeat(
-    1,
-    while: (n) => n | isLessThan(limit),
-    next: (n) => n | times(2),
-);
-[
-    powerOfTwo(1),
-    powerOfTwo(3),
-    powerOfTwo(1000),
-]
->> [
-    1,
-    2,
-    512,
-]
-```
-
-Alternatively, you can pass a `continueIf` function. Then the result is the first value for which `continueIf` returns `false`.
-
-```
-# Repeat with continue-if
-powerOfTwo = (limit) => repeat(
-    1,
-    next: (n) => n | times(2),
-    continueIf: (n) => n | isLessThan(limit),
-);
-[
-    powerOfTwo(1),
-    powerOfTwo(3),
-    powerOfTwo(1000),
-]
->> [
-    1,
-    4,
-    1024,
-]
-```
-
-```
-# Repeat - next isn't called if continue-if is false
-mySum = (array) => [1, 0] | repeat(
-    next: (state) => (
-        [i, total] = state;
-        [i | increment, total | plus(array @ i)]
-    ),
-    continueIf: (state) => (
-        [i, total] = state;
-        i | isAtMost(array | length)
-    ),
-) @ 2;
-mySum([1, 2, 3])
->> 6
-```
-
 ## Stream Builders
 
 These functions build up new streams from scalar inputs.
