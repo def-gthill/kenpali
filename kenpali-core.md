@@ -931,7 +931,7 @@ These functions exhaust an input stream to produce a scalar output or side effec
 # Sorting in natural order
 [
     ["foo", "bar", "spam", "eggs"] | sort,
-    ["foo", "bar", "spam", "eggs"] | sort,
+    ["foo", "bar", "spam", "eggs"] | toStream | sort,
 ]
 >> [
     ["bar", "eggs", "foo", "spam"],
