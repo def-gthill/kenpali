@@ -1089,9 +1089,15 @@ The `continueIf` function is like `while`, except it includes one extra elementâ
 ```
 
 ```
-# Flattening nested arrays
-[[1], [2, 3], [4, 5, [6]]] | flatten | toArray
->> [1, 2, 3, 4, 5, [6]]
+# Flattening nested sequences
+[
+    [[1], [2, 3], [4, 5, [6]]] | flatten | toArray,
+    [[1], [2, 3], []] | flatten | toArray,
+]
+>> [
+    [1, 2, 3, 4, 5, [6]],
+    [1, 2, 3],
+]
 ```
 
 ```
