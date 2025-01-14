@@ -966,7 +966,7 @@ On the other hand, names that are in scope when the function is called don't lea
     "indexing": {"literal": 42},
     "at": {"literal": 2}
 }
-!! wrongType {"value": 42, "expectedType": {"either": ["string", "array", "object"]}}
+!! wrongType {"value": 42, "expectedType": {"either": ["sequence", "object"]}}
 ```
 
 ## Errors

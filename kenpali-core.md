@@ -513,7 +513,7 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
     "stream [1, 2, 3...]",
     "{foo: \"bar\", \"spam!\": \"eggs\"}",
     "function toString",
-    "error wrongType {value: 1, expectedType: {either: [\"string\", \"array\", \"object\"]}}"
+    "error wrongType {value: 1, expectedType: {either: [\"sequence\", \"object\"]}}"
 ]
 ```
 
@@ -976,10 +976,14 @@ These functions create new streams that depend on existing ones, preserving stre
 ```
 
 ```
-# Transforming with running
+# Running state
 [2, 8, 9, 3, 7]
-| transform((number, back: total) => total | times(10) | plus(number))
-| withRunning(start: 0)
+| running(
+    start: 0,
+    next: (number, state: total) => (
+        total | times(10) | plus(number)
+    ),
+)
 | toArray
 >> [0, 2, 28, 289, 2893, 28937]
 ```
@@ -1046,38 +1050,41 @@ The `continueIf` function is like `while`, except it includes one extra elementâ
 
 ```
 # Filtering
-[1, 10, 2, 9, 3, 12] | where((i) => (i | isLessThan(10))) | toArray
->> [1, 2, 9, 3]
+[
+    [1] | where(| isLessThan(10)) | isStream,
+    [1, 10, 2, 9, 3, 12] | where(| isLessThan(10)) | toArray
+]
+>> [
+    true,
+    [1, 2, 9, 3],
+]
 ```
 
 ```
 # Zipping
 [
-    [1, 2, 3] | zip(["one", "two", "three"]),
-    [1, 2, 3] | zip(["one", "two"]),
-] | toArray
+    [1] | zip(["one"]) | isStream,
+    [1, 2, 3] | zip(["one", "two", "three"]) | toArray,
+    [1, 2, 3] | zip(["one", "two"]) | toArray,
+    1 | build(| times(2)) | zip(["one", "two", "three"]) | toArray,
+]
 >> [
+    true,
     [[1, "one"], [2, "two"], [3, "three"]],
     [[1, "one"], [2, "two"]],
+    [[1, "one"], [2, "two"], [4, "three"]],
 ]
 ```
 
 ```
-# Zipping - filling missing elements
-zipFilling = (*args) => (
-    zip(
-        *args,
-        fillWith: ((arrayNumber:, elementNumber:) => [arrayNumber, elementNumber])
-    )
-    | toArray
-);
+# Unzipping
 [
-    [1, 2, 3] | zipFilling(["one", "two", "three"]),
-    [1, 2, 3] | zipFilling(["one", "two"]),
+    [[1, "one"]] | unzip | forAll(| isStream),
+    [[1, "one"], [2, "two"], [3, "three"]] | unzip | transform(| toArray) | toArray,
 ]
 >> [
-    [[1, "one"], [2, "two"], [3, "three"]],
-    [[1, "one"], [2, "two"], [3, [2, 3]]],
+    true,
+    [[1, 2, 3], ["one", "two", "three"]]
 ]
 ```
 
