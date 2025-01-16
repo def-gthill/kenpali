@@ -496,7 +496,6 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
     toString("foo"),
     toString([1, 2, 3]),
     toString(1 | to(3)),
-    toString(1 | to(4)),
     toString({foo: "bar", "spam!": "eggs"}),
     toString(toString),
     toString((1 @ 1)!),
@@ -509,11 +508,33 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
     "-2.5",
     "\"foo\"",
     "[1, 2, 3]",
-    "stream [1, 2, 3]",
-    "stream [1, 2, 3...]",
+    "stream [...]",
     "{foo: \"bar\", \"spam!\": \"eggs\"}",
     "function toString",
     "error wrongType {value: 1, expectedType: {either: [\"sequence\", \"object\"]}}"
+]
+```
+
+Calling `toString` on a stream reports already evaluated elements but never forces further evaluation.
+
+```
+# To string on streams
+stream = 1 | to(4);
+[
+    stream | toString,
+    (
+        stream | keepFirst(3) | toArray;
+        stream | toString
+    ),
+    (
+        stream | toArray;
+        stream | toString
+    ),
+]
+>> [
+    "stream [...]",
+    "stream [1, 2, 3...]",
+    "stream [1, 2, 3, 4]",
 ]
 ```
 
