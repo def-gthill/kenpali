@@ -26,6 +26,34 @@ foo
 ## Streams
 
 ```
+# Merely invoking build doesn't call the callback
+1 | build(() => 1 @ 1);
+42
+>> 42
+```
+
+```
+# Destructuring a stream
+[foo, bar, baz] = 1 | build(| times(2));
+[bar, baz, foo]
+>> [2, 4, 1]
+```
+
+```
+# Destructuring a stream with rest
+[foo, *rest] = 1 | build(| times(2));
+[foo, rest | keepFirst(3) | toArray]
+>> [1, [2, 4, 8]]
+```
+
+```
+# Destructuring a stream with a middle rest
+[foo, *rest, bar] = 1 | build(| times(2)) | while(| isLessThan(100));
+[foo, rest, bar]
+>> [1, [2, 4, 8, 16, 32], 64]
+```
+
+```
 # Stream values are locked in by the first traversal
 answer = variable(42);
 stream = 1 | to(3) | transform(| plus(answer @ get:()));
@@ -42,7 +70,7 @@ after = stream | toArray;
 # Destructuring an object with an array pattern
 [foo, bar] = {foo: 42, bar: 97};
 foo
-!! wrongType {"value": {"foo": 42, "bar": 97}, "expectedType": "array"}
+!! wrongType {"value": {"foo": 42, "bar": 97}, "expectedType": {"either": ["array", "stream"]}}
 ```
 
 ```
