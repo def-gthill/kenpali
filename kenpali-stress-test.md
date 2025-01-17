@@ -54,6 +54,12 @@ foo
 ```
 
 ```
+# Spreading a stream
+["foo", *(1 | to(3)), "bar"]
+>> ["foo", 1, 2, 3, "bar"]
+```
+
+```
 # Stream values are locked in by the first traversal
 answer = variable(42);
 stream = 1 | to(3) | transform(| plus(answer @ get:()));
