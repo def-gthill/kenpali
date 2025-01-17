@@ -753,11 +753,12 @@ The `build` function generates a stream by repeatedly applying a function to a s
 # Build
 powersOfTwo = 1 | build(| times(2));
 [
+    powersOfTwo | isStream,
     powersOfTwo @ 1,
     powersOfTwo @ 3,
     powersOfTwo @ 8,
 ]
->> [1, 4, 128]
+>> [true, 1, 4, 128]
 ```
 
 ```
@@ -995,14 +996,46 @@ These functions exhaust an input stream to produce a scalar output or side effec
 
 These functions calculate a scalar value from a stream, but only access a finite number of elements to do so. Therefore, they are safe to call even on infinite streams.
 
+```
+# Indexing with a positive index
+[
+    ["foo", "bar", "baz"] @ 2,
+    2 | to(5) @ 2,
+    2 | build(| times(2)) @ 2,
+]
+>> ["bar", 3, 4]
+```
+
+```
+# First element
+[
+    ["foo"] | first,
+    ["foo", "bar", "baz"] | first,
+    1 | to(5) | first,
+    1 | build(| times(2)) | first,
+]
+>> ["foo", "foo", 1, 1]
+```
+
 ## Stream Rebuilders
 
 These functions create new streams that depend on existing ones, preserving stream laziness.
 
 ```
 # Transforming
-[1, 2, 3] | transform((i) => times(i, i)) | toArray
->> [1, 4, 9]
+[
+    [1, 2, 3] | transform((i) => times(i, i)) | toArray,
+    1 | to(3) | transform((i) => times(i, i)) | toArray,
+    1 | build(| increment)
+    | transform((i) => times(i, i))
+    | keepFirst(3)
+    | toArray,
+]
+>> [
+    [1, 4, 9],
+    [1, 4, 9],
+    [1, 4, 9],
+]
 ```
 
 ```
