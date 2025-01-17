@@ -812,6 +812,24 @@ powersOfTwo = 1 | build(| times(2));
 ]
 ```
 
+```
+# Repeating the same values forever
+[
+    [42] | repeat | isStream,
+    [42] | repeat | keepFirst(3) | toArray,
+    [42] | repeat | keepFirst(5) | toArray,
+    ["foo", "bar", "baz"] | repeat | keepFirst(5) | toArray,
+    1 | to(3) | repeat | keepFirst(5) | toArray,
+]
+>> [
+    true,
+    [42, 42, 42],
+    [42, 42, 42, 42, 42],
+    ["foo", "bar", "baz", "foo", "bar"],
+    [1, 2, 3, 1, 2],
+]
+```
+
 ## Stream Collapsers
 
 These functions exhaust an input stream to produce a scalar output or side effect. They loop forever if given an infinite stream.
@@ -1067,6 +1085,15 @@ The `continueIf` function is like `while`, except it includes one extra elementâ
 | continueIf(| isLessThan(100))
 | toArray
 >> [1, 2, 4, 8, 16, 32, 64, 128]
+```
+
+```
+# Operating on a sliding window
+[2, 8, 9, 3, 7]
+| sliding(2)
+| transform(([a, b]) => b | minus(a))
+| toArray
+>> [6, 1, -6, 4]
 ```
 
 ```
