@@ -84,6 +84,28 @@ sum(1 | to(10))
 ```
 
 ```
+# Quotient
+[
+    10 | quotientBy(3),
+    -10 | quotientBy(3),
+    10 | quotientBy(-3),
+    -10 | quotientBy(-3),
+]
+>> [3, -4, -4, 3]
+```
+
+```
+# Remainder
+[
+    10 | remainderBy(3),
+    -10 | remainderBy(3),
+    10 | remainderBy(-3),
+    -10 | remainderBy(-3),
+]
+>> [1, 2, -2, -1]
+```
+
+```
 # Divisible by
 [
     10 | isDivisibleBy(5),
@@ -156,9 +178,9 @@ fromCodePoints([102, 111, 111, 4660])
 ```
 # Slicing strings
 [
-    "foobar" | slice(2 | to(4)),
-    "foobar" | slice(2 | to(10)),
-    "foobar" | slice(0 | to(4)),
+    "foobar" | slice(from: 2, to: 4),
+    "foobar" | slice(from: 2, to: 10),
+    "foobar" | slice(from: 0, to: 4),
 ]
 >> [
     "oob",
@@ -1063,12 +1085,10 @@ These functions create new streams that depend on existing ones, preserving stre
 ```
 # Keeping leading elements
 [
-    [42, 97, 6, 12, 64] | keepFirst(3) | isStream,
     [42, 97, 6, 12, 64] | keepFirst(3) | toArray,
     1 | build(| times(2)) | keepFirst(3) | toArray,
 ]
 >> [
-    true,
     [42, 97, 6],
     [1, 2, 4],
 ]
@@ -1089,12 +1109,18 @@ These functions create new streams that depend on existing ones, preserving stre
 ```
 
 ```
-# Slicing arrays
+# Slicing
 [
-    [42, 97, 6, 12, 64] | slice(2 | to(4)),
+    [42, 97, 6, 12, 64] | slice(from: 2, to: 4) | toArray,
+    [42, 97, 6, 12, 64] | slice(from: 2, to: 10) | toArray,
+    [42, 97, 6, 12, 64] | slice(from: 0, to: 4) | toArray,
+    1 | build(| times(2)) | slice(from: 2, to: 4) | toArray,
 ]
 >> [
     [97, 6, 12],
+    [97, 6, 12, 64],
+    [42, 97, 6, 12],
+    [2, 4, 8]
 ]
 ```
 
@@ -1122,50 +1148,69 @@ The `continueIf` function is like `while`, except it includes one extra elementâ
 
 ```
 # Operating on a sliding window
-[2, 8, 9, 3, 7]
-| sliding(2)
-| transform(([a, b]) => b | minus(a))
-| toArray
->> [6, 1, -6, 4]
+diffs = (sequence) => (
+    sequence
+    | sliding(2)
+    | transform(([a, b]) => b | minus(a))
+);
+[
+    [2, 8, 9, 3, 7] | diffs | toArray,
+    [2, 8, 9, 3, 7] | repeat | diffs | keepFirst(6) | toArray,
+]
+>> [
+    [6, 1, -6, 4],
+    [6, 1, -6, 4, -5, 6],
+]
 ```
 
 ```
 # Filtering
 [
-    [1] | where(| isLessThan(10)) | isStream,
-    [1, 10, 2, 9, 3, 12] | where(| isLessThan(10)) | toArray
+    [1, 10, 2, 9, 3, 12] | where(| isLessThan(10)) | toArray,
+    [1, 10, 2, 9, 3, 12]
+    | repeat
+    | where(| isLessThan(10))
+    | keepFirst(5)
+    | toArray,
 ]
 >> [
-    true,
     [1, 2, 9, 3],
+    [1, 2, 9, 3, 1],
 ]
 ```
 
 ```
 # Zipping
 [
-    [1] | zip(["one"]) | isStream,
     [1, 2, 3] | zip(["one", "two", "three"]) | toArray,
     [1, 2, 3] | zip(["one", "two"]) | toArray,
     1 | build(| times(2)) | zip(["one", "two", "three"]) | toArray,
+    1 | build(| times(2)) | zip(1 | build(| times(3))) | keepFirst(3) | toArray,
 ]
 >> [
-    true,
     [[1, "one"], [2, "two"], [3, "three"]],
     [[1, "one"], [2, "two"]],
     [[1, "one"], [2, "two"], [4, "three"]],
+    [[1, 1], [2, 3], [4, 9]],
 ]
 ```
 
 ```
 # Unzipping
 [
-    [[1, "one"]] | unzip | forAll(| isStream),
-    [[1, "one"], [2, "two"], [3, "three"]] | unzip | transform(| toArray) | toArray,
+    [[1, "one"], [2, "two"], [3, "three"]]
+    | unzip
+    | transform(| toArray)
+    | toArray,
+    [2, 2]
+    | build(([a, b]) => [b | times(2), a | increment])
+    | unzip
+    | transform(| keepFirst(4) | toArray)
+    | toArray,
 ]
 >> [
-    true,
-    [[1, 2, 3], ["one", "two", "three"]]
+    [[1, 2, 3], ["one", "two", "three"]],
+    [[2, 4, 6, 10], [2, 3, 5, 7]]
 ]
 ```
 
@@ -1174,10 +1219,26 @@ The `continueIf` function is like `while`, except it includes one extra elementâ
 [
     [[1], [2, 3], [4, 5, [6]]] | flatten | toArray,
     [[1], [2, 3], []] | flatten | toArray,
+    [1] | build((a) => [*a, a | last | increment]) | flatten | keepFirst(7) | toArray,
 ]
 >> [
     [1, 2, 3, 4, 5, [6]],
     [1, 2, 3],
+    [1, 1, 2, 1, 2, 3, 1],
+]
+```
+
+```
+# Dissecting
+[
+    [] | dissect(| isAtLeast(8)) | toArray,
+    [2, 8, 9, 3, 7] | dissect(| isAtLeast(8)) | toArray,
+    [2, 8, 9, 3, 7] | repeat | dissect(| isAtLeast(8)) | keepFirst(5) | toArray,
+]
+>> [
+    [],
+    [[2, 8], [9], [3, 7]],
+    [[2, 8], [9], [3, 7, 2, 8], [9], [3, 7, 2, 8]],
 ]
 ```
 
@@ -1187,11 +1248,13 @@ The `continueIf` function is like `while`, except it includes one extra elementâ
     1 | to(9) | chunk(3) | toArray,
     1 | to(10) | chunk(3) | toArray,
     1 | to(11) | chunk(3) | toArray,
+    1 | build(| times(2)) | chunk(3) | keepFirst(3) | toArray,
 ]
 >> [
     [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
     [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]],
     [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11]],
+    [[1, 2, 4], [8, 16, 32], [64, 128, 256]],
 ]
 ```
 
