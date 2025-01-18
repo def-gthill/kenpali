@@ -68,30 +68,16 @@ sum(1 | to(10))
 ```
 
 ```
-# Divide with remainder
-[
-    divideWithRemainder(10, 3),
-    divideWithRemainder(-10, 3),
-    divideWithRemainder(10, -3),
-    divideWithRemainder(-10, -3),
-]
->> [
-    {quotient: 3, remainder: 1},
-    {quotient: -4, remainder: 2},
-    {quotient: -4, remainder: -2},
-    {quotient: 3, remainder: -1}
-]
-```
-
-```
-# Quotient
+# Integer quotient
 [
     10 | quotientBy(3),
     -10 | quotientBy(3),
     10 | quotientBy(-3),
     -10 | quotientBy(-3),
+    10.5 | quotientBy(3),
+    10 | quotientBy(3.5),
 ]
->> [3, -4, -4, 3]
+>> [3, -4, -4, 3, 3, 2]
 ```
 
 ```
@@ -101,8 +87,10 @@ sum(1 | to(10))
     -10 | remainderBy(3),
     10 | remainderBy(-3),
     -10 | remainderBy(-3),
+    10.5 | remainderBy(3),
+    10 | remainderBy(3.5),
 ]
->> [1, 2, -2, -1]
+>> [1, 2, -2, -1, 1.5, 3]
 ```
 
 ```
@@ -861,9 +849,15 @@ These functions exhaust an input stream to produce a scalar output or side effec
 # Indexing with a negative index
 [
     ["foo", "bar", "baz"] @ -2,
+    ["foo", "bar", "baz"] | at(-2),
+    ["foo", "bar", "baz"] | at(-2, default: () => 42),
+    ["foo", "bar", "baz"] | at(-4, default: () => 42),
     1 | to(5) @ -2,
+    1 | to(5) | at(-2),
+    1 | to(5) | at(-2, default: () => 42),
+    1 | to(5) | at(-6, default: () => 42),
 ]
->> ["bar", 4]
+>> ["bar", "bar", "bar", 42, 4, 4, 4, 42]
 ```
 
 ```
@@ -913,36 +907,6 @@ These functions exhaust an input stream to produce a scalar output or side effec
     [42, 97],
     [1, 2, 3, 4],
     [1, 2],
-]
-```
-
-```
-# Transposing
-[
-    [[1, "one"], [2, "two"], [3, "three"]] | transpose,
-    [[1, "one"], [2, "two"], [3, "three"]] | toStream | transpose,
-]
->> [
-    [[1, 2, 3], ["one", "two", "three"]],
-    [[1, 2, 3], ["one", "two", "three"]],
-]
-```
-
-```
-# Transposing - ragged arrays
-[[42, 97, 216, 729], ["foo", "bar"], ["spam", "eggs", "cheese"]] | transpose
->> [[42, "foo", "spam"], [97, "bar", "eggs"]]
-```
-
-```
-# Transposing - filling missing elements
-[[42, 97, 216, 729], ["foo", "bar"], ["spam", "eggs", "cheese"]]
-| transpose(fillWith: (arrayNumber:, elementNumber:) => [arrayNumber, elementNumber])
->> [
-    [42, "foo", "spam"],
-    [97, "bar", "eggs"],
-    [216, [2, 3], "cheese"],
-    [729, [2, 4], [3, 4]],
 ]
 ```
 
@@ -1014,18 +978,60 @@ These functions exhaust an input stream to produce a scalar output or side effec
 >> ["bar", "foo", "eggs", "spam"]
 ```
 
+```
+# Applying a side effect to each element
+result = mutableArray();
+["foo", "bar", "baz"] | forEach(result @ append:);
+1 | to(5) | forEach(result @ append:);
+result @ elements:()
+>> ["foo", "bar", "baz", 1, 2, 3, 4, 5]
+```
+
 ## Stream Accessors
 
 These functions calculate a scalar value from a stream, but only access a finite number of elements to do so. Therefore, they are safe to call even on infinite streams.
 
 ```
+# Is empty
+[
+    [] | isEmpty,
+    [1] | isEmpty,
+    [] | toStream | isEmpty,
+    [1] | toStream | isEmpty,
+    [1] | repeat | isEmpty,
+]
+>> [
+    true,
+    false,
+    true,
+    false,
+    false,
+]
+```
+
+```
 # Indexing with a positive index
 [
     ["foo", "bar", "baz"] @ 2,
+    ["foo", "bar", "baz"] | at(2),
+    ["foo", "bar", "baz"] | at(2, default: () => 42),
+    ["foo", "bar", "baz"] | at(0, default: () => 42),
+    ["foo", "bar", "baz"] | at(4, default: () => 42),
     2 | to(5) @ 2,
+    2 | to(5) | at(2),
+    2 | to(5) | at(2, default: () => 42),
+    2 | to(5) | at(0, default: () => 42),
+    2 | to(5) | at(5, default: () => 42),
     2 | build(| times(2)) @ 2,
+    2 | build(| times(2)) | at(2),
+    2 | build(| times(2)) | at(2, default: () => 42),
+    2 | build(| times(2)) | at(0, default: () => 42),
 ]
->> ["bar", 3, 4]
+>> [
+    "bar", "bar", "bar", 42, 42,
+    3, 3, 3, 42, 42,
+    4, 4, 4, 42,
+]
 ```
 
 ```

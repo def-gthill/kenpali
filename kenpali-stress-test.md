@@ -158,7 +158,6 @@ foo()()()
 
 ## Indexing
 
-
 ```
 # Indexing strings with escapes
 string = "\"\\\/\b\f\n\r\t\u1234";
