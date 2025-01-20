@@ -824,20 +824,14 @@ powersOfTwo = 1 | build(| times(2));
 ```
 
 ```
-# Repeating the same values forever
+# Repeating the same value forever
 [
-    [42] | repeat | isStream,
-    [42] | repeat | keepFirst(3) | toArray,
-    [42] | repeat | keepFirst(5) | toArray,
-    ["foo", "bar", "baz"] | repeat | keepFirst(5) | toArray,
-    1 | to(3) | repeat | keepFirst(5) | toArray,
+    42 | repeat | isStream,
+    42 | repeat | keepFirst(5) | toArray,
 ]
 >> [
     true,
-    [42, 42, 42],
     [42, 42, 42, 42, 42],
-    ["foo", "bar", "baz", "foo", "bar"],
-    [1, 2, 3, 1, 2],
 ]
 ```
 
@@ -998,7 +992,7 @@ These functions calculate a scalar value from a stream, but only access a finite
     [1] | isEmpty,
     [] | toStream | isEmpty,
     [1] | toStream | isEmpty,
-    [1] | repeat | isEmpty,
+    1 | repeat | isEmpty,
 ]
 >> [
     true,
@@ -1152,6 +1146,14 @@ The `continueIf` function is like `while`, except it includes one extra elementâ
 >> [1, 2, 4, 8, 16, 32, 64, 128]
 ```
 
+Conversely, the `thenRepeat` function adds endless copies of a constant value to the end of a finite sequence, useful if subsequent steps need to continue past the end of the stream.
+
+```
+# Then repeat
+[2, 8, 9, 3, 7] | thenRepeat(null) | keepFirst(8) | toArray
+>> [2, 8, 9, 3, 7, null, null, null]
+```
+
 ```
 # Operating on a sliding window
 diffs = (sequence) => (
@@ -1161,7 +1163,7 @@ diffs = (sequence) => (
 );
 [
     [2, 8, 9, 3, 7] | diffs | toArray,
-    [2, 8, 9, 3, 7] | repeat | diffs | keepFirst(6) | toArray,
+    [2, 8, 9, 3, 7] | repeat | flatten | diffs | keepFirst(6) | toArray,
 ]
 >> [
     [6, 1, -6, 4],
@@ -1175,6 +1177,7 @@ diffs = (sequence) => (
     [1, 10, 2, 9, 3, 12] | where(| isLessThan(10)) | toArray,
     [1, 10, 2, 9, 3, 12]
     | repeat
+    | flatten
     | where(| isLessThan(10))
     | keepFirst(5)
     | toArray,
@@ -1239,7 +1242,7 @@ diffs = (sequence) => (
 [
     [] | dissect(| isAtLeast(8)) | toArray,
     [2, 8, 9, 3, 7] | dissect(| isAtLeast(8)) | toArray,
-    [2, 8, 9, 3, 7] | repeat | dissect(| isAtLeast(8)) | keepFirst(5) | toArray,
+    [2, 8, 9, 3, 7] | repeat | flatten | dissect(| isAtLeast(8)) | keepFirst(5) | toArray,
 ]
 >> [
     [],
@@ -1262,6 +1265,21 @@ diffs = (sequence) => (
     [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11]],
     [[1, 2, 4], [8, 16, 32], [64, 128, 256]],
 ]
+```
+
+```
+# Interleaving
+[3 | build(| plus(3)), 5 | build(| plus(5))]
+| interleave((first, second) => (
+    if(
+        second | isLessThan(first),
+        then: () => 2,
+        else: () => 1,
+    )
+))
+| keepFirst(10)
+| toArray
+>> [3, 5, 6, 9, 10, 12, 15, 15, 18, 20]
 ```
 
 ## Objects

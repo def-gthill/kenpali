@@ -77,3 +77,50 @@ collatz(7)
 @ numbers:
 >> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
 ```
+
+```
+# Mergesort
+mergesort = (sequence) => (
+    array = sequence | toArray;
+    if(
+        array | length | isAtMost(1),
+        then: () => array,
+        else: () => (
+            halfway = array | length | quotientBy(2);
+            firstHalfSorted = array
+            | keepFirst(halfway)
+            | mergesort
+            | thenRepeat(null);
+            secondHalfSorted = array
+            | dropFirst(halfway)
+            | mergesort
+            | thenRepeat(null);
+            [firstHalfSorted, secondHalfSorted] | interleave((first, second) => (
+                if(
+                    second | isNull | not | and(
+                        () => first | isNull | or(
+                            () => second | isLessThan(first)
+                        )
+                    ),
+                    then: () => 2,
+                    else: () => 1,
+                )
+            ))
+            | while(| isNull | not)
+            | toArray
+        )
+    )
+);
+[
+    [] | mergesort,
+    1 | to(10) | mergesort,
+    10 | to(1, by: -1) | mergesort,
+    ["foo", "bar", "baz", "spam", "eggs"] | mergesort,
+]
+>> [
+    [],
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    ["bar", "baz", "eggs", "foo", "spam"],
+]
+```
