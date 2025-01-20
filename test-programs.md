@@ -80,6 +80,25 @@ collatz(7)
 
 ```
 # Mergesort
+merge = (list1, list2) => (
+    head1 = list1 | first;
+    head2 = list2 | first;
+    if(
+        head2 | isNull | not | and(
+            () => head1 | isNull | or(
+                () => head2 | isLessThan(head1)
+            )
+        ),
+        then: () => newStream(
+            value: () => head2,
+            next: () => merge(list1, list2 | dropFirst),
+        ),
+        else: () => newStream(
+            value: () => head1,
+            next: () => merge(list1 | dropFirst, list2),
+        ),
+    )
+);
 mergesort = (sequence) => (
     array = sequence | toArray;
     if(
@@ -95,17 +114,7 @@ mergesort = (sequence) => (
             | dropFirst(halfway)
             | mergesort
             | thenRepeat(null);
-            [firstHalfSorted, secondHalfSorted] | interleave((first, second) => (
-                if(
-                    second | isNull | not | and(
-                        () => first | isNull | or(
-                            () => second | isLessThan(first)
-                        )
-                    ),
-                    then: () => 2,
-                    else: () => 1,
-                )
-            ))
+            merge(firstHalfSorted, secondHalfSorted)
             | while(| isNull | not)
             | toArray
         )

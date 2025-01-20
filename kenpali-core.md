@@ -835,6 +835,16 @@ powersOfTwo = 1 | build(| times(2));
 ]
 ```
 
+```
+# Explicitly creating a stream
+myStream = (start) => newStream(
+    value: () => start,
+    next: () => myStream(start | times(2))
+);
+1 | myStream | keepFirst(5) | toArray
+>> [1, 2, 4, 8, 16]
+```
+
 ## Stream Collapsers
 
 These functions exhaust an input stream to produce a scalar output or side effect. They loop forever if given an infinite stream.
@@ -1061,15 +1071,6 @@ These functions create new streams that depend on existing ones, preserving stre
 ```
 
 ```
-# Transforming with state
-[2, 8, 9, 3, 7]
-| transform((number, back: index) => number | times(index))
-| withState(start: 1, next: | times(2))
-| toArray
->> [2, 16, 36, 24, 112]
-```
-
-```
 # Running state
 [2, 8, 9, 3, 7]
 | running(
@@ -1265,21 +1266,6 @@ diffs = (sequence) => (
     [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11]],
     [[1, 2, 4], [8, 16, 32], [64, 128, 256]],
 ]
-```
-
-```
-# Interleaving
-[3 | build(| plus(3)), 5 | build(| plus(5))]
-| interleave((first, second) => (
-    if(
-        second | isLessThan(first),
-        then: () => 2,
-        else: () => 1,
-    )
-))
-| keepFirst(10)
-| toArray
->> [3, 5, 6, 9, 10, 12, 15, 15, 18, 20]
 ```
 
 ## Objects
