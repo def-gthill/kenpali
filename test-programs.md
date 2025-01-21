@@ -68,7 +68,7 @@ collatz(7)
         ))
         | toArray
     ),
-    index: increment(index),
+    index: index | up,
 })
 | while(({numbers:, index:}) => (
     index | isAtMost(numbers | length)

@@ -39,13 +39,13 @@ sum(1 | to(10))
 
 ```
 # Increment
-[3 | increment, -3 | increment, 1.5 | increment]
+[3 | up, -3 | up, 1.5 | up]
 >> [4, -2, 2.5]
 ```
 
 ```
 # Decrement
-[3 | decrement, -3 | decrement, 1.5 | decrement]
+[3 | down, -3 | down, 1.5 | down]
 >> [2, -4, 0.5]
 ```
 
@@ -1058,7 +1058,7 @@ These functions create new streams that depend on existing ones, preserving stre
 [
     [1, 2, 3] | transform((i) => times(i, i)) | toArray,
     1 | to(3) | transform((i) => times(i, i)) | toArray,
-    1 | build(| increment)
+    1 | build(| up)
     | transform((i) => times(i, i))
     | keepFirst(3)
     | toArray,
@@ -1213,7 +1213,7 @@ diffs = (sequence) => (
     | transform(| toArray)
     | toArray,
     [2, 2]
-    | build(([a, b]) => [b | times(2), a | increment])
+    | build(([a, b]) => [b | times(2), a | up])
     | unzip
     | transform(| keepFirst(4) | toArray)
     | toArray,
@@ -1229,7 +1229,7 @@ diffs = (sequence) => (
 [
     [[1], [2, 3], [4, 5, [6]]] | flatten | toArray,
     [[1], [2, 3], []] | flatten | toArray,
-    [1] | build((a) => [*a, a | last | increment]) | flatten | keepFirst(7) | toArray,
+    [1] | build((a) => [*a, a | last | up]) | flatten | keepFirst(7) | toArray,
 ]
 >> [
     [1, 2, 3, 4, 5, [6]],
