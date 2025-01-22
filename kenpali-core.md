@@ -344,10 +344,10 @@ foo = (n) => n | isBetween(42, 97);
 ```
 # And
 [
-    and(true, () => true),
-    and(true, () => false),
-    and(false, () => true),
-    and(false, () => false),
+    and(true, $ true),
+    and(true, $ false),
+    and(false, $ true),
+    and(false, $ false),
 ]
 >> [true, false, false, false]
 ```
@@ -355,8 +355,8 @@ foo = (n) => n | isBetween(42, 97);
 ```
 # And short-circuiting
 [
-    and(false, () => [] @ 1),
-    and(false, () => (foo = foo; foo)),
+    and(false, $ [] @ 1),
+    and(false, $ (foo = foo; foo)),
 ]
 >> [false, false]
 ```
@@ -364,10 +364,10 @@ foo = (n) => n | isBetween(42, 97);
 ```
 # Or
 [
-    or(true, () => true),
-    or(true, () => false),
-    or(false, () => true),
-    or(false, () => false),
+    or(true, $ true),
+    or(true, $ false),
+    or(false, $ true),
+    or(false, $ false),
 ]
 >> [true, true, true, false]
 ```
@@ -375,8 +375,8 @@ foo = (n) => n | isBetween(42, 97);
 ```
 # Or short-circuiting
 [
-    or(true, () => [] @ 1),
-    or(true, () => (foo = foo; foo)),
+    or(true, $ [] @ 1),
+    or(true, $ (foo = foo; foo)),
 ]
 >> [true, true]
 ```
@@ -550,12 +550,12 @@ stream = 1 | to(4);
 
 ```
 # To string on givens
-foo = () => (
-    bar = () => 42;
-    () => bar
+foo = $ (
+    bar = $ 42;
+    $ bar
 );
 [
-    (() => 42) | toString,
+    ($ 42) | toString,
     foo | toString,
     foo() | toString,
     foo()() | toString,
@@ -727,8 +727,8 @@ foo = () => (
 ```
 # If
 [
-    if(true, then: () => 1, else: () => 2),
-    if(false, then: () => 1, else: () => 2),
+    if(true, then: $ 1, else: $ 2),
+    if(false, then: $ 1, else: $ 2),
 ]
 >> [1, 2]
 ```
@@ -736,10 +736,10 @@ foo = () => (
 ```
 # If short-circuiting
 [
-    if(true, then: () => 1, else: () => [] @ 1),
-    if(true, then: () => 1, else: () => (foo = foo; foo)),
-    if(false, then: () => [] @ 1, else: () => 2),
-    if(false, then: () => (foo = foo; foo), else: () => 2),
+    if(true, then: $ 1, else: $ [] @ 1),
+    if(true, then: $ 1, else: $ (foo = foo; foo)),
+    if(false, then: $ [] @ 1, else: $ 2),
+    if(false, then: $ (foo = foo; foo), else: $ 2),
 ]
 >> [1, 1, 2, 2]
 ```
@@ -756,9 +756,9 @@ foo = () => (
 ```
 # Multi-way if
 foo = (a, b) => ifs(
-    [() => a | isLessThan(b), () => "Too small!"],
-    [() => a | isMoreThan(b), () => "Too big!"],
-    else: () => "Just right!",
+    [$ a | isLessThan(b), $ "Too small!"],
+    [$ a | isMoreThan(b), $ "Too big!"],
+    else: $ "Just right!",
 );
 [
     foo(97, 42),
@@ -869,8 +869,8 @@ powersOfTwo = 1 | build(| times(2));
 ```
 # Explicitly creating a stream
 myStream = (start) => newStream(
-    value: () => start,
-    next: () => myStream(start | times(2))
+    value: $ start,
+    next: $ myStream(start | times(2))
 );
 1 | myStream | keepFirst(5) | toArray
 >> [1, 2, 4, 8, 16]
@@ -885,12 +885,12 @@ These functions exhaust an input stream to produce a scalar output or side effec
 [
     ["foo", "bar", "baz"] @ -2,
     ["foo", "bar", "baz"] | at(-2),
-    ["foo", "bar", "baz"] | at(-2, default: () => 42),
-    ["foo", "bar", "baz"] | at(-4, default: () => 42),
+    ["foo", "bar", "baz"] | at(-2, default: $ 42),
+    ["foo", "bar", "baz"] | at(-4, default: $ 42),
     1 | to(5) @ -2,
     1 | to(5) | at(-2),
-    1 | to(5) | at(-2, default: () => 42),
-    1 | to(5) | at(-6, default: () => 42),
+    1 | to(5) | at(-2, default: $ 42),
+    1 | to(5) | at(-6, default: $ 42),
 ]
 >> ["bar", "bar", "bar", 42, 4, 4, 4, 42]
 ```
@@ -1049,18 +1049,18 @@ These functions calculate a scalar value from a stream, but only access a finite
 [
     ["foo", "bar", "baz"] @ 2,
     ["foo", "bar", "baz"] | at(2),
-    ["foo", "bar", "baz"] | at(2, default: () => 42),
-    ["foo", "bar", "baz"] | at(0, default: () => 42),
-    ["foo", "bar", "baz"] | at(4, default: () => 42),
+    ["foo", "bar", "baz"] | at(2, default: $ 42),
+    ["foo", "bar", "baz"] | at(0, default: $ 42),
+    ["foo", "bar", "baz"] | at(4, default: $ 42),
     2 | to(5) @ 2,
     2 | to(5) | at(2),
-    2 | to(5) | at(2, default: () => 42),
-    2 | to(5) | at(0, default: () => 42),
-    2 | to(5) | at(5, default: () => 42),
+    2 | to(5) | at(2, default: $ 42),
+    2 | to(5) | at(0, default: $ 42),
+    2 | to(5) | at(5, default: $ 42),
     2 | build(| times(2)) @ 2,
     2 | build(| times(2)) | at(2),
-    2 | build(| times(2)) | at(2, default: () => 42),
-    2 | build(| times(2)) | at(0, default: () => 42),
+    2 | build(| times(2)) | at(2, default: $ 42),
+    2 | build(| times(2)) | at(0, default: $ 42),
 ]
 >> [
     "bar", "bar", "bar", 42, 42,
@@ -1319,8 +1319,8 @@ properties | toObject
 # Indexing with default
 object = {foo: "bar", spam: "eggs"};
 [
-    object | at("foo", default: () => "nothing"),
-    object | at("baz", default: () => "nothing"),
+    object | at("foo", default: $ "nothing"),
+    object | at("baz", default: $ "nothing"),
 ]
 >> ["bar", "nothing"]
 ```
@@ -1396,8 +1396,8 @@ map = [["foo", 42], ["bar", 97]] | newMap;
     map @ has:("foo"),
     map @ has:("spam"),
     map @ at:("foo"),
-    map @ at:("bar", default: () => 216),
-    map @ at:("spam", default: () => 216),
+    map @ at:("bar", default: $ 216),
+    map @ at:("spam", default: $ 216),
 ]
 >> [
     2,
@@ -1508,8 +1508,8 @@ array = ["foo", "bar", "baz"] | mutableArray
     array @ size:(),
     array @ elements:(),
     array @ at:(1),
-    array @ at:(1, default: () => "boo"),
-    array @ at:(7, default: () => "boo"),
+    array @ at:(1, default: $ "boo"),
+    array @ at:(7, default: $ "boo"),
     array @ at:(-2),
     array @ pop:(),
     array @ size:(),
@@ -1597,8 +1597,8 @@ map = [["foo", 42], ["bar", 97]] | mutableMap
     map @ has:("foo"),
     map @ has:("bar"),
     map @ at:("foo"),
-    map @ at:("eggs", default: () => 57),
-    map @ at:("bar", default: () => 57),
+    map @ at:("eggs", default: $ 57),
+    map @ at:("bar", default: $ 57),
 ]
 >> [
     2,

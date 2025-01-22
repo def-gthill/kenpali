@@ -64,7 +64,7 @@ join(["foo", 1])
 
 ```
 # And - wrong first argument type
-and("foo", () => true)
+and("foo", $ true)
 !! wrongArgumentType {"value": "foo", "expectedType": "boolean"}
 ```
 
@@ -76,13 +76,13 @@ and(true, true)
 
 ```
 # And - wrong callback return type
-and(true, () => "foo")
+and(true, $ "foo")
 !! wrongReturnType {"value": "foo", "expectedType": "boolean"}
 ```
 
 ```
 # Or - wrong first argument type
-or("foo", () => false)
+or("foo", $ false)
 !! wrongArgumentType {"value": "foo", "expectedType": "boolean"}
 ```
 
@@ -94,7 +94,7 @@ or(false, false)
 
 ```
 # Or - wrong callback return type
-or(false, () => "foo")
+or(false, $ "foo")
 !! wrongReturnType {"value": "foo", "expectedType": "boolean"}
 ```
 

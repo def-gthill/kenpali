@@ -494,6 +494,15 @@ foo !
 ```
 
 ```
+# Constant function shorthand
+$ foo
+>> {
+    "given": {},
+    "result": {"name": "foo"}
+}
+```
+
+```
 # Scope in function body
 (x) => (y = plus(x, 3); y)
 >> {

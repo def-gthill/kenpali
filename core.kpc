@@ -1,10 +1,10 @@
 sum = (numbers) => plus(*toArray(numbers));
-absolute = (n) => n | butIf(n | isLessThan(0), () => negative(n));
+absolute = (n) => n | butIf(n | isLessThan(0), $ negative(n));
 isDivisibleBy = (a, b) => a | remainderBy(b) | equals(0);
 joinLines = (strings) => (strings | join(on: "\n"));
 splitLines = (string) => (string | split(on: "\n"));
 isBetween = (n, lower, upper) => (
-    n | isAtLeast(lower) | and(() => n | isAtMost(upper))
+    n | isAtLeast(lower) | and($ n | isAtMost(upper))
 );
 least = (sequence) => (
     sequence
@@ -12,10 +12,10 @@ least = (sequence) => (
         start: null,
         next: (element, state: leastSoFar) => if(
             leastSoFar | isNull | or(
-                () => element | isLessThan(leastSoFar)
+                $ element | isLessThan(leastSoFar)
             ),
-            then: () => element,
-            else: () => leastSoFar,
+            then: $ element,
+            else: $ leastSoFar,
         )
     )
     | last
@@ -26,23 +26,25 @@ most = (sequence) => (
         start: null,
         next: (element, state: mostSoFar) => if(
             mostSoFar | isNull | or(
-                () => element | isMoreThan(mostSoFar)
+                $ element | isMoreThan(mostSoFar)
             ),
-            then: () => element,
-            else: () => mostSoFar,
+            then: $ element,
+            else: $ mostSoFar,
         )
     )
     | last
 );
-butIf = (value, condition, ifTrue) => (
-    if(toFunction(condition)(value), then: () => ifTrue(value), else: () => value)
+butIf = (value, condition, ifTrue) => if(
+    toFunction(condition)(value),
+    then: $ ifTrue(value),
+    else: $ value,
 );
 ifs = (*conditions, else:) => null | switch(*conditions, else:);
 to = (start, end, by: = 1) => (
     isNoFurtherThan = if(
         by | isMoreThan(0),
-        then: () => isAtMost,
-        else: () => isAtLeast,
+        then: $ isAtMost,
+        else: $ isAtLeast,
     );
     start
     | build(| plus(by))
@@ -53,14 +55,14 @@ repeat = (value) => value | build((x) => x);
 last = @ -1;
 keepLast = (coll, n) => (
     result = coll | dropFirst(length(coll) | minus(n));
-    result | butIf(result | isString | not, () => result | toArray)
+    result | butIf(result | isString | not, $ result | toArray)
 );
 dropLast = (coll, n = 1) => (
     result = coll | keepFirst(length(coll) | minus(n));
     if(
         result | isString,
-        then: () => result,
-        else: () => result | toArray,
+        then: $ result,
+        else: $ result | toArray,
     )
 );
 count = (sequence, condition) => sequence | where(condition) | toArray | length;
@@ -112,8 +114,8 @@ group = (pairs, onGroup: = (x) => x) => (
     | forEach(([key, value]) => (
         if(
             result @ has:(key),
-            then: () => result @ at:(key) @ append:(value),
-            else: () => result @ set:(key, mutableArray([value])),
+            then: $ result @ at:(key) @ append:(value),
+            else: $ result @ set:(key, mutableArray([value])),
         )
     ));
     result @ entries:()

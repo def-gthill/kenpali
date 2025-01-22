@@ -27,7 +27,7 @@ foo
 
 ```
 # Merely invoking build doesn't call the callback
-1 | build(() => 1 @ 1);
+1 | build($ 1 @ 1);
 42
 >> 42
 ```
@@ -144,10 +144,10 @@ In this example, `x` has already gone out of scope by the time `baz` is *declare
 
 ```
 # Nasty nested closure
-foo = () => (
+foo = $ (
     x = 42;
-    bar = () => (
-        baz = () => x;
+    bar = $ (
+        baz = $ x;
         baz
     );
     bar
@@ -204,12 +204,12 @@ set = [1, 2, 3, 4, 42] | newSet;
 
 ```
 # Stack traces
-bar = () => (
-  (() => 1 @ 1)()
+bar = $ (
+  ($ 1 @ 1)()
 );
-foo = () => bar();
-main = () => (
-  baz = () => foo();
+foo = $ bar();
+main = $ (
+  baz = $ foo();
   baz() ! | toObject @ calls:
 );
 main()
