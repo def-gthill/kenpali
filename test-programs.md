@@ -83,20 +83,19 @@ collatz(7)
 merge = (list1, list2) => (
     head1 = list1 | first;
     head2 = list2 | first;
-    if(
-        head2 | isNull | not | and(
-            () => head1 | isNull | or(
-                () => head2 | isLessThan(head1)
-            )
-        ),
-        then: () => newStream(
-            value: () => head2,
-            next: () => merge(list1, list2 | dropFirst),
-        ),
-        else: () => newStream(
-            value: () => head1,
-            next: () => merge(list1 | dropFirst, list2),
-        ),
+    take1 = () => newStream(
+        value: () => head1,
+        next: () => merge(list1 | dropFirst, list2),
+    );
+    take2 = () => newStream(
+        value: () => head2,
+        next: () => merge(list1, list2 | dropFirst),
+    );
+    ifs(
+        [() => head1 | isNull, take2],
+        [() => head2 | isNull, take1],
+        [() => head2 | isLessThan(head1), take2],
+        else: take1,
     )
 );
 mergesort = (sequence) => (

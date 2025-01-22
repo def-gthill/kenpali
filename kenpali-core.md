@@ -753,6 +753,37 @@ foo = () => (
 >> [37, 7]
 ```
 
+```
+# Multi-way if
+foo = (a, b) => ifs(
+    [() => a | isLessThan(b), () => "Too small!"],
+    [() => a | isMoreThan(b), () => "Too big!"],
+    else: () => "Just right!",
+);
+[
+    foo(97, 42),
+    foo(1, 42),
+    foo(42, 42),
+]
+>> ["Too big!", "Too small!", "Just right!"]
+```
+
+```
+# Switch
+withComment = (value, comment) => [value | toString, comment] | join;
+foo = | switch(
+    [| isLessThan(42), | withComment(" is too small!")],
+    [| isMoreThan(42), | withComment(" is too big!")],
+    else: | withComment(" is just right!"),
+);
+[
+    foo(97),
+    foo(1),
+    foo(42),
+]
+>> ["97 is too big!", "1 is too small!", "42 is just right!"]
+```
+
 ## Stream Builders
 
 These functions build up new streams from scalar inputs.
