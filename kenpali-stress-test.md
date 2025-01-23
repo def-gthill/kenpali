@@ -62,9 +62,9 @@ foo
 ```
 # Stream values are locked in by the first traversal
 answer = variable(42);
-stream = 1 | to(3) | transform(| plus(answer @ get:()));
+stream = 1 | to(3) | transform(| plus(answer.get()));
 before = stream | toArray;
-answer @ set:(73);
+answer.set(73);
 after = stream | toArray;
 [before, after]
 >> [[43, 44, 45], [43, 44, 45]]
@@ -190,7 +190,7 @@ foo = (a, b = 4) => (c, d = 5) => [a, b, c, d];
 ```
 # Set-has as callback
 set = [1, 2, 3, 4, 42] | newSet;
-[3, 8, 4, 42, 57] | where(set @ has:) | toArray
+[3, 8, 4, 42, 57] | where(set.has) | toArray
 >> [3, 4, 42]
 ```
 
@@ -210,7 +210,7 @@ bar = $ (
 foo = $ bar();
 main = $ (
   baz = $ foo();
-  baz() ! | toObject @ calls:
+  baz() ! | toObject |.calls
 );
 main()
 >> [

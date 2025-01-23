@@ -1016,9 +1016,9 @@ These functions exhaust an input stream to produce a scalar output or side effec
 ```
 # Applying a side effect to each element
 result = mutableArray();
-["foo", "bar", "baz"] | forEach(result @ append:);
-1 | to(5) | forEach(result @ append:);
-result @ elements:()
+["foo", "bar", "baz"] | forEach(result.append);
+1 | to(5) | forEach(result.append);
+result.elements()
 >> ["foo", "bar", "baz", 1, 2, 3, 4, 5]
 ```
 
@@ -1343,11 +1343,11 @@ object = {foo: "bar", spam: "eggs"};
 # Set
 set = ["foo", "bar", "baz"] | newSet;
 [
-    set @ size:(),
-    set @ elements:(),
-    set @ has:("foo"),
-    set @ has:("baz"),
-    set @ has:("spam"),
+    set.size(),
+    set.elements(),
+    set.has("foo"),
+    set.has("baz"),
+    set.has("spam"),
 ]
 >> [
     3,
@@ -1362,15 +1362,15 @@ set = ["foo", "bar", "baz"] | newSet;
 # Collections as set keys
 set = [["foo"], {foo: 42, bar: 97}] | newSet;
 [
-    set @ has:(["foo"]),
-    set @ has:({foo: 42, bar: 97}),
-    set @ has:({bar: 97, foo: 42}),
-    set @ has:("foo"),
-    set @ has:("[\"foo\"]"),
-    set @ has:(["fob"]),
-    set @ has:({foo: 42}),
-    set @ has:({fob: 42, bar: 97}),
-    set @ has:({foo: 43, bar: 97}),
+    set.has(["foo"]),
+    set.has({foo: 42, bar: 97}),
+    set.has({bar: 97, foo: 42}),
+    set.has("foo"),
+    set.has("[\"foo\"]"),
+    set.has(["fob"]),
+    set.has({foo: 42}),
+    set.has({fob: 42, bar: 97}),
+    set.has({foo: 43, bar: 97}),
 ]
 >> [
     true,
@@ -1389,15 +1389,15 @@ set = [["foo"], {foo: 42, bar: 97}] | newSet;
 # Map
 map = [["foo", 42], ["bar", 97]] | newMap;
 [
-    map @ size:(),
-    map @ keys:(),
-    map @ values:(),
-    map @ entries:(),
-    map @ has:("foo"),
-    map @ has:("spam"),
-    map @ at:("foo"),
-    map @ at:("bar", default: $ 216),
-    map @ at:("spam", default: $ 216),
+    map.size(),
+    map.keys(),
+    map.values(),
+    map.entries(),
+    map.has("foo"),
+    map.has("spam"),
+    map.at("foo"),
+    map.at("bar", default: $ 216),
+    map.at("spam", default: $ 216),
 ]
 >> [
     2,
@@ -1416,17 +1416,17 @@ map = [["foo", 42], ["bar", 97]] | newMap;
 # Collections as map keys
 map = [[["foo"], 42], [{foo: 42, bar: 97}, 97]] | newMap;
 [
-    map @ has:(["foo"]),
-    map @ has:({foo: 42, bar: 97}),
-    map @ has:({bar: 97, foo: 42}),
-    map @ has:("foo"),
-    map @ has:("[\"foo\"]"),
-    map @ has:(["fob"]),
-    map @ has:({foo: 42}),
-    map @ has:({fob: 42, bar: 97}),
-    map @ has:({foo: 43, bar: 97}),
-    map @ at:(["foo"]),
-    map @ at:({bar: 97, foo: 42}),
+    map.has(["foo"]),
+    map.has({foo: 42, bar: 97}),
+    map.has({bar: 97, foo: 42}),
+    map.has("foo"),
+    map.has("[\"foo\"]"),
+    map.has(["fob"]),
+    map.has({foo: 42}),
+    map.has({fob: 42, bar: 97}),
+    map.has({foo: 43, bar: 97}),
+    map.at(["foo"]),
+    map.at({bar: 97, foo: 42}),
 ]
 >> [
     true,
@@ -1489,9 +1489,9 @@ map = [[["foo"], 42], [{foo: 42, bar: 97}, 97]] | newMap;
 # Variable
 var = variable(42);
 [
-    var @ get:(),
-    var @ set:(73),
-    var @ get:(),
+    var.get(),
+    var.set(73),
+    var.get(),
 ]
 >> [42, 73, 73]
 ```
@@ -1499,21 +1499,21 @@ var = variable(42);
 ```
 # Mutable array
 array = ["foo", "bar", "baz"] | mutableArray
-@ append:("spam")
-@ append:("eggs")
-@ append:("foo")
-@ set:(2, "toast")
-@ storeAt:("sausages", 4);
+|.append("spam")
+|.append("eggs")
+|.append("foo")
+|.set(2, "toast")
+|.storeAt("sausages", 4);
 [
-    array @ size:(),
-    array @ elements:(),
-    array @ at:(1),
-    array @ at:(1, default: $ "boo"),
-    array @ at:(7, default: $ "boo"),
-    array @ at:(-2),
-    array @ pop:(),
-    array @ size:(),
-    array @ elements:(),
+    array.size(),
+    array.elements(),
+    array.at(1),
+    array.at(1, default: $ "boo"),
+    array.at(7, default: $ "boo"),
+    array.at(-2),
+    array.pop(),
+    array.size(),
+    array.elements(),
 ]
 >> [
     6,
@@ -1531,19 +1531,19 @@ array = ["foo", "bar", "baz"] | mutableArray
 ```
 # Mutable set
 set = ["foo", "bar", "baz"] | mutableSet
-@ add:("spam")
-@ add:("eggs")
-@ add:("foo")
-@ remove:("bar")
-@ remove:("quux");
+|.add("spam")
+|.add("eggs")
+|.add("foo")
+|.remove("bar")
+|.remove("quux");
 [
-    set @ size:(),
-    set @ elements:(),
-    set @ has:("foo"),
-    set @ has:("bar"),
-    set @ has:("baz"),
-    set @ has:("spam"),
-    set @ has:("gorp"),
+    set.size(),
+    set.elements(),
+    set.has("foo"),
+    set.has("bar"),
+    set.has("baz"),
+    set.has("spam"),
+    set.has("gorp"),
 ]
 >> [
     4,
@@ -1560,16 +1560,16 @@ set = ["foo", "bar", "baz"] | mutableSet
 # Collections as mutable set keys
 set = [["foo"]] | mutableSet;
 [
-    set @ has:(["foo"]),
-    set @ has:("foo"),
-    set @ has:("[\"foo\"]"),
-    set @ has:(["fob"]),
+    set.has(["foo"]),
+    set.has("foo"),
+    set.has("[\"foo\"]"),
+    set.has(["fob"]),
     set
-    @ add:({foo: 42, bar: 97})
-    @ has:({foo: 42, bar: 97}),
-    set @ has:({bar: 97, foo: 42}),
-    set @ has:({fob: 42, bar: 97}),
-    set @ has:({foo: 43, bar: 97}),
+    |.add({foo: 42, bar: 97})
+    |.has({foo: 42, bar: 97}),
+    set.has({bar: 97, foo: 42}),
+    set.has({fob: 42, bar: 97}),
+    set.has({foo: 43, bar: 97}),
 ]
 >> [
     true,
@@ -1586,19 +1586,19 @@ set = [["foo"]] | mutableSet;
 ```
 # Mutable map
 map = [["foo", 42], ["bar", 97]] | mutableMap
-@ set:("eggs", 216)
-@ storeAt:(729, "foo")
-@ remove:("bar");
+|.set("eggs", 216)
+|.storeAt(729, "foo")
+|.remove("bar");
 [
-    map @ size:(),
-    map @ keys:(),
-    map @ values:(),
-    map @ entries:(),
-    map @ has:("foo"),
-    map @ has:("bar"),
-    map @ at:("foo"),
-    map @ at:("eggs", default: $ 57),
-    map @ at:("bar", default: $ 57),
+    map.size(),
+    map.keys(),
+    map.values(),
+    map.entries(),
+    map.has("foo"),
+    map.has("bar"),
+    map.at("foo"),
+    map.at("eggs", default: $ 57),
+    map.at("bar", default: $ 57),
 ]
 >> [
     2,
@@ -1617,18 +1617,18 @@ map = [["foo", 42], ["bar", 97]] | mutableMap
 # Collections as mutable map keys
 map = [[["foo"], 42]] | mutableMap;
 [
-    map @ has:(["foo"]),
-    map @ has:("foo"),
-    map @ has:("[\"foo\"]"),
-    map @ has:(["fob"]),
-    map @ at:(["foo"]),
+    map.has(["foo"]),
+    map.has("foo"),
+    map.has("[\"foo\"]"),
+    map.has(["fob"]),
+    map.at(["foo"]),
     map
-    @ set:({foo: 42, bar: 97}, 97)
-    @ has:({foo: 42, bar: 97}),
-    map @ has:({bar: 97, foo: 42}),
-    map @ has:({fob: 42, bar: 97}),
-    map @ has:({foo: 43, bar: 97}),
-    map @ at:({bar: 97, foo: 42}),
+    |.set({foo: 42, bar: 97}, 97)
+    |.has({foo: 42, bar: 97}),
+    map.has({bar: 97, foo: 42}),
+    map.has({fob: 42, bar: 97}),
+    map.has({foo: 43, bar: 97}),
+    map.at({bar: 97, foo: 42}),
 ]
 >> [
     true,
@@ -1648,8 +1648,8 @@ map = [[["foo"], 42]] | mutableMap;
 # Doing side effects on an expression result as it flies by
 array = mutableArray();
 [
-    42 | also((n) => array @ append:(n)),
-    array @ elements:(),
+    42 | also((n) => array.append(n)),
+    array.elements(),
 ]
 >> [42, [42]]
 ```

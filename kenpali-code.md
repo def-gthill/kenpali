@@ -669,11 +669,26 @@ $ foo
 ```
 
 ```
-# Indexing with a property name
-x @ y:
+# Tight-binding property access
+x | y.z
 >> {
-    "indexing": {"name": "x"},
-    "at": {"literal": "y"}
+    "calling": {
+        "indexing": {"name": "y"},
+        "at": {"literal": "z"}
+    },
+    "args": [{"name": "x"}]
+}
+```
+
+```
+# Loose-binding property access
+x | y |.z
+>> {
+    "indexing": {
+        "calling": {"name": "y"},
+        "args": [{"name": "x"}]
+    },
+    "at": {"literal": "z"}
 }
 ```
 
@@ -859,15 +874,4 @@ foo = 42
 foo = bar = 42;
 foo
 !! missingStatementSeparator {"line": 1, "column": 11}
-```
-
-## Modules
-
-```
-# Accessing a name in a module
-foo.bar
->> {
-    "name": "bar",
-    "from": "foo"
-}
 ```

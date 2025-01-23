@@ -122,18 +122,18 @@ toNumber("42a")
 
 ```
 # Mutable array - reading a bad index
-["foo", "bar", "baz"] | mutableArray @ at:(4)
+["foo", "bar", "baz"] | mutableArray |.at(4)
 !! indexOutOfBounds {"length": 3, "index": 4}
 ```
 
 ```
 # Mutable array - writing to a bad index
-["foo", "bar", "baz"] | mutableArray @ set:(4, "spam")
+["foo", "bar", "baz"] | mutableArray |.set(4, "spam")
 !! indexOutOfBounds {"length": 3, "index": 4}
 ```
 
 ```
 # Mutable array - pop on an empty array
-[] | mutableArray @ pop:()
+[] | mutableArray |.pop()
 !! indexOutOfBounds {"length": 0, "index": -1}
 ```
