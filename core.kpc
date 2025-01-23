@@ -113,14 +113,14 @@ group = (pairs, onGroup: = (x) => x) => (
     pairs
     | forEach(([key, value]) => (
         if(
-            result @ has:(key),
-            then: $ result @ at:(key) @ append:(value),
-            else: $ result @ set:(key, mutableArray([value])),
+            result.has(key),
+            then: $ result.at(key) |.append(value),
+            else: $ result.set(key, mutableArray([value])),
         )
     ));
-    result @ entries:()
+    result.entries()
     | transform(([key, value]) => (
-        [key, value @ elements:() | onGroup]
+        [key, value.elements() | onGroup]
     ))
     | toArray
 );
