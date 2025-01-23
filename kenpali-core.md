@@ -1337,6 +1337,22 @@ object = {foo: "bar", spam: "eggs"};
 >> {foo: 1, bar: 3, baz: 4}
 ```
 
+## Utilities
+
+```
+# Identity function
+[
+    42 | itself,
+    "foo" | itself,
+    [{foo: 1, bar: 2}, {bar: 3, baz: 4}] | itself,
+]
+>> [
+    42,
+    "foo",
+    [{foo: 1, bar: 2}, {bar: 3, baz: 4}],
+]
+```
+
 ## Sets and Maps
 
 ```
