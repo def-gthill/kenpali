@@ -86,6 +86,12 @@ foo
 >> [216, 73, 42]
 ```
 
+```
+# Immediate property access on an object
+{foo: 42, bar: 97}.foo
+>> 42
+```
+
 ## Defining and Calling Functions
 
 ```
