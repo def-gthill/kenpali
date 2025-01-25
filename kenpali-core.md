@@ -876,6 +876,20 @@ myStream = (start) => newStream(
 >> [1, 2, 4, 8, 16]
 ```
 
+```
+# Explicitly creating a finite stream
+myStream = (start) => if(
+    start | isLessThan(100),
+    then: $ newStream(
+        value: $ start,
+        next: $ myStream(start | times(2))
+    ),
+    else: $ emptyStream(),
+);
+1 | myStream | toArray
+>> [1, 2, 4, 8, 16, 32, 64]
+```
+
 ## Stream Collapsers
 
 These functions exhaust an input stream to produce a scalar output or side effect. They loop forever if given an infinite stream.
