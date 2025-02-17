@@ -1,6 +1,6 @@
 # Kenpali Code Specification
 
-## Literals
+## Literals|literals
 
 ```
 # Literal null
@@ -44,7 +44,7 @@ true
 >> {"literal": "f\\o\\o\\b\\a\\r"}
 ```
 
-## Names
+## Names|names
 
 ```
 # Name with only letters
@@ -64,7 +64,7 @@ f00
 >> {"name": "f00"}
 ```
 
-## Arrays
+## Arrays|arrays
 
 ```
 # Empty array
@@ -135,7 +135,7 @@ foo = [1, 2, 3];
 }
 ```
 
-## Objects
+## Objects|objects
 
 ```
 # Empty object
@@ -245,7 +245,7 @@ foo = {bar: 1, baz: 2};
 }
 ```
 
-## Comments
+## Comments|comments
 
 ```
 # A comment on its own line
@@ -260,7 +260,7 @@ null // A billion-dollar mistake
 >> {"literal": null}
 ```
 
-## Function Calls
+## Function Calls|function-calls
 
 ```
 # One positional argument
@@ -359,7 +359,7 @@ foo(x)(y)
 }
 ```
 
-## Error Catching
+## Error Catching|error-catching
 
 ```
 # Error catching
@@ -369,7 +369,7 @@ foo !
 }
 ```
 
-## Function Definitions
+## Function Definitions|function-definitions
 
 ```
 # No parameters
@@ -524,7 +524,7 @@ $ foo
 }
 ```
 
-## Forward Pipe
+## Forward Pipe|forward-pipe
 
 ```
 # Forward pipe into a bare name
@@ -629,7 +629,7 @@ $ foo
 }
 ```
 
-## Indexing
+## Indexing|indexing
 
 ```
 # Indexing
@@ -701,7 +701,7 @@ x @ "y"
 }
 ```
 
-## Scopes
+## Scopes|scopes
 
 ```
 # Simple declaration

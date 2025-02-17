@@ -1,6 +1,6 @@
 # Kenpali JSON Specification
 
-## Literals
+## Literals|literals
 
 A literal expression has the form `{"literal": <value>}`. The value can be `null`, `true`, `false`, or [any valid JSON string or number](https://www.json.org/json-en.html).
 
@@ -36,7 +36,7 @@ Examples:
 >> "foobar"
 ```
 
-## Names
+## Names|names
 
 ```
 # Binding a name
@@ -147,7 +147,7 @@ Examples:
 >> 73
 ```
 
-## Arrays
+## Arrays|arrays
 
 ```
 # Empty array
@@ -255,7 +255,7 @@ Examples:
 >> [97, 42, [1, 2, 3]]
 ```
 
-## Objects
+## Objects|objects
 
 ```
 # Empty object
@@ -427,7 +427,7 @@ Examples:
 >> [97, 97, 42]
 ```
 
-## Defining and Calling Functions
+## Defining and Calling Functions|functions
 
 ```
 # No parameters, no arguments
@@ -815,7 +815,7 @@ On the other hand, names that are in scope when the function is called don't lea
 !! nameNotDefined {"name": "intruder"}
 ```
 
-## Indexing
+## Indexing|indexing
 
 ```
 # Indexing strings
@@ -969,7 +969,7 @@ On the other hand, names that are in scope when the function is called don't lea
 !! wrongType {"value": 42, "expectedType": {"either": ["sequence", "object"]}}
 ```
 
-## Errors
+## Errors|errors
 
 ```
 # Error short-circuiting through function calls
