@@ -33,6 +33,21 @@ foo
 ```
 
 ```
+# Indexing with a positive index
+[
+    2 | to(5) @ 2,
+    2 | build(| times(2)) @ 2,
+]
+>> [3, 4]
+```
+
+```
+# Indexing with a negative index
+1 | to(5) @ -2
+>> 4
+```
+
+```
 # Destructuring a stream
 [foo, bar, baz] = 1 | build(| times(2));
 [bar, baz, foo]

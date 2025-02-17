@@ -4,11 +4,36 @@ The Core functions must be available to any Kenpali program. Reference implement
 
 ## Arithmetic
 
+### plus
+
+Returns the sum of its arguments
+
+Parameters:
+
+- `*numbers` (_array of number_): The numbers to add up.
+
+Returns:
+
+- (_number_): The sum.
+
+
 ```
 # Plus
 [plus(), plus(1), plus(1, 2), plus(1, 2, 3)]
 >> [0, 1, 3, 6]
 ```
+
+### sum
+
+Returns the sum of the values in the specified sequence.
+
+Parameters:
+
+- `numbers` (_sequence of number_): The numbers to add up.
+
+Returns:
+
+- (_number_): The sum.
 
 ```
 # Sum
@@ -16,17 +41,54 @@ sum(1 | to(10))
 >> 55
 ```
 
+### minus
+
+Returns its first argument minus its second argument.
+
+Parameters:
+
+- `a` (_number_): The amount to subtract from.
+- `b` (_number_): The amount to take away.
+
+Returns:
+
+- (_number_): The difference.
+
 ```
 # Minus
 [5 | minus(2), 2 | minus(5)]
 >> [3, -3]
 ```
 
+### negative
+
+Returns its argument with the sign flipped.
+
+Parameters:
+
+- `n` (_number_): The value to negate.
+
+Returns:
+
+- (_number_): The negated value.
+
 ```
 # Negative
 [negative(42), negative(-1.5)]
 >> [-42, 1.5]
 ```
+
+### absolute
+
+Returns its argument with the sign set to positive.
+
+Parameters:
+
+- `n` (_number_): The value to make positive.
+
+Returns:
+
+- (_number_): The absolute value.
 
 ```
 # Absolute value
@@ -37,11 +99,35 @@ sum(1 | to(10))
 >> [42, 42]
 ```
 
+### up
+
+Returns its argument plus one.
+
+Parameters:
+
+- `n` (_number_): The value to increase.
+
+Returns:
+
+- (_number_): The incremented value.
+
 ```
 # Increment
 [3 | up, -3 | up, 1.5 | up]
 >> [4, -2, 2.5]
 ```
+
+### down
+
+Returns its argument minus one.
+
+Parameters:
+
+- `n` (_number_): The value to decrease.
+
+Returns:
+
+- (_number_): The decremented value.
 
 ```
 # Decrement
@@ -49,11 +135,36 @@ sum(1 | to(10))
 >> [2, -4, 0.5]
 ```
 
+### times
+
+Returns the product of its arguments.
+
+Parameters:
+
+- `*numbers` (_array of number_): The values to multiply.
+
+Returns:
+
+- (_number_): The product.
+
 ```
 # Times
 [times(), times(2), times(2, 3), times(2, 3, 4)]
 >> [1, 2, 6, 24]
 ```
+
+### dividedBy
+
+Returns its first argument divided by its second argument.
+
+Parameters:
+
+- `a` (_number_): The dividend.
+- `b` (_number_): The divisor.
+
+Returns:
+
+- (_number_): The quotient.
 
 ```
 # Divided by
@@ -61,11 +172,36 @@ sum(1 | to(10))
 >> [4, 1.5]
 ```
 
+### oneOver
+
+Returns the reciprocal of its argument.
+
+Parameters:
+
+- `x` (_number_): The value to invert.
+
+Returns:
+
+- (_number_): The reciprocal.
+
 ```
 # One over
 [oneOver(2), oneOver(-0.5)]
 >> [0.5, -2]
 ```
+
+### quotientBy
+
+Returns the integer quotient of its first argument divided by its second argument.
+
+Parameters:
+
+- `a` (_number_): The dividend.
+- `b` (_number_): The divisor.
+
+Returns:
+
+- (_number_): The integer quotient.
 
 ```
 # Integer quotient
@@ -79,6 +215,19 @@ sum(1 | to(10))
 ]
 >> [3, -4, -4, 3, 3, 2]
 ```
+
+### remainderBy
+
+Returns the remainder of its first argument divided by its second argument, always non-negative.
+
+Parameters:
+
+- `a` (_number_): The dividend.
+- `b` (_number_): The divisor.
+
+Returns:
+
+- (_number_): The remainder.
 
 ```
 # Remainder
@@ -103,8 +252,19 @@ sum(1 | to(10))
 >> [true, false, true]
 ```
 
-
 ## Strings
+
+### toCodePoints
+
+Returns an array of Unicode code points representing the characters in the given string.
+
+Parameters:
+
+- `string` (_string_): The text to convert.
+
+Returns:
+
+- (_array of number_): The code points.
 
 ```
 # Converting a string to code points
@@ -112,17 +272,36 @@ toCodePoints("foo\u1234")
 >> [102, 111, 111, 4660]
 ```
 
+### fromCodePoints
+
+Returns a string created from the given array of Unicode code points.
+
+Parameters:
+
+- `codePoints` (_array of number_): The code points to convert.
+
+Returns:
+
+- (_string_): The resulting text.
+
 ```
 # Converting code points to a string
 fromCodePoints([102, 111, 111, 4660])
 >> "foo\u1234"
 ```
 
-```
-# String length
-[length(""), length("f"), length("foo")]
->> [0, 1, 3]
-```
+### join
+
+Returns a string created by joining the given values with a separator.
+
+Parameters:
+
+- `strings` (_array or stream of string_): The values to join.
+- `on:` (_string_, default `""`): The separator to insert between values.
+
+Returns:
+
+- (_string_): The joined string.
 
 ```
 # Joining strings
@@ -140,6 +319,19 @@ fromCodePoints([102, 111, 111, 4660])
 ["foo", "bar", "", "baz"] | joinLines
 >> "foo\nbar\n\nbaz"
 ```
+
+### split
+
+Returns an array of substrings by splitting the given string at occurrences of a separator.
+
+Parameters:
+
+- `string` (_string_): The text to split.
+- `on:` (_string_): The separator to split on.
+
+Returns:
+
+- (_array of string_): The split substrings.
 
 ```
 # Splitting on a delimiter
@@ -195,6 +387,41 @@ fromCodePoints([102, 111, 111, 4660])
 
 ## Comparison
 
+### Comparison Rules
+
+Kenpali can perform equality and ordering comparisons on various types.
+
+All comparisons are strict about types: testing values of different types for equality always returns `false`, while using ordering comparisons on different types always throws a `wrongArgumentType` error.
+
+Any two values can be tested for equality. To be considered equal, the values must have the same type, _and_:
+
+- If both are booleans, they must both be true or both be false.
+- If both are numbers, they must have the same numerical value.
+- If both are strings, they must have the same sequence of Unicode code points.
+- If both are arrays, they must have the same length, and corresponding elements must be equal according to the `equals` function.
+- If both are objects, they must have the same property names, and corresponding property values must be equal according to the `equals` function. The order in which the properties are written does not affect equality.
+- Otherwise, they must be aliases referring to the same data in memory.
+
+Ordering comparisons work on booleans, numbers, strings, and arrays, as follows:
+
+- For booleans, `false` is less than `true`.
+- Numbers are compared by numerical value.
+- Strings are compared lexicographically by their Unicode code points.
+- Arrays are compared lexicographically by their elements.
+
+### equals
+
+Returns whether its arguments have equal values, according to the [Comparison Rules](#comparison-rules).
+
+Parameters:
+
+- `a` (_any_): The first value.
+- `b` (_any_): The second value.
+
+Returns:
+
+- (_boolean_): Whether the values are equal.
+
 ```
 # Equals
 [
@@ -231,6 +458,19 @@ fromCodePoints([102, 111, 111, 4660])
     [true, false]
 ]
 ```
+
+### isLessThan
+
+Returns whether its first argument is less than its second argument, according to the [Comparison Rules](#comparison-rules).
+
+Parameters:
+
+- `a` (_number, string, boolean, or array_): The first value.
+- `b` (_number, string, boolean, or array_): The second value.
+
+Returns:
+
+- (_boolean_): Whether `a` is less than `b`.
 
 ```
 # Less than
@@ -274,6 +514,19 @@ fromCodePoints([102, 111, 111, 4660])
 ]
 ```
 
+### isAtMost
+
+Returns whether its first argument is less than or equal to its second argument, according to the [Comparison Rules](#comparison-rules).
+
+Parameters:
+
+- `a` (_number, string, boolean, or array_): The first value.
+- `b` (_number, string, boolean, or array_): The second value.
+
+Returns:
+
+- (_boolean_): Whether `a` is less than or equal to `b`.
+
 ```
 # At most (less than or equal)
 [
@@ -284,6 +537,19 @@ fromCodePoints([102, 111, 111, 4660])
 >> [true, true, false]
 ```
 
+### isMoreThan
+
+Returns whether its first argument is greater than its second argument.
+
+Parameters:
+
+- `a` (_number, string, boolean, or array_): The first value.
+- `b` (_number, string, boolean, or array_): The second value.
+
+Returns:
+
+- (_boolean_): Whether `a` is greater than `b`.
+
 ```
 # More than (greater than)
 [
@@ -293,6 +559,19 @@ fromCodePoints([102, 111, 111, 4660])
 ]
 >> [false, false, true]
 ```
+
+### isAtLeast
+
+Returns whether its first argument is greater than or equal to its second argument.
+
+Parameters:
+
+- `a` (_number, string, boolean, or array_): The first value.
+- `b` (_number, string, boolean, or array_): The second value.
+
+Returns:
+
+- (_boolean_): Whether `a` is greater than or equal to `b`.
 
 ```
 # At least (greater than or equal)
@@ -341,6 +620,19 @@ foo = (n) => n | isBetween(42, 97);
 
 ## Logic
 
+### and
+
+Returns whether all given conditions evaluate to `true`. If any condition evaluates to `false`, the remaining conditions are not evaluated.
+
+Parameters:
+
+- `first` (_boolean_): The first condition.
+- `*rest` (_array of function returning boolean_): The remaining conditions.
+
+Returns:
+
+- (_boolean_): Whether all conditions are `true`.
+
 ```
 # And
 [
@@ -360,6 +652,19 @@ foo = (n) => n | isBetween(42, 97);
 ]
 >> [false, false]
 ```
+
+### or
+
+Returns whether at least one of the given conditions evaluates to `true`. If any condition evaluates to `true`, the remaining conditions are not evaluated.
+
+Parameters:
+
+- `first` (_boolean_): The first condition.
+- `*rest` (_array of function returning boolean_): The remaining conditions.
+
+Returns:
+
+- (_boolean_): Whether any condition is `true`.
 
 ```
 # Or
@@ -381,6 +686,18 @@ foo = (n) => n | isBetween(42, 97);
 >> [true, true]
 ```
 
+### not
+
+Returns the logical negation of its argument.
+
+Parameters:
+
+- `x` (_boolean_): The value to negate.
+
+Returns:
+
+- (_boolean_): The negated value.
+
 ```
 # Not
 [
@@ -391,6 +708,18 @@ foo = (n) => n | isBetween(42, 97);
 ```
 
 ## Types and Type Conversion
+
+### typeOf
+
+Returns the Kenpali type of its argument.
+
+Parameters:
+
+- `value` (_any_): The value whose type to get.
+
+Returns:
+
+- (_`"null"` or `"boolean"` or `"number"` or `"string"` or `"array"` or `"stream"` or `"object"` or `"builtin"` or `"given"` or `"error"`_): The Kenpali type.
 
 ```
 # Type of
@@ -410,7 +739,17 @@ foo = (n) => n | isBetween(42, 97);
 >> ["null", "boolean", "boolean", "number", "string", "array", "stream", "object", "builtin", "given", "error"]
 ```
 
-The `typeOf` function never returns `"function"`, since there are two distinct types of functions: _givens_ (functions defined within Kenpali) and _builtins_ (functions defined in the host language).
+### isNull
+
+Returns whether its argument is `null`.
+
+Parameters:
+
+- `value` (_any_): The value to check.
+
+Returns:
+
+- (_boolean_): Whether `value` is `null`.
 
 ```
 # Is null
@@ -430,6 +769,18 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
 >> [true, false, false, false, false, false, false, false, false, false, false]
 ```
 
+### isBoolean
+
+Returns whether its argument is a boolean.
+
+Parameters:
+
+- `value` (_any_): The value to check.
+
+Returns:
+
+- (_boolean_): Whether `value` is a boolean.
+
 ```
 # Is boolean
 [
@@ -447,6 +798,18 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
 ]
 >> [false, true, true, false, false, false, false, false, false, false, false]
 ```
+
+### isNumber
+
+Returns whether its argument is a number.
+
+Parameters:
+
+- `value` (_any_): The value to check.
+
+Returns:
+
+- (_boolean_): Whether `value` is a number.
 
 ```
 # Is number
@@ -466,6 +829,22 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
 >> [false, false, false, true, false, false, false, false, false, false, false]
 ```
 
+### toNumber
+
+Returns the numeric representation of its argument.
+
+Parameters:
+
+- `value` (_string or number_): The value to convert.
+
+Returns:
+
+- (_number_): The numeric value.
+
+Throws:
+
+- `notNumeric`: If `value` is a string that cannot be parsed as a number.
+
 ```
 # To number
 [
@@ -476,6 +855,18 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
 ]
 >> [1, -2.5, 5, 42]
 ```
+
+### isString
+
+Returns whether its argument is a string.
+
+Parameters:
+
+- `value` (_any_): The value to check.
+
+Returns:
+
+- (_boolean_): Whether `value` is a string.
 
 ```
 # Is string
@@ -494,6 +885,20 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
 ]
 >> [false, false, false, false, true, false, false, false, false, false, false]
 ```
+
+### toString
+
+Returns the string representation of its argument.
+
+Calling `toString` on a stream reports already evaluated elements but never forces further evaluation.
+
+Parameters:
+
+- `value` (_any_): The value to convert.
+
+Returns:
+
+- (_string_): The string value.
 
 ```
 # To string
@@ -524,8 +929,6 @@ The `typeOf` function never returns `"function"`, since there are two distinct t
     "error wrongType {value: 1, expectedType: {either: [\"sequence\", \"object\"]}}"
 ]
 ```
-
-Calling `toString` on a stream reports already evaluated elements but never forces further evaluation.
 
 ```
 # To string on streams
@@ -568,6 +971,18 @@ foo = $ (
 ]
 ```
 
+### isArray
+
+Returns whether its argument is an array.
+
+Parameters:
+
+- `value` (_any_): The value to check.
+
+Returns:
+
+- (_boolean_): Whether `value` is an array.
+
 ```
 # Is array
 [
@@ -585,6 +1000,30 @@ foo = $ (
 ]
 >> [false, false, false, false, false, true, false, false, false, false, false]
 ```
+
+### toArray
+
+Collects the elements of the specified sequence into an array.
+
+Parameters:
+
+- `value` (_sequence_): The value to convert.
+
+Returns:
+
+- (_array_): The array of elements.
+
+### isStream
+
+Returns whether its argument is a stream.
+
+Parameters:
+
+- `value` (_any_): The value to check.
+
+Returns:
+
+- (_boolean_): Whether `value` is a stream.
 
 ```
 # Is stream
@@ -604,6 +1043,32 @@ foo = $ (
 >> [false, false, false, false, false, false, true, false, false, false, false]
 ```
 
+### toStream
+
+Returns a stream that iterates over the elements of the specified sequence.
+
+If the argument is already a stream, the same stream is returned, rather than a wrapper, i.e. `x | toStream | equals(x)` is true if `x` is a stream.
+
+Parameters:
+
+- `value` (_sequence_): The value to convert.
+
+Returns:
+
+- (_stream_): The stream of elements.
+
+### isObject
+
+Returns whether its argument is an object.
+
+Parameters:
+
+- `value` (_any_): The value to check.
+
+Returns:
+
+- (_boolean_): Whether `value` is an object.
+
 ```
 # Is object
 [
@@ -621,6 +1086,18 @@ foo = $ (
 ]
 >> [false, false, false, false, false, false, false, true, false, false, false]
 ```
+
+### isBuiltin
+
+Returns whether its argument is a builtin function, written in the platform language.
+
+Parameters:
+
+- `value` (_any_): The value to check.
+
+Returns:
+
+- (_boolean_): Whether `value` is a builtin function.
 
 ```
 # Is builtin
@@ -640,6 +1117,18 @@ foo = $ (
 >> [false, false, false, false, false, false, false, false, true, false, false]
 ```
 
+### isGiven
+
+Returns whether its argument is a pure-Kenpali function.
+
+Parameters:
+
+- `value` (_any_): The value to check.
+
+Returns:
+
+- (_boolean_): Whether `value` is a pure-Kenpali function.
+
 ```
 # Is given
 [
@@ -657,6 +1146,20 @@ foo = $ (
 ]
 >> [false, false, false, false, false, false, false, false, false, true, false]
 ```
+
+### isError
+
+Returns whether its argument is an error.
+
+Note that merely calling this function doesn't _catch_ a thrown error: if `x` throws, `x | isError` propagates the error rather than returning `true`. The error must be explicitly caught first, i.e. `x ! | isError`.
+
+Parameters:
+
+- `value` (_any_): The value to check.
+
+Returns:
+
+- (_boolean_): Whether `value` is an error.
 
 ```
 # Is error
@@ -676,6 +1179,18 @@ foo = $ (
 >> [false, false, false, false, false, false, false, false, false, false, true]
 ```
 
+### isFunction
+
+Returns whether its argument is a function.
+
+Parameters:
+
+- `value` (_any_): The value to check.
+
+Returns:
+
+- (_boolean_): Whether `value` is a function.
+
 ```
 # Is function
 [
@@ -694,6 +1209,21 @@ foo = $ (
 >> [false, false, false, false, false, false, false, false, true, true, false]
 ```
 
+### toFunction
+
+Converts the specified value to a function:
+
+- If the argument is already a function, the same function is returned.
+- Otherwise, a constant function that returns the specified value is returned.
+
+Parameters:
+
+- `value` (_any_): The value to convert.
+
+Returns:
+
+- (_function_): The function.
+
 ```
 # To function
 [
@@ -703,6 +1233,18 @@ foo = $ (
 ]
 >> [42, "97", 100]
 ```
+
+### isSequence
+
+Returns whether its argument is a sequence—a string, array, or stream.
+
+Parameters:
+
+- `value` (_any_): The value to check.
+
+Returns:
+
+- (_boolean_): Whether `value` is a sequence.
 
 ```
 # Is sequence
@@ -723,6 +1265,20 @@ foo = $ (
 ```
 
 ## Control Flow
+
+### if
+
+Evaluates and returns the result of one of two functions based on a condition.
+
+Parameters:
+
+- `condition` (_boolean_): The condition to check.
+- `then:` (_function_): The function to call if `condition` is `true`.
+- `else:` (_function_): The function to call if `condition` is `false`.
+
+Returns:
+
+- (_any_): The result of the evaluated function.
 
 ```
 # If
@@ -768,6 +1324,20 @@ foo = (a, b) => ifs(
 >> ["Too big!", "Too small!", "Just right!"]
 ```
 
+### switch
+
+Evaluates a list of conditions and returns the result of the first matching case.
+
+Parameters:
+
+- `value` (_any_): The value to pass to conditions and results.
+- `conditions` (_array of tuple like [function, function]_): A list of condition-result pairs. Each condition function is called with `value`, and if it returns `true`, the corresponding result function is called with `value` and its result is returned.
+- `else:` (_function_): The function to call if no conditions match.
+
+Returns:
+
+- (_any_): The result of the first matching case, or the `else` function if no conditions match.
+
 ```
 # Switch
 withComment = (value, comment) => [value | toString, comment] | join;
@@ -788,7 +1358,18 @@ foo = | switch(
 
 These functions build up new streams from scalar inputs.
 
-The `build` function generates a stream by repeatedly applying a function to a start value.
+### build
+
+Generates a stream by repeatedly applying a function to a start value.
+
+Parameters:
+
+- `start` (_any_): The start value.
+- `next` (_function_): A function that computes the next state from the current state.
+
+Returns:
+
+- (_stream_): A stream containing `start` and all values produced by the `next` function.
 
 ```
 # Build
@@ -866,6 +1447,19 @@ powersOfTwo = 1 | build(| times(2));
 ]
 ```
 
+### newStream
+
+Explicitly creates a stream with the specified head value and tail stream.
+
+Parameters:
+
+- `value:` (_function_): A function that returns the first value in the stream.
+- `next:` (_function_): A function that returns the remaining values in the stream, as a stream. This normally makes a recursive call to the containing function, allowing the stream to continue indefinitely.
+
+Returns:
+
+- (_stream_): The new stream.
+
 ```
 # Explicitly creating a stream
 myStream = (start) => newStream(
@@ -874,6 +1468,20 @@ myStream = (start) => newStream(
 );
 1 | myStream | keepFirst(5) | toArray
 >> [1, 2, 4, 8, 16]
+```
+
+### emptyStream
+
+Creates a stream with no elements. Together with `newStream`, this allows explicitly creating finite streams.
+
+Returns:
+
+- (_stream_): An empty stream.
+
+```
+# Empty stream
+emptyStream() | toArray
+>> []
 ```
 
 ```
@@ -895,21 +1503,6 @@ myStream = (start) => if(
 These functions exhaust an input stream to produce a scalar output or side effect. They loop forever if given an infinite stream.
 
 ```
-# Indexing with a negative index
-[
-    ["foo", "bar", "baz"] @ -2,
-    ["foo", "bar", "baz"] | at(-2),
-    ["foo", "bar", "baz"] | at(-2, default: $ 42),
-    ["foo", "bar", "baz"] | at(-4, default: $ 42),
-    1 | to(5) @ -2,
-    1 | to(5) | at(-2),
-    1 | to(5) | at(-2, default: $ 42),
-    1 | to(5) | at(-6, default: $ 42),
-]
->> ["bar", "bar", "bar", 42, 4, 4, 4, 42]
-```
-
-```
 # Last element
 [
     ["foo"] | last,
@@ -919,16 +1512,33 @@ These functions exhaust an input stream to produce a scalar output or side effec
 >> ["foo", "baz", 5]
 ```
 
+### length
+
+Returns the number of elements in the specified sequence.
+
+For strings, this is the number of characters.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to find the length of.
+
+Returns:
+
+- (_number_): The length.
+
 ```
 # Sequence length
 [
+    length(""),
+    length("f"),
+    length("foo"),
     length([]),
     length(["foo"]),
     length(["foo", "bar", "baz"]),
     length(1 | to(0)),
     length(1 | to(5)),
 ]
->> [0, 1, 3, 0, 5]
+>> [0, 1, 3, 0, 1, 3, 0, 5]
 ```
 
 ```
@@ -1002,6 +1612,23 @@ These functions exhaust an input stream to produce a scalar output or side effec
 ]
 ```
 
+### sort
+
+Returns an array with the same elements as the specified sequence, but in ascending order.
+
+If `by` is `null`, the elements are sorted in their natural order, following the [Comparison Rules](#comparison-rules).
+
+Otherwise, `by` is called on each element to obtain a sort key, and the elements are sorted by that sort key, again following the Comparison Rules. The sort is stable: two elements with equal sort keys will appear in the same relative order in the sorted array as they were in the original sequence.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to sort.
+- `by:` (_function or null_, default `null`): A function to produce a sort key from each element, or `null` to sort the elements in their natural order.
+
+Returns:
+
+- (_array_): The sorted array.
+
 ```
 # Sorting in natural order
 [
@@ -1026,6 +1653,59 @@ These functions exhaust an input stream to produce a scalar output or side effec
 | sort(by: (word) => [word | length, word])
 >> ["bar", "foo", "eggs", "spam"]
 ```
+
+```
+# Grouping
+[["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]] | group
+>> [
+    ["foo", [42, 216, 729]],
+    ["bar", [97]],
+    ["spam", [57]],
+]
+```
+
+```
+# Grouping with aggregation
+[["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]]
+| group(onGroup: length)
+>> [
+    ["foo", 3],
+    ["bar", 1],
+    ["spam", 1],
+]
+```
+
+```
+# Grouping by a key function
+["foo", "bar", "spam", "eggs"] | groupBy(length)
+>> [
+    [3, ["foo", "bar"]],
+    [4, ["spam", "eggs"]],
+]
+```
+
+```
+# Grouping by a key function with aggregation
+["foo", "bar", "spam", "eggs"]
+| groupBy(length, onGroup: least)
+>> [
+    [3, "bar"],
+    [4, "eggs"],
+]
+```
+
+### forEach
+
+Applies a function to each element in a sequence for its side effects.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence of values to iterate over.
+- `action` (_function_): The function to apply to each element.
+
+Returns:
+
+- (_array_): The input sequence as an array.
 
 ```
 # Applying a side effect to each element
@@ -1059,31 +1739,6 @@ These functions calculate a scalar value from a stream, but only access a finite
 ```
 
 ```
-# Indexing with a positive index
-[
-    ["foo", "bar", "baz"] @ 2,
-    ["foo", "bar", "baz"] | at(2),
-    ["foo", "bar", "baz"] | at(2, default: $ 42),
-    ["foo", "bar", "baz"] | at(0, default: $ 42),
-    ["foo", "bar", "baz"] | at(4, default: $ 42),
-    2 | to(5) @ 2,
-    2 | to(5) | at(2),
-    2 | to(5) | at(2, default: $ 42),
-    2 | to(5) | at(0, default: $ 42),
-    2 | to(5) | at(5, default: $ 42),
-    2 | build(| times(2)) @ 2,
-    2 | build(| times(2)) | at(2),
-    2 | build(| times(2)) | at(2, default: $ 42),
-    2 | build(| times(2)) | at(0, default: $ 42),
-]
->> [
-    "bar", "bar", "bar", 42, 42,
-    3, 3, 3, 42, 42,
-    4, 4, 4, 42,
-]
-```
-
-```
 # First element
 [
     ["foo"] | first,
@@ -1097,6 +1752,19 @@ These functions calculate a scalar value from a stream, but only access a finite
 ## Stream Rebuilders
 
 These functions create new streams that depend on existing ones, preserving stream laziness.
+
+### transform
+
+Creates a stream from applying a function to each element in an input sequence.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence of values to transform.
+- `f` (_function_): The function to apply to each element.
+
+Returns:
+
+- (_stream_): A stream of transformed values.
 
 ```
 # Transforming
@@ -1115,6 +1783,20 @@ These functions create new streams that depend on existing ones, preserving stre
 ]
 ```
 
+### running
+
+Maintains state while processing a sequence, producing a stream of intermediate states.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence of values to process.
+- `start:` (_any_): The initial state.
+- `next:` (_function_): A function that computes the next state from the current element and state. The state is passed as a named argument `state:`.
+
+Returns:
+
+- (_stream_): A stream containing `start` and all values produced by the `next` function.
+
 ```
 # Running state
 [2, 8, 9, 3, 7]
@@ -1128,6 +1810,19 @@ These functions create new streams that depend on existing ones, preserving stre
 >> [0, 2, 28, 289, 2893, 28937]
 ```
 
+### keepFirst
+
+Returns a stream containing only the first `n` elements of the input.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to take values from.
+- `n` (_number_): The number of elements to keep.
+
+Returns:
+
+- (_stream_): A stream of at most `n` elements.
+
 ```
 # Keeping leading elements
 [
@@ -1139,6 +1834,19 @@ These functions create new streams that depend on existing ones, preserving stre
     [1, 2, 4],
 ]
 ```
+
+### dropFirst
+
+Returns a stream with the first `n` elements skipped.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to skip values from.
+- `n` (_number_, default: `1`): The number of elements to drop.
+
+Returns:
+
+- (_stream_): A stream with the first `n` elements skipped.
 
 ```
 # Dropping leading elements
@@ -1170,7 +1878,18 @@ These functions create new streams that depend on existing ones, preserving stre
 ]
 ```
 
-The `while` function stops the stream as soon as the specified condition becomes false. The resulting stream contains only elements that satisfy the condition.
+### while
+
+Creates a stream of elements from the input sequence while a condition holds.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to process.
+- `condition` (_function returning boolean_): A function that returns `false` when the stream should stop.
+
+Returns:
+
+- (_stream_): A stream containing elements for which `condition` returns `true`, stopping at the first `false`.
 
 ```
 # While
@@ -1182,6 +1901,19 @@ The `while` function stops the stream as soon as the specified condition becomes
 ```
 
 The `continueIf` function is like `while`, except it includes one extra element—the first element that doesn't satisfy the condition. This make some stopping conditions easier to express.
+
+### continueIf
+
+Creates a stream of elements from the input sequence, continuing to the next element if a condition holds. The resulting stream has one extra element compared to `while`—the first element that doesn't satisfy the condition—which makes some stopping conditions easier to express.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to process.
+- `condition` (_function returning boolean_): A function that returns `false` when the stream should stop.
+
+Returns:
+
+- (_stream_): A stream containing the first element for which the condition returns `false`, and all elements before it.
 
 ```
 # Continue-If
@@ -1217,6 +1949,19 @@ diffs = (sequence) => (
 ]
 ```
 
+### where
+
+Filters a sequence, keeping only elements that satisfy a condition.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to filter.
+- `condition` (_function_): A function that returns `true` for elements to keep.
+
+Returns:
+
+- (_stream_): A stream of elements where `condition` returns `true`.
+
 ```
 # Filtering
 [
@@ -1234,6 +1979,19 @@ diffs = (sequence) => (
 ]
 ```
 
+### zip
+
+Combines multiple sequences into a stream of tuples, stopping when the shortest sequence is exhausted.
+
+Parameters:
+
+- `*sequences` (_array of sequence_): The sequences to combine.
+
+Returns:
+
+- (_stream_): A stream of tuples, where each tuple contains corresponding elements from the input sequences.
+
+
 ```
 # Zipping
 [
@@ -1249,6 +2007,19 @@ diffs = (sequence) => (
     [[1, 1], [2, 3], [4, 9]],
 ]
 ```
+
+### unzip
+
+Splits a sequence of tuples into multiple streams.
+
+Parameters:
+
+- `sequence` (_sequence of array_): A sequence where each element is a tuple.
+- `numStreams:` (_number_, default: `2`): The number of streams to produce.
+
+Returns:
+
+- (_array of stream_): An array of `numStreams` streams, where the `i`-th stream contains the `i`-th element from each tuple.
 
 ```
 # Unzipping
@@ -1269,6 +2040,18 @@ diffs = (sequence) => (
 ]
 ```
 
+### flatten
+
+Flattens a sequence of sequences into a single stream.
+
+Parameters:
+
+- `sequences` (_sequence of sequence_): The sequence to flatten.
+
+Returns:
+
+- (_stream_): A stream containing all elements from the nested sequences.
+
 ```
 # Flattening nested sequences
 [
@@ -1282,6 +2065,19 @@ diffs = (sequence) => (
     [1, 1, 2, 1, 2, 3, 1],
 ]
 ```
+
+### dissect
+
+Splits a sequence into chunks at elements that satisfy a condition.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to process.
+- `condition` (_function_): A function that determines split points.
+
+Returns:
+
+- (_stream of array_): A stream of arrays, where each array contains a group of elements up to and including a split point.
 
 ```
 # Dissecting
@@ -1315,6 +2111,18 @@ diffs = (sequence) => (
 
 ## Objects
 
+### keys
+
+Returns an array of the keys in an object.
+
+Parameters:
+
+- `object` (_object_): The object whose keys to retrieve.
+
+Returns:
+
+- (_array_): An array of the object's keys.
+
 ```
 # Object keys
 object = {foo: "bar", spam: "eggs"};
@@ -1322,11 +2130,40 @@ object | keys
 >> ["foo", "spam"]
 ```
 
+### toObject
+
+Converts the specified value into an object.
+
+If the value is an array or stream, its elements are treated as key-value pairs. Any duplicate keys are assigned the value from the _last_ pair with that key in the sequence.
+
+If the value is an error, an object containing the error details is returned.
+
+Parameters:
+
+- `value` (_array or stream or error_): The value to convert. If an array or stream, it must contain tuples like _[string, any]_.
+
+Returns:
+
+- (_object_): An object constructed from `value`.
+
 ```
 # Object from properties
 properties = [["foo", "bar"], ["spam", "eggs"]];
 properties | toObject
 >> {foo: "bar", spam: "eggs"}
+```
+
+```
+# Object from properties with duplicates
+properties = [["foo", "bar"], ["spam", "eggs"], ["foo", "baz"]];
+properties | toObject
+>> {foo: "baz", spam: "eggs"}
+```
+
+```
+# Object from error
+1 @ 1 ! | toObject
+>> {error: "wrongType", details: {value: 1, expectedType: {either: ["sequence", "object"]}}, calls: []}
 ```
 
 ```
@@ -1351,7 +2188,86 @@ object = {foo: "bar", spam: "eggs"};
 >> {foo: 1, bar: 3, baz: 4}
 ```
 
+## Indexing
+
+### at
+
+Returns the value at the specified index in the specified collection, or a default value if the index is invalid.
+
+Without the default value, `a | at(b)` is equivalent to `a @ b`.
+
+Parameters:
+
+- `collection` (_sequence or object_): The collection to index into.
+- `index` (_number or string_): The index value.
+- `default:` (_function or null_, default `null`): A function to call and return the result of if the index is invalid, or `null` to throw an error if the index is invalid.
+
+```
+# Indexing arrays
+[
+    ["foo", "bar", "baz"] | at(2),
+    ["foo", "bar", "baz"] | at(2, default: $ "other"),
+    ["foo", "bar", "baz"] | at(-2),
+    ["foo", "bar", "baz"] | at(-2, default: $ "other"),
+    ["foo", "bar", "baz"] | at(4, default: $ "other"),
+    ["foo", "bar", "baz"] | at(0, default: $ "other"),
+    ["foo", "bar", "baz"] | at(-4, default: $ "other"),
+]
+>> ["bar", "bar", "bar", "bar", "other", "other", "other"]
+```
+
+```
+# Indexing finite streams
+[
+    2 | to(5) | at(2),
+    2 | to(5) | at(2, default: $ 42),
+    2 | to(5) | at(-2),
+    2 | to(5) | at(-2, default: $ 42),
+    2 | to(5) | at(5, default: $ 42),
+    2 | to(5) | at(0, default: $ 42),
+    2 | to(5) | at(-5, default: $ 42),
+]
+>> [3, 3, 4, 4, 42, 42, 42]
+```
+
+```
+# Indexing infinite streams
+[
+    2 | build(| times(2)) | at(2),
+    2 | build(| times(2)) | at(2, default: $ 42),
+    2 | build(| times(2)) | at(0, default: $ 42),
+]
+>> [4, 4, 42]
+```
+
 ## Utilities
+
+### debug
+
+Writes the specified value to a diagnostic log. Exactly where this goes depends on the implementation and configuration; writing to standard error is a common default.
+
+This function returns its argument, allowing it to be dropped into pipelines temporarily without disrupting their structure. For example, `42 | foo | bar | debug | baz` has the same result as `42 | foo | bar | baz`, but it writes `bar`'s return value to the diagnostic log.
+
+Parameters:
+
+- `value` (_any_): The value to write.
+- `name` (_string or null_, default `null`): If provided, the output value will be tagged with this, making it clearer which debug values came from where.
+
+Returns:
+
+- (_any_): The `value` argument.
+
+### itself
+
+Returns its argument. Useful when a function must be provided, but no transformation is needed.
+
+Parameters:
+
+- `x` (_any_): The argument.
+
+Returns:
+
+- (_any_): The argument.
 
 ```
 # Identity function
@@ -1368,6 +2284,44 @@ object = {foo: "bar", spam: "eggs"};
 ```
 
 ## Sets and Maps
+
+### newSet
+
+Creates an immutable set.
+
+A set is like an array, but it can't have duplicate elements, and checking whether an element is in the set is fast regardless of the size of the set.
+
+Parameters:
+
+- `elements` (_array_, default `[]`): The set's elements. Duplicate elements are silently discarded.
+
+Returns:
+
+- (_object_): The new set.
+
+#### newSet/size
+
+Returns:
+
+- (_number_): The number of elements in the set.
+
+#### newSet/elements
+
+Returns:
+
+- (_array_): An array containing all the elements in the set.
+
+#### newSet/has
+
+Checks whether the specified element is in the set.
+
+Parameters:
+
+- `element` (_any_): The value to look for.
+
+Returns:
+
+- (_boolean_): Whether the value is in the set.
 
 ```
 # Set
@@ -1414,6 +2368,69 @@ set = [["foo"], {foo: 42, bar: 97}] | newSet;
     false,
 ]
 ```
+
+### newMap
+
+Creates an immutable map.
+
+A map is a collection of key-value pairs, where keys are unique. Looking up a value by key is fast regardless of the size of the map.
+
+Parameters:
+
+- `entries` (_array_, default `[]`): An array of `[key, value]` pairs. If duplicate keys exist, only the last one is kept.
+
+Returns:
+
+- (_object_): The new map.
+
+#### newMap/size
+
+Returns:
+
+- (_number_): The number of key-value pairs in the map.
+
+#### newMap/keys
+
+Returns:
+
+- (_array_): An array containing all keys in the map.
+
+#### newMap/values
+
+Returns:
+
+- (_array_): An array containing all values in the map.
+
+#### newMap/entries
+
+Returns:
+
+- (_array_): An array of `[key, value]` pairs representing the map’s contents.
+
+#### newMap/has
+
+Checks whether the specified key exists in the map.
+
+Parameters:
+
+- `key` (_any_): The key to check.
+
+Returns:
+
+- (_boolean_): Whether the key is in the map.
+
+#### newMap/at
+
+Retrieves the value associated with the specified key.
+
+Parameters:
+
+- `key` (_any_): The key whose value to retrieve.
+- `default` (_function or null_, default `null`): A function that provides a default value if the key is not found, or `null` to throw an error if the key is missing.
+
+Returns:
+
+- (_any_): The value associated with the key, or the result of calling `default` if the key is not found.
 
 ```
 # Map
@@ -1473,47 +2490,41 @@ map = [[["foo"], 42], [{foo: 42, bar: 97}, 97]] | newMap;
 ]
 ```
 
-```
-# Grouping
-[["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]] | group
->> [
-    ["foo", [42, 216, 729]],
-    ["bar", [97]],
-    ["spam", [57]],
-]
-```
-
-```
-# Grouping with aggregation
-[["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]]
-| group(onGroup: length)
->> [
-    ["foo", 3],
-    ["bar", 1],
-    ["spam", 1],
-]
-```
-
-```
-# Grouping by a key function
-["foo", "bar", "spam", "eggs"] | groupBy(length)
->> [
-    [3, ["foo", "bar"]],
-    [4, ["spam", "eggs"]],
-]
-```
-
-```
-# Grouping by a key function with aggregation
-["foo", "bar", "spam", "eggs"]
-| groupBy(length, onGroup: least)
->> [
-    [3, "bar"],
-    [4, "eggs"],
-]
-```
-
 ## Mutable Objects
+
+### variable
+
+Creates a mutable variable.
+
+A variable holds a value that can be retrieved or updated.
+
+Parameters:
+
+- `initialValue` (_any_): The initial value of the variable.
+
+Returns:
+
+- (_object_): The new variable.
+
+#### variable/get
+
+Returns the current value of the variable.
+
+Returns:
+
+- (_any_): The current value.
+
+#### variable/set
+
+Updates the variable's value.
+
+Parameters:
+
+- `newValue` (_any_): The new value to assign.
+
+Returns:
+
+- (_any_): The updated value.
 
 ```
 # Variable
@@ -1525,6 +2536,111 @@ var = variable(42);
 ]
 >> [42, 73, 73]
 ```
+
+### mutableArray
+
+Creates a mutable array.
+
+A mutable array allows updating arbitrary elements, adding new elements to the end, and removing elements from the end.
+
+Parameters:
+
+- `elements` (_array_, default `[]`): The initial elements of the array.
+
+Returns:
+
+- (_object_): The new mutable array.
+
+#### mutableArray/size
+
+Returns:
+
+- (_number_): The number of elements in the array.
+
+#### mutableArray/elements
+
+Returns:
+
+- (_array_): An array containing all elements in the mutable array.
+
+#### mutableArray/append
+
+Adds an element to the end of the array.
+
+Parameters:
+
+- `element` (_any_): The value to append.
+
+Returns:
+
+- (_object_): The mutable array itself, for chaining.
+
+#### mutableArray/set
+
+Replaces the element at the specified index.
+
+Parameters:
+
+- `index` (_number_): The position to update (1-based, negative values count from the end).
+- `element` (_any_): The new value.
+
+Returns:
+
+- (_object_): The mutable array itself, for chaining.
+
+Throws:
+
+- `indexOutOfBounds`: If the index is out of range.
+
+#### mutableArray/storeAt
+
+Alias for `set`, but with parameters in reversed order. Useful as the final step in a pipeline that computes the new element value.
+
+Parameters:
+
+- `element` (_any_): The new value.
+- `index` (_number_): The position to update (1-based, negative values count from the end).
+
+Returns:
+
+- (_object_): The mutable array itself, for chaining.
+
+Throws:
+
+- `indexOutOfBounds`: If the index is out of range.
+
+#### mutableArray/at
+
+Retrieves the element at the specified index.
+
+Parameters:
+
+- `index` (_number_): The position to retrieve (1-based, negative values count from the end).
+- `default:` (_function or null_, default `null`): A function returning a default value if the index is out of range, or `null` to throw an error.
+
+Returns:
+
+- (_any_): The element at the index, or the result of `default` if out of range.
+
+#### mutableArray/pop
+
+Removes and returns the last element.
+
+Parameters:
+
+- `default:` (_function or null_, default `null`): A function returning a default value if the array is empty, or `null` to throw an error.
+
+Returns:
+
+- (_any_): The last element, or the result of `default` if the array is empty.
+
+#### mutableArray/clear
+
+Removes all elements from the array.
+
+Returns:
+
+- (_object_): The mutable array itself, for chaining.
 
 ```
 # Mutable array
@@ -1557,6 +2673,76 @@ array = ["foo", "bar", "baz"] | mutableArray
     ["foo", "toast", "baz", "sausages", "eggs"]
 ]
 ```
+
+### mutableSet
+
+Creates a mutable set.
+
+A mutable set is like a regular set, but it allows adding and removing elements dynamically.
+
+Parameters:
+
+- `elements` (_array_, default `[]`): The initial elements of the set. Duplicate elements are silently discarded.
+
+Returns:
+
+- (_object_): The new mutable set.
+
+#### mutableSet/size
+
+Returns:
+
+- (_number_): The number of elements in the set.
+
+#### mutableSet/elements
+
+Returns:
+
+- (_array_): An array containing all elements in the mutable set.
+
+#### mutableSet/add
+
+Adds an element to the set.
+
+Parameters:
+
+- `element` (_any_): The value to add.
+
+Returns:
+
+- (_object_): The mutable set itself, for chaining.
+
+#### mutableSet/remove
+
+Removes an element from the set.
+
+Parameters:
+
+- `element` (_any_): The value to remove.
+
+Returns:
+
+- (_object_): The mutable set itself, for chaining.
+
+#### mutableSet/has
+
+Checks whether the specified element is in the set.
+
+Parameters:
+
+- `element` (_any_): The value to look for.
+
+Returns:
+
+- (_boolean_): Whether the value is in the set.
+
+#### mutableSet/clear
+
+Removes all elements from the set.
+
+Returns:
+
+- (_object_): The mutable set itself, for chaining.
 
 ```
 # Mutable set
@@ -1612,6 +2798,115 @@ set = [["foo"]] | mutableSet;
     false,
 ]
 ```
+
+### mutableMap
+
+Creates a mutable map.
+
+A mutable map is a collection of key-value pairs where keys are unique, and entries can be added, updated, and removed dynamically.
+
+Parameters:
+
+- `entries` (_array_, default `[]`): An array of `[key, value]` pairs to initialize the map.
+
+Returns:
+
+- (_object_): The new mutable map.
+
+#### mutableMap/size
+
+Returns:
+
+- (_number_): The number of entries in the map.
+
+#### mutableMap/keys
+
+Returns:
+
+- (_array_): An array containing all keys in the map.
+
+#### mutableMap/values
+
+Returns:
+
+- (_array_): An array containing all values in the map.
+
+#### mutableMap/entries
+
+Returns:
+
+- (_array_): An array of `[key, value]` pairs representing the map's entries.
+
+#### mutableMap/set
+
+Sets the value for a given key.
+
+Parameters:
+
+- `key` (_any_): The key to set.
+- `value` (_any_): The value to associate with the key.
+
+Returns:
+
+- (_object_): The mutable map itself, for chaining.
+
+#### mutableMap/storeAt
+
+Alias for `set`, but with parameters in reversed order. Useful as the final step in a pipeline that computes the new element value.
+
+Parameters:
+
+- `value` (_any_): The value to store.
+- `key` (_any_): The key to associate with the value.
+
+Returns:
+
+- (_object_): The mutable map itself, for chaining.
+
+#### mutableMap/remove
+
+Removes a key and its associated value from the map.
+
+Parameters:
+
+- `key` (_any_): The key to remove.
+
+Returns:
+
+- (_object_): The mutable map itself, for chaining.
+
+#### mutableMap/has
+
+Checks whether the map contains a specific key.
+
+Parameters:
+
+- `key` (_any_): The key to check.
+
+Returns:
+
+- (_boolean_): Whether the key exists in the map.
+
+#### mutableMap/at
+
+Retrieves the value associated with a given key.
+
+Parameters:
+
+- `key` (_any_): The key to look up.
+- `default:` (_function or null_, default `null`): A function returning a default value if the key is not found, or `null` to throw an error.
+
+Returns:
+
+- (_any_): The value associated with the key, or the default value if the key is not found.
+
+#### mutableMap/clear
+
+Removes all entries from the map.
+
+Returns:
+
+- (_object_): The mutable map itself, for chaining.
 
 ```
 # Mutable map
@@ -1686,6 +2981,15 @@ array = mutableArray();
 
 ## Errors
 
+### error
+
+Creates an error value with the specified error type and details. This in itself doesn't _throw_ the error.
+
+Parameters:
+
+- `type` (_string_): The kind of error condition that this error represents.
+- `**details` (_object_): Any relevant information about the cause of the error.
+
 ```
 # Creation and conversion to object
 {error: errorType, details:} = error("badIdea", foo: "bar", spam: "eggs") | toObject;
@@ -1694,6 +2998,46 @@ array = mutableArray();
 ```
 
 ## Validation
+
+Kenpali is a dynamically typed language, but it does strict type checks at runtime. The core module exposes several functions to interact with the type checking system.
+
+Values are checked against a _schema_. Valid schemas are:
+
+- A string representing the expected Kenpali type: one of `"null"`, `"boolean"`, `"number"`, `"string"`, `"array"`, `"stream"`, `"sequence"`, `"object",`, `"builtin"`, `"given"`, `"function"`, `"error"`, `"any"`.
+- An object of the form `{oneOf: [<values>]}`, which matches only the specified values.
+- An object of the form `{either: [<schemas>]}`, which matches a value if _at least one of_ the specified schemas matches it.
+- An object of the form `{type: <type>, ...}`. On its own, this is equivalent to a string schema, e.g. `{type: "number"}` matches the same values as `"number"`. But this format allows additional properties to narrow the range of accepted values:
+    - For arrays, the `elements` property specifies the schema that all the array's elements must match, e.g. `{type: "array", elements: "number"}` matches only array of numbers.
+    - For arrays, the `shape` property specifies an array of individual schemas for each element, e.g. `{type: "array", shape: ["number", "string"]}` matches only arrays whose first element is a number and whose second element is a string.
+    - For objects, the `values` property specifies the schemas that all the object's property values must match, e.g. `{type: "object", values: "number"}` matches only objects whose properties are all numbers.
+    - For objects, the `shape` property specifies an object whose properties are schemas that the corresponding properties must match, e.g. `{type: "object", shape: {foo: "number", bar: "string"}}` matches only objects with a numeric `foo` property and a string `bar` property.
+    - The `where` property specifies an arbitrary function that must return `true` when called on the value, e.g. `{type: "number", where: | isLessThan(10)}` matches only numbers less than 10.
+
+### validate
+
+Ensures that the specified value matches a schema. Throws a validation error if the value doesn't match.
+
+Parameters:
+
+- `value` (_any_): The value to check.
+- `schema` (_string or object_): The schema to check against.
+
+Returns:
+
+- (_boolean_): Always `true`.
+
+### matches
+
+Checks whether the specified value matches a schema.
+
+Parameters:
+
+- `value` (_any_): The value to check.
+- `schema` (_string or object_): The schema to check against.
+
+Returns:
+
+- (_boolean_): Whether the value matches the schema.
 
 ```
 # Matching typeOf results
@@ -1783,6 +3127,19 @@ array = mutableArray();
 ]
 ```
 
+### is
+
+Creates a schema that checks the type of the value, and optionally that it satisfies a predicate.
+
+Parameters:
+
+- `type` (_string_): The expected Kenpali type.
+- `where:` (_function or null_, default `null`): A predicate that the value must satisfy.
+
+Returns:
+
+- (_object_): A schema of the form `{type, where}`.
+
 ```
 # Matching a type with a predicate
 sch = is("number", where: (n) => isLessThan(n, 10));
@@ -1797,6 +3154,18 @@ sch = is("number", where: (n) => isLessThan(n, 10));
     false,
 ]
 ```
+
+### oneOf
+
+Creates a schema that checks if the value is in the specified list.
+
+Parametersː
+
+- `*values` (_array of any_): The allowed values.
+
+Returns:
+
+- (_object_): A schema of the form `{oneOf: values}`.
 
 ```
 # Matching a list of specific values
@@ -1814,6 +3183,19 @@ sch = oneOf("red", "green", "blue");
     false,
 ]
 ```
+
+### arrayOf
+
+Creates a schema that checks the elements of an array against a single schema, and optionally that the array satisfies a predicate.
+
+Parameters:
+
+- `elementSchema` (_string or object_): The schema that all elements must match.
+- `where:` (_function or null_, default `null`): A predicate that the array must satisfy.
+
+Returns:
+
+- (_object_): A schema of the form `{type: "array", elements: elementSchema, where}`.
 
 ```
 # Matching an array where all elements must be of a given type
@@ -1834,6 +3216,18 @@ sch = arrayOf("string");
 ]
 ```
 
+### tupleLike
+
+Creates a schema that checks each element of an array against a separate schema.
+
+Parameters:
+
+- `shape` (_array of string or object_): A schema that each element of the array must match.
+
+Returns:
+
+- (_object_): A schema of the form `{type: "array", shape}`.
+
 ```
 # Matching an array where each element has its own schema
 sch = tupleLike(["string", "number", arrayOf("number")]);
@@ -1852,6 +3246,20 @@ sch = tupleLike(["string", "number", arrayOf("number")]);
     false,
 ]
 ```
+
+### objectOf
+
+Creates a schema that checks the property values of an object against a single schema, and optionally that the keys match a schema and/or that the entire object satisfies a predicate.
+
+Parameters:
+
+- `keys:` (_string or object_, default: "string"): The schema that all keys must match.
+- `values:` (_string or object_): The schema that all values must match.
+- `where:` (_function or null_, default `null`): A predicate that the object must satisfy.
+
+Returns:
+
+- (_object_): An object of the form `{type: "object", keys, values, where}`.
 
 ```
 # Matching an object where keys and values must match schemas
@@ -1876,8 +3284,78 @@ sch = objectOf(keys: is("string", where: (s) => (length(s) | equals(1))), values
 ]
 ```
 
+### recordLike
+
+Creates a schema that checks each property of an object against a separate schema.
+
+Parameters:
+
+- `shape` (_object of string or object_): A schema that each property of the object must match.
+
+Returns:
+
+- (_object_): A schema of the form `{type: "object", shape}`.
+
 ```
 # Matching an object with a specific structure
+person = recordLike({name: "string", age: "number"});
+[
+    {name: "John", age: 42} | matches(person),
+    {name: "John", age: 42, job: "doctor"} | matches(person),
+    {name: "John"} | matches(person),
+    {name: "John", age: "middle"} | matches(person),
+    {name: 42} | matches(person),
+    {age: 42} | matches(person),
+    42 | matches(person),
+]
+>> [
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+]
+```
+
+### optional
+
+Creates a schema that marks an array element or object property as optional.
+
+The returned schema is only valid inside the `shape` property of an array or object schema.
+
+Parameters:
+
+- `schema` (_string or object_): The schema that the element or property must match if present.
+
+Returns:
+
+- (_object_): A schema of the form `{optional: schema}`.
+
+```
+# Matching an array with an optional element
+sch = tupleLike(["string", "number", optional(arrayOf("number"))]);
+[
+    ["foo", 42, [1, 2, 3]] | matches(sch),
+    ["foo", 42, [], "extra"] | matches(sch),
+    ["foo", 42] | matches(sch),
+    ["foo", "bar", [1, 2, 3]] | matches(sch),
+    ["foo"] | matches(sch),
+    42 | matches(sch),
+]
+>> [
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+]
+```
+
+```
+# Matching an object with an optional property
 person = recordLike({name: "string", age: optional("number")});
 [
     {name: "John", age: 42} | matches(person),
@@ -1898,6 +3376,18 @@ person = recordLike({name: "string", age: optional("number")});
     false,
 ]
 ```
+
+### either
+
+Creates a schema that allows anything matching any of the specified schemas.
+
+Parameters:
+
+- `*schemas` (_array of string or object_): The allowed schemas.
+
+Returns:
+
+- (_object_): A schema of the form `{either: schemas}`.
 
 ```
 # Matching a union

@@ -17,7 +17,7 @@ plus(1, "foo")
 ```
 # Negative - missing argument
 negative()
-!! missingArgument {"name": "x"}
+!! missingArgument {"name": "n"}
 ```
 
 ```
