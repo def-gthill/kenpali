@@ -2,9 +2,9 @@
 
 The Core functions must be available to any Kenpali program. Reference implementations for some of them in terms of the others are provided by `core.kpc`, enabling a complete implementation with fewer builtins.
 
-## Arithmetic
+## Arithmetic|arithmetic
 
-### plus
+### plus|plus
 
 Returns the sum of its arguments
 
@@ -23,7 +23,7 @@ Returns:
 >> [0, 1, 3, 6]
 ```
 
-### sum
+### sum|sum
 
 Returns the sum of the values in the specified sequence.
 
@@ -41,7 +41,7 @@ sum(1 | to(10))
 >> 55
 ```
 
-### minus
+### minus|minus
 
 Returns its first argument minus its second argument.
 
@@ -60,7 +60,7 @@ Returns:
 >> [3, -3]
 ```
 
-### negative
+### negative|negative
 
 Returns its argument with the sign flipped.
 
@@ -78,7 +78,7 @@ Returns:
 >> [-42, 1.5]
 ```
 
-### absolute
+### absolute|absolute
 
 Returns its argument with the sign set to positive.
 
@@ -99,7 +99,7 @@ Returns:
 >> [42, 42]
 ```
 
-### up
+### up|up
 
 Returns its argument plus one.
 
@@ -117,7 +117,7 @@ Returns:
 >> [4, -2, 2.5]
 ```
 
-### down
+### down|down
 
 Returns its argument minus one.
 
@@ -135,7 +135,7 @@ Returns:
 >> [2, -4, 0.5]
 ```
 
-### times
+### times|times
 
 Returns the product of its arguments.
 
@@ -153,7 +153,7 @@ Returns:
 >> [1, 2, 6, 24]
 ```
 
-### dividedBy
+### dividedBy|dividedBy
 
 Returns its first argument divided by its second argument.
 
@@ -172,7 +172,7 @@ Returns:
 >> [4, 1.5]
 ```
 
-### oneOver
+### oneOver|oneOver
 
 Returns the reciprocal of its argument.
 
@@ -190,7 +190,7 @@ Returns:
 >> [0.5, -2]
 ```
 
-### quotientBy
+### quotientBy|quotientBy
 
 Returns the integer quotient of its first argument divided by its second argument.
 
@@ -216,7 +216,7 @@ Returns:
 >> [3, -4, -4, 3, 3, 2]
 ```
 
-### remainderBy
+### remainderBy|remainderBy
 
 Returns the remainder of its first argument divided by its second argument, always non-negative.
 
@@ -252,9 +252,9 @@ Returns:
 >> [true, false, true]
 ```
 
-## Strings
+## Strings|strings
 
-### toCodePoints
+### toCodePoints|toCodePoints
 
 Returns an array of Unicode code points representing the characters in the given string.
 
@@ -272,7 +272,7 @@ toCodePoints("foo\u1234")
 >> [102, 111, 111, 4660]
 ```
 
-### fromCodePoints
+### fromCodePoints|fromCodePoints
 
 Returns a string created from the given array of Unicode code points.
 
@@ -290,7 +290,7 @@ fromCodePoints([102, 111, 111, 4660])
 >> "foo\u1234"
 ```
 
-### join
+### join|join
 
 Returns a string created by joining the given values with a separator.
 
@@ -320,7 +320,7 @@ Returns:
 >> "foo\nbar\n\nbaz"
 ```
 
-### split
+### split|split
 
 Returns an array of substrings by splitting the given string at occurrences of a separator.
 
@@ -385,9 +385,9 @@ Returns:
 ]
 ```
 
-## Comparison
+## Comparison|comparison
 
-### Comparison Rules
+### Comparison Rules|comparison-rules
 
 Kenpali can perform equality and ordering comparisons on various types.
 
@@ -409,7 +409,7 @@ Ordering comparisons work on booleans, numbers, strings, and arrays, as follows:
 - Strings are compared lexicographically by their Unicode code points.
 - Arrays are compared lexicographically by their elements.
 
-### equals
+### equals|equals
 
 Returns whether its arguments have equal values, according to the [Comparison Rules](#comparison-rules).
 
@@ -459,7 +459,7 @@ Returns:
 ]
 ```
 
-### isLessThan
+### isLessThan|isLessThan
 
 Returns whether its first argument is less than its second argument, according to the [Comparison Rules](#comparison-rules).
 
@@ -514,7 +514,7 @@ Returns:
 ]
 ```
 
-### isAtMost
+### isAtMost|isAtMost
 
 Returns whether its first argument is less than or equal to its second argument, according to the [Comparison Rules](#comparison-rules).
 
@@ -537,7 +537,7 @@ Returns:
 >> [true, true, false]
 ```
 
-### isMoreThan
+### isMoreThan|isMoreThan
 
 Returns whether its first argument is greater than its second argument.
 
@@ -560,7 +560,7 @@ Returns:
 >> [false, false, true]
 ```
 
-### isAtLeast
+### isAtLeast|isAtLeast
 
 Returns whether its first argument is greater than or equal to its second argument.
 
@@ -618,9 +618,9 @@ foo = (n) => n | isBetween(42, 97);
 >> 216
 ```
 
-## Logic
+## Logic|logic
 
-### and
+### and|and
 
 Returns whether all given conditions evaluate to `true`. If any condition evaluates to `false`, the remaining conditions are not evaluated.
 
@@ -653,7 +653,7 @@ Returns:
 >> [false, false]
 ```
 
-### or
+### or|or
 
 Returns whether at least one of the given conditions evaluates to `true`. If any condition evaluates to `true`, the remaining conditions are not evaluated.
 
@@ -686,7 +686,7 @@ Returns:
 >> [true, true]
 ```
 
-### not
+### not|not
 
 Returns the logical negation of its argument.
 
@@ -707,9 +707,9 @@ Returns:
 >> [false, true]
 ```
 
-## Types and Type Conversion
+## Types and Type Conversion|types
 
-### typeOf
+### typeOf|typeOf
 
 Returns the Kenpali type of its argument.
 
@@ -719,7 +719,7 @@ Parameters:
 
 Returns:
 
-- (_`"null"` or `"boolean"` or `"number"` or `"string"` or `"array"` or `"stream"` or `"object"` or `"builtin"` or `"given"` or `"error"`_): The Kenpali type.
+- (_string_): The Kenpali type.
 
 ```
 # Type of
@@ -739,7 +739,7 @@ Returns:
 >> ["null", "boolean", "boolean", "number", "string", "array", "stream", "object", "builtin", "given", "error"]
 ```
 
-### isNull
+### isNull|isNull
 
 Returns whether its argument is `null`.
 
@@ -769,7 +769,7 @@ Returns:
 >> [true, false, false, false, false, false, false, false, false, false, false]
 ```
 
-### isBoolean
+### isBoolean|isBoolean
 
 Returns whether its argument is a boolean.
 
@@ -799,7 +799,7 @@ Returns:
 >> [false, true, true, false, false, false, false, false, false, false, false]
 ```
 
-### isNumber
+### isNumber|isNumber
 
 Returns whether its argument is a number.
 
@@ -829,7 +829,7 @@ Returns:
 >> [false, false, false, true, false, false, false, false, false, false, false]
 ```
 
-### toNumber
+### toNumber|toNumber
 
 Returns the numeric representation of its argument.
 
@@ -856,7 +856,7 @@ Throws:
 >> [1, -2.5, 5, 42]
 ```
 
-### isString
+### isString|isString
 
 Returns whether its argument is a string.
 
@@ -886,7 +886,7 @@ Returns:
 >> [false, false, false, false, true, false, false, false, false, false, false]
 ```
 
-### toString
+### toString|toString
 
 Returns the string representation of its argument.
 
@@ -971,7 +971,7 @@ foo = $ (
 ]
 ```
 
-### isArray
+### isArray|isArray
 
 Returns whether its argument is an array.
 
@@ -1001,7 +1001,7 @@ Returns:
 >> [false, false, false, false, false, true, false, false, false, false, false]
 ```
 
-### toArray
+### toArray|toArray
 
 Collects the elements of the specified sequence into an array.
 
@@ -1013,7 +1013,7 @@ Returns:
 
 - (_array_): The array of elements.
 
-### isStream
+### isStream|isStream
 
 Returns whether its argument is a stream.
 
@@ -1043,7 +1043,7 @@ Returns:
 >> [false, false, false, false, false, false, true, false, false, false, false]
 ```
 
-### toStream
+### toStream|toStream
 
 Returns a stream that iterates over the elements of the specified sequence.
 
@@ -1057,7 +1057,7 @@ Returns:
 
 - (_stream_): The stream of elements.
 
-### isObject
+### isObject|isObject
 
 Returns whether its argument is an object.
 
@@ -1087,7 +1087,7 @@ Returns:
 >> [false, false, false, false, false, false, false, true, false, false, false]
 ```
 
-### isBuiltin
+### isBuiltin|isBuiltin
 
 Returns whether its argument is a builtin function, written in the platform language.
 
@@ -1117,7 +1117,7 @@ Returns:
 >> [false, false, false, false, false, false, false, false, true, false, false]
 ```
 
-### isGiven
+### isGiven|isGiven
 
 Returns whether its argument is a pure-Kenpali function.
 
@@ -1147,7 +1147,7 @@ Returns:
 >> [false, false, false, false, false, false, false, false, false, true, false]
 ```
 
-### isError
+### isError|isError
 
 Returns whether its argument is an error.
 
@@ -1179,7 +1179,7 @@ Returns:
 >> [false, false, false, false, false, false, false, false, false, false, true]
 ```
 
-### isFunction
+### isFunction|isFunction
 
 Returns whether its argument is a function.
 
@@ -1209,7 +1209,7 @@ Returns:
 >> [false, false, false, false, false, false, false, false, true, true, false]
 ```
 
-### toFunction
+### toFunction|toFunction
 
 Converts the specified value to a function:
 
@@ -1234,7 +1234,7 @@ Returns:
 >> [42, "97", 100]
 ```
 
-### isSequence
+### isSequence|isSequence
 
 Returns whether its argument is a sequence—a string, array, or stream.
 
@@ -1264,9 +1264,9 @@ Returns:
 >> [false, false, false, false, true, true, true, false, false, false, false]
 ```
 
-## Control Flow
+## Control Flow|control-flow
 
-### if
+### if|if
 
 Evaluates and returns the result of one of two functions based on a condition.
 
@@ -1324,7 +1324,7 @@ foo = (a, b) => ifs(
 >> ["Too big!", "Too small!", "Just right!"]
 ```
 
-### switch
+### switch|switch
 
 Evaluates a list of conditions and returns the result of the first matching case.
 
@@ -1354,11 +1354,11 @@ foo = | switch(
 >> ["97 is too big!", "1 is too small!", "42 is just right!"]
 ```
 
-## Stream Builders
+## Stream Builders|stream-builders
 
 These functions build up new streams from scalar inputs.
 
-### build
+### build|build
 
 Generates a stream by repeatedly applying a function to a start value.
 
@@ -1447,7 +1447,7 @@ powersOfTwo = 1 | build(| times(2));
 ]
 ```
 
-### newStream
+### newStream|newStream
 
 Explicitly creates a stream with the specified head value and tail stream.
 
@@ -1470,7 +1470,7 @@ myStream = (start) => newStream(
 >> [1, 2, 4, 8, 16]
 ```
 
-### emptyStream
+### emptyStream|emptyStream
 
 Creates a stream with no elements. Together with `newStream`, this allows explicitly creating finite streams.
 
@@ -1498,7 +1498,7 @@ myStream = (start) => if(
 >> [1, 2, 4, 8, 16, 32, 64]
 ```
 
-## Stream Collapsers
+## Stream Collapsers|stream-collapsers
 
 These functions exhaust an input stream to produce a scalar output or side effect. They loop forever if given an infinite stream.
 
@@ -1512,7 +1512,7 @@ These functions exhaust an input stream to produce a scalar output or side effec
 >> ["foo", "baz", 5]
 ```
 
-### length
+### length|length
 
 Returns the number of elements in the specified sequence.
 
@@ -1612,7 +1612,7 @@ Returns:
 ]
 ```
 
-### sort
+### sort|sort
 
 Returns an array with the same elements as the specified sequence, but in ascending order.
 
@@ -1694,7 +1694,7 @@ Returns:
 ]
 ```
 
-### forEach
+### forEach|forEach
 
 Applies a function to each element in a sequence for its side effects.
 
@@ -1716,7 +1716,7 @@ result.elements()
 >> ["foo", "bar", "baz", 1, 2, 3, 4, 5]
 ```
 
-## Stream Accessors
+## Stream Accessors|stream-accessors
 
 These functions calculate a scalar value from a stream, but only access a finite number of elements to do so. Therefore, they are safe to call even on infinite streams.
 
@@ -1749,11 +1749,11 @@ These functions calculate a scalar value from a stream, but only access a finite
 >> ["foo", "foo", 1, 1]
 ```
 
-## Stream Rebuilders
+## Stream Rebuilders|stream-rebuilders
 
 These functions create new streams that depend on existing ones, preserving stream laziness.
 
-### transform
+### transform|transform
 
 Creates a stream from applying a function to each element in an input sequence.
 
@@ -1783,7 +1783,7 @@ Returns:
 ]
 ```
 
-### running
+### running|running
 
 Maintains state while processing a sequence, producing a stream of intermediate states.
 
@@ -1810,7 +1810,7 @@ Returns:
 >> [0, 2, 28, 289, 2893, 28937]
 ```
 
-### keepFirst
+### keepFirst|keepFirst
 
 Returns a stream containing only the first `n` elements of the input.
 
@@ -1835,7 +1835,7 @@ Returns:
 ]
 ```
 
-### dropFirst
+### dropFirst|dropFirst
 
 Returns a stream with the first `n` elements skipped.
 
@@ -1878,7 +1878,7 @@ Returns:
 ]
 ```
 
-### while
+### while|while
 
 Creates a stream of elements from the input sequence while a condition holds.
 
@@ -1902,7 +1902,7 @@ Returns:
 
 The `continueIf` function is like `while`, except it includes one extra element—the first element that doesn't satisfy the condition. This make some stopping conditions easier to express.
 
-### continueIf
+### continueIf|continueIf
 
 Creates a stream of elements from the input sequence, continuing to the next element if a condition holds. The resulting stream has one extra element compared to `while`—the first element that doesn't satisfy the condition—which makes some stopping conditions easier to express.
 
@@ -1949,7 +1949,7 @@ diffs = (sequence) => (
 ]
 ```
 
-### where
+### where|where
 
 Filters a sequence, keeping only elements that satisfy a condition.
 
@@ -1979,7 +1979,7 @@ Returns:
 ]
 ```
 
-### zip
+### zip|zip
 
 Combines multiple sequences into a stream of tuples, stopping when the shortest sequence is exhausted.
 
@@ -2008,7 +2008,7 @@ Returns:
 ]
 ```
 
-### unzip
+### unzip|unzip
 
 Splits a sequence of tuples into multiple streams.
 
@@ -2040,7 +2040,7 @@ Returns:
 ]
 ```
 
-### flatten
+### flatten|flatten
 
 Flattens a sequence of sequences into a single stream.
 
@@ -2066,7 +2066,7 @@ Returns:
 ]
 ```
 
-### dissect
+### dissect|dissect
 
 Splits a sequence into chunks at elements that satisfy a condition.
 
@@ -2109,9 +2109,9 @@ Returns:
 ]
 ```
 
-## Objects
+## Objects|objects
 
-### keys
+### keys|keys
 
 Returns an array of the keys in an object.
 
@@ -2130,7 +2130,7 @@ object | keys
 >> ["foo", "spam"]
 ```
 
-### toObject
+### toObject|toObject
 
 Converts the specified value into an object.
 
@@ -2188,9 +2188,9 @@ object = {foo: "bar", spam: "eggs"};
 >> {foo: 1, bar: 3, baz: 4}
 ```
 
-## Indexing
+## Indexing|indexing
 
-### at
+### at|at
 
 Returns the value at the specified index in the specified collection, or a default value if the index is invalid.
 
@@ -2240,9 +2240,9 @@ Parameters:
 >> [4, 4, 42]
 ```
 
-## Utilities
+## Utilities|utilities
 
-### debug
+### debug|debug
 
 Writes the specified value to a diagnostic log. Exactly where this goes depends on the implementation and configuration; writing to standard error is a common default.
 
@@ -2257,7 +2257,7 @@ Returns:
 
 - (_any_): The `value` argument.
 
-### itself
+### itself|itself
 
 Returns its argument. Useful when a function must be provided, but no transformation is needed.
 
@@ -2283,9 +2283,9 @@ Returns:
 ]
 ```
 
-## Sets and Maps
+## Sets and Maps|sets-maps
 
-### newSet
+### newSet|newSet
 
 Creates an immutable set.
 
@@ -2299,19 +2299,19 @@ Returns:
 
 - (_object_): The new set.
 
-#### newSet/size
+#### newSet/size|newSet-size
 
 Returns:
 
 - (_number_): The number of elements in the set.
 
-#### newSet/elements
+#### newSet/elements|newSet-elements
 
 Returns:
 
 - (_array_): An array containing all the elements in the set.
 
-#### newSet/has
+#### newSet/has|newSet-has
 
 Checks whether the specified element is in the set.
 
@@ -2369,7 +2369,7 @@ set = [["foo"], {foo: 42, bar: 97}] | newSet;
 ]
 ```
 
-### newMap
+### newMap|newMap
 
 Creates an immutable map.
 
@@ -2383,31 +2383,31 @@ Returns:
 
 - (_object_): The new map.
 
-#### newMap/size
+#### newMap/size|newMap-size
 
 Returns:
 
 - (_number_): The number of key-value pairs in the map.
 
-#### newMap/keys
+#### newMap/keys|newMap-keys
 
 Returns:
 
 - (_array_): An array containing all keys in the map.
 
-#### newMap/values
+#### newMap/values|newMap-values
 
 Returns:
 
 - (_array_): An array containing all values in the map.
 
-#### newMap/entries
+#### newMap/entries|newMap-entries
 
 Returns:
 
 - (_array_): An array of `[key, value]` pairs representing the map’s contents.
 
-#### newMap/has
+#### newMap/has|newMap-has
 
 Checks whether the specified key exists in the map.
 
@@ -2419,7 +2419,7 @@ Returns:
 
 - (_boolean_): Whether the key is in the map.
 
-#### newMap/at
+#### newMap/at|newMap-at
 
 Retrieves the value associated with the specified key.
 
@@ -2490,9 +2490,9 @@ map = [[["foo"], 42], [{foo: 42, bar: 97}, 97]] | newMap;
 ]
 ```
 
-## Mutable Objects
+## Mutable Objects|mutable
 
-### variable
+### variable|variable
 
 Creates a mutable variable.
 
@@ -2506,7 +2506,7 @@ Returns:
 
 - (_object_): The new variable.
 
-#### variable/get
+#### variable/get|variable-get
 
 Returns the current value of the variable.
 
@@ -2514,7 +2514,7 @@ Returns:
 
 - (_any_): The current value.
 
-#### variable/set
+#### variable/set|variable-set
 
 Updates the variable's value.
 
@@ -2537,7 +2537,7 @@ var = variable(42);
 >> [42, 73, 73]
 ```
 
-### mutableArray
+### mutableArray|mutableArray
 
 Creates a mutable array.
 
@@ -2551,19 +2551,19 @@ Returns:
 
 - (_object_): The new mutable array.
 
-#### mutableArray/size
+#### mutableArray/size|mutableArray-size
 
 Returns:
 
 - (_number_): The number of elements in the array.
 
-#### mutableArray/elements
+#### mutableArray/elements|mutableArray-elements
 
 Returns:
 
 - (_array_): An array containing all elements in the mutable array.
 
-#### mutableArray/append
+#### mutableArray/append|mutableArray-append
 
 Adds an element to the end of the array.
 
@@ -2575,7 +2575,7 @@ Returns:
 
 - (_object_): The mutable array itself, for chaining.
 
-#### mutableArray/set
+#### mutableArray/set|mutableArray-set
 
 Replaces the element at the specified index.
 
@@ -2592,7 +2592,7 @@ Throws:
 
 - `indexOutOfBounds`: If the index is out of range.
 
-#### mutableArray/storeAt
+#### mutableArray/storeAt|mutableArray-storeAt
 
 Alias for `set`, but with parameters in reversed order. Useful as the final step in a pipeline that computes the new element value.
 
@@ -2609,7 +2609,7 @@ Throws:
 
 - `indexOutOfBounds`: If the index is out of range.
 
-#### mutableArray/at
+#### mutableArray/at|mutableArray-at
 
 Retrieves the element at the specified index.
 
@@ -2622,7 +2622,7 @@ Returns:
 
 - (_any_): The element at the index, or the result of `default` if out of range.
 
-#### mutableArray/pop
+#### mutableArray/pop|mutableArray-pop
 
 Removes and returns the last element.
 
@@ -2634,7 +2634,7 @@ Returns:
 
 - (_any_): The last element, or the result of `default` if the array is empty.
 
-#### mutableArray/clear
+#### mutableArray/clear|mutableArray-clear
 
 Removes all elements from the array.
 
@@ -2674,7 +2674,7 @@ array = ["foo", "bar", "baz"] | mutableArray
 ]
 ```
 
-### mutableSet
+### mutableSet|mutableSet
 
 Creates a mutable set.
 
@@ -2688,19 +2688,19 @@ Returns:
 
 - (_object_): The new mutable set.
 
-#### mutableSet/size
+#### mutableSet/size|mutableSet-size
 
 Returns:
 
 - (_number_): The number of elements in the set.
 
-#### mutableSet/elements
+#### mutableSet/elements|mutableSet-elements
 
 Returns:
 
 - (_array_): An array containing all elements in the mutable set.
 
-#### mutableSet/add
+#### mutableSet/add|mutableSet-add
 
 Adds an element to the set.
 
@@ -2712,7 +2712,7 @@ Returns:
 
 - (_object_): The mutable set itself, for chaining.
 
-#### mutableSet/remove
+#### mutableSet/remove|mutableSet-remove
 
 Removes an element from the set.
 
@@ -2724,7 +2724,7 @@ Returns:
 
 - (_object_): The mutable set itself, for chaining.
 
-#### mutableSet/has
+#### mutableSet/has|mutableSet-has
 
 Checks whether the specified element is in the set.
 
@@ -2736,7 +2736,7 @@ Returns:
 
 - (_boolean_): Whether the value is in the set.
 
-#### mutableSet/clear
+#### mutableSet/clear|mutableSet-clear
 
 Removes all elements from the set.
 
@@ -2799,7 +2799,7 @@ set = [["foo"]] | mutableSet;
 ]
 ```
 
-### mutableMap
+### mutableMap|mutableMap
 
 Creates a mutable map.
 
@@ -2813,31 +2813,31 @@ Returns:
 
 - (_object_): The new mutable map.
 
-#### mutableMap/size
+#### mutableMap/size|mutableMap-size
 
 Returns:
 
 - (_number_): The number of entries in the map.
 
-#### mutableMap/keys
+#### mutableMap/keys|mutableMap-keys
 
 Returns:
 
 - (_array_): An array containing all keys in the map.
 
-#### mutableMap/values
+#### mutableMap/values|mutableMap-values
 
 Returns:
 
 - (_array_): An array containing all values in the map.
 
-#### mutableMap/entries
+#### mutableMap/entries|mutableMap-entries
 
 Returns:
 
 - (_array_): An array of `[key, value]` pairs representing the map's entries.
 
-#### mutableMap/set
+#### mutableMap/set|mutableMap-set
 
 Sets the value for a given key.
 
@@ -2850,7 +2850,7 @@ Returns:
 
 - (_object_): The mutable map itself, for chaining.
 
-#### mutableMap/storeAt
+#### mutableMap/storeAt|mutableMap-storeAt
 
 Alias for `set`, but with parameters in reversed order. Useful as the final step in a pipeline that computes the new element value.
 
@@ -2863,7 +2863,7 @@ Returns:
 
 - (_object_): The mutable map itself, for chaining.
 
-#### mutableMap/remove
+#### mutableMap/remove|mutableMap-remove
 
 Removes a key and its associated value from the map.
 
@@ -2875,7 +2875,7 @@ Returns:
 
 - (_object_): The mutable map itself, for chaining.
 
-#### mutableMap/has
+#### mutableMap/has|mutableMap-has
 
 Checks whether the map contains a specific key.
 
@@ -2887,7 +2887,7 @@ Returns:
 
 - (_boolean_): Whether the key exists in the map.
 
-#### mutableMap/at
+#### mutableMap/at|mutableMap-at
 
 Retrieves the value associated with a given key.
 
@@ -2900,7 +2900,7 @@ Returns:
 
 - (_any_): The value associated with the key, or the default value if the key is not found.
 
-#### mutableMap/clear
+#### mutableMap/clear|mutableMap-clear
 
 Removes all entries from the map.
 
@@ -2979,9 +2979,9 @@ array = mutableArray();
 >> [42, [42]]
 ```
 
-## Errors
+## Errors|errors
 
-### error
+### error|error
 
 Creates an error value with the specified error type and details. This in itself doesn't _throw_ the error.
 
@@ -2997,7 +2997,7 @@ Parameters:
 >> ["badIdea", {foo: "bar", spam: "eggs"}]
 ```
 
-## Validation
+## Validation|validation
 
 Kenpali is a dynamically typed language, but it does strict type checks at runtime. The core module exposes several functions to interact with the type checking system.
 
@@ -3013,7 +3013,7 @@ Values are checked against a _schema_. Valid schemas are:
     - For objects, the `shape` property specifies an object whose properties are schemas that the corresponding properties must match, e.g. `{type: "object", shape: {foo: "number", bar: "string"}}` matches only objects with a numeric `foo` property and a string `bar` property.
     - The `where` property specifies an arbitrary function that must return `true` when called on the value, e.g. `{type: "number", where: | isLessThan(10)}` matches only numbers less than 10.
 
-### validate
+### validate|validate
 
 Ensures that the specified value matches a schema. Throws a validation error if the value doesn't match.
 
@@ -3026,7 +3026,7 @@ Returns:
 
 - (_boolean_): Always `true`.
 
-### matches
+### matches|matches
 
 Checks whether the specified value matches a schema.
 
@@ -3127,7 +3127,7 @@ Returns:
 ]
 ```
 
-### is
+### is|is
 
 Creates a schema that checks the type of the value, and optionally that it satisfies a predicate.
 
@@ -3155,7 +3155,7 @@ sch = is("number", where: (n) => isLessThan(n, 10));
 ]
 ```
 
-### oneOf
+### oneOf|oneOf
 
 Creates a schema that checks if the value is in the specified list.
 
@@ -3184,7 +3184,7 @@ sch = oneOf("red", "green", "blue");
 ]
 ```
 
-### arrayOf
+### arrayOf|arrayOf
 
 Creates a schema that checks the elements of an array against a single schema, and optionally that the array satisfies a predicate.
 
@@ -3216,7 +3216,7 @@ sch = arrayOf("string");
 ]
 ```
 
-### tupleLike
+### tupleLike|tupleLike
 
 Creates a schema that checks each element of an array against a separate schema.
 
@@ -3247,7 +3247,7 @@ sch = tupleLike(["string", "number", arrayOf("number")]);
 ]
 ```
 
-### objectOf
+### objectOf|objectOf
 
 Creates a schema that checks the property values of an object against a single schema, and optionally that the keys match a schema and/or that the entire object satisfies a predicate.
 
@@ -3284,7 +3284,7 @@ sch = objectOf(keys: is("string", where: (s) => (length(s) | equals(1))), values
 ]
 ```
 
-### recordLike
+### recordLike|recordLike
 
 Creates a schema that checks each property of an object against a separate schema.
 
@@ -3319,7 +3319,7 @@ person = recordLike({name: "string", age: "number"});
 ]
 ```
 
-### optional
+### optional|optional
 
 Creates a schema that marks an array element or object property as optional.
 
@@ -3377,7 +3377,7 @@ person = recordLike({name: "string", age: optional("number")});
 ]
 ```
 
-### either
+### either|either
 
 Creates a schema that allows anything matching any of the specified schemas.
 
