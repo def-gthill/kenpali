@@ -218,7 +218,9 @@ Returns:
 
 ### remainderBy|remainderBy
 
-Returns the remainder of its first argument divided by its second argument, always non-negative.
+Returns the remainder of its first argument divided by its second argument.
+
+A non-zero remainder always has the same sign as the divisor.
 
 Parameters:
 
@@ -241,6 +243,19 @@ Returns:
 ]
 >> [1, 2, -2, -1, 1.5, 3]
 ```
+
+### isDivisibleBy|isDivisibleBy
+
+Returns whether its first argument is divisible by its second argument.
+
+Parameters:
+
+- `a` (_number_): The dividend.
+- `b` (_number_): The divisor.
+
+Returns:
+
+- (_boolean_): Whether `a` divided by `b` is an integer.
 
 ```
 # Divisible by
@@ -314,6 +329,18 @@ Returns:
 >> ["", "foo", "foobarbaz", "foo|bar|baz"]
 ```
 
+### joinLines|joinLines
+
+Returns a string created by joining the given values with newlines.
+
+Parameters:
+
+- `strings` (_array or stream of string_): The values to join.
+
+Returns:
+
+- (_string_): The joined string.
+
 ```
 # Joining lines
 ["foo", "bar", "", "baz"] | joinLines
@@ -349,40 +376,22 @@ Returns:
 ]
 ```
 
+### splitLines|splitLines
+
+Returns an array of the newline-separated lines in the specified string.
+
+Parameters:
+
+- `string` (_string_): The text to split.
+
+Returns:
+
+- (_array of string_): The lines.
+
 ```
 # Splitting lines
 "foo\nbar\n\nbaz" | splitLines
 >> ["foo", "bar", "", "baz"]
-```
-
-```
-# Slicing strings
-[
-    "foobar" | slice(from: 2, to: 4),
-    "foobar" | slice(from: 2, to: 10),
-    "foobar" | slice(from: 0, to: 4),
-]
->> [
-    "oob",
-    "oobar",
-    "foob",
-]
-```
-
-```
-# Dropping leading and trailing characters
-[
-    "foobar" | dropFirst,
-    "foobar" | dropFirst(2),
-    "foobar" | dropLast,
-    "foobar" | dropLast(2),
-]
->> [
-    "oobar",
-    "obar",
-    "fooba",
-    "foob",
-]
 ```
 
 ## Comparison|comparison
@@ -539,7 +548,7 @@ Returns:
 
 ### isMoreThan|isMoreThan
 
-Returns whether its first argument is greater than its second argument.
+Returns whether its first argument is greater than its second argument, according to the [Comparison Rules](#comparison-rules).
 
 Parameters:
 
@@ -562,7 +571,7 @@ Returns:
 
 ### isAtLeast|isAtLeast
 
-Returns whether its first argument is greater than or equal to its second argument.
+Returns whether its first argument is greater than or equal to its second argument, according to the [Comparison Rules](#comparison-rules).
 
 Parameters:
 
@@ -582,6 +591,22 @@ Returns:
 ]
 >> [false, true, true]
 ```
+
+### isBetween|isBetween
+
+Returns whether its first argument is between the specified lower and upper bounds, according to the [Comparison Rules](#comparison-rules).
+
+Both bounds are inclusive.
+
+Parameters:
+
+- `n` (_number, string, boolean, or array_): The value to test.
+- `lower` (_number, string, boolean, or array_): The lower bound.
+- `upper` (_number, string, boolean, or array_): The upper bound.
+
+Returns:
+
+- (_boolean_): Whether `n` is between `lower` and `upper`.
 
 ```
 # Between
@@ -606,11 +631,35 @@ foo = (n) => n | isBetween(42, 97);
 ]
 ```
 
+### least|least
+
+Returns the least element in the specified sequence, i.e. the element that is less than or equal to all other elements, according to the [Comparison Rules](#comparison-rules).
+
+Parameters:
+
+- `sequence` (_sequence_): The values to find the least element of.
+
+Returns:
+
+- (_number, string, boolean, or array_): The least element.
+
 ```
 # Least
 [97, 42, 216] | least
 >> 42
 ```
+
+### most|most
+
+Returns the greatest element in the specified sequence, i.e. the element that is greater than or equal to all other elements, according to the [Comparison Rules](#comparison-rules).
+
+Parameters:
+
+- `sequence` (_sequence_): The values to find the greatest element of.
+
+Returns:
+
+- (_number, string, boolean, or array_): The greatest element.
 
 ```
 # Most
@@ -1300,14 +1349,42 @@ Returns:
 >> [1, 1, 2, 2]
 ```
 
+### butIf|butIf
+
+Substitutes a different value if a condition is true.
+
+Parameters:
+
+- `value` (_any_): The original value.
+- `condition` (_boolean or function_): The condition to check. If this is a function, it is called with `value` as its argument to get the condition's truth value.
+- `ifTrue` (_function_): A function that returns the value to substitue if `condition` is true. This is called with `value` as its argument.
+
+Returns:
+
+- (_any_): `value` if `condition` is false, the result of `ifTrue` otherwise.
+
 ```
 # But if
 [
-    42 | butIf((x) => (x | isMoreThan(10)), (x) => (x | minus(5))),
-    7 | butIf((x) => (x | isMoreThan(10)), (x) => (x | minus(5))),
+    42 | butIf(| isMoreThan(10), | minus(5)),
+    7 | butIf(| isMoreThan(10), | minus(5)),
 ]
 >> [37, 7]
 ```
+
+### ifs|ifs
+
+Evaluates a list of conditions and returns the result of the first matching case.
+
+
+Parameters:
+
+- `conditions` (_array of tuple like [function, function]_): A list of condition-result pairs. Each condition function is called with no arguments, and if it returns `true`, the corresponding result function is called with no arguments and its result is returned.
+- `else:` (_function_): The function to call if no conditions match.
+
+Returns:
+
+- (_any_): The result of the first matching case, or the `else` function if no conditions match.
 
 ```
 # Multi-way if
@@ -1326,7 +1403,7 @@ foo = (a, b) => ifs(
 
 ### switch|switch
 
-Evaluates a list of conditions and returns the result of the first matching case.
+Evaluates a list of conditions on an input value and returns the result of the first matching case.
 
 Parameters:
 
@@ -1383,6 +1460,22 @@ powersOfTwo = 1 | build(| times(2));
 >> [true, 1, 4, 128]
 ```
 
+### to|to
+
+Generates a stream of numbers covering a range.
+
+This is often useful for situations where other languages would use `for` loops.
+
+Parameters:
+
+- `start` (_number_): The number to start counting from. This is always the first element of the stream.
+- `end` (_number_): The number to stop at or before.
+- `by:` (_number_, default `1`): The number to count by. Each element of the stream will be `by` more than the previous one. If `by` is negative, the stream will count down. If the sign of `by` is opposite the sign of `end - start` (i.e. counting the "wrong way"), the resulting stream is empty.
+
+Returns:
+
+- (_stream_): A stream of numbers ranging from `start` to `end`, incrementing by `by`.
+
 ```
 # Ranges
 [
@@ -1421,6 +1514,19 @@ powersOfTwo = 1 | build(| times(2));
 ]
 ```
 
+### toSize|toSize
+
+Generates a stream of incrementing numbers with a given size.
+
+Parameters:
+
+- `start` (_number_): The number to start counting from.
+- `size` (_number_): The number of elements to include in the stream.
+
+Returns:
+
+- (_stream_): A stream of numbers counting up from `start`, with `size` elements in total.
+
 ```
 # Ranges defined by size
 [
@@ -1434,6 +1540,18 @@ powersOfTwo = 1 | build(| times(2));
     [5, 6, 7, 8, 9, 10],
 ]
 ```
+
+### repeat|repeat
+
+Creates a stream that repeats the same value forever.
+
+Parameters:
+
+- `value` (_any_): The value to repeat.
+
+Returns:
+
+- (_stream_): An infinite stream all of whose elements are `value`.
 
 ```
 # Repeating the same value forever
@@ -1502,6 +1620,18 @@ myStream = (start) => if(
 
 These functions exhaust an input stream to produce a scalar output or side effect. They loop forever if given an infinite stream.
 
+### last|last
+
+Returns the last element of the specified sequence. Equivalent to indexing with `-1`.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to get the last element of.
+
+Returns:
+
+- (_any_): The last element.
+
 ```
 # Last element
 [
@@ -1541,33 +1671,78 @@ Returns:
 >> [0, 1, 3, 0, 1, 3, 0, 5]
 ```
 
+### keepLast|keepLast
+
+Retains only the last `n` elements of the input.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to take values from.
+- `n` (_number_): The number of elements to keep.
+
+Returns:
+
+- (_array or string_): An array of at most `n` elements, or a string containing the last `n` characters if `sequence` is a string.
+
 ```
 # Keeping trailing elements
 [
+    "foobar" | keepLast(3),
     [42, 97, 6, 12, 64] | keepLast(3),
     1 | to(5) | keepLast(3),
 ]
 >> [
+    "bar",
     [6, 12, 64],
     [3, 4, 5],
 ]
 ```
 
+### dropLast|dropLast
+
+Drops the last `n` elements of the input.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to drop values from.
+- `n` (_number_, default: `1`): The number of elements to drop.
+
+Returns:
+
+- (_array or string_): An array with the last `n` elements dropped, or a string with the last `n` characters dropped if `sequence` is a string.
+
 ```
 # Dropping trailing elements
 [
+    "foobar" | dropLast,
+    "foobar" | dropLast(2),
     [42, 97, 6, 12, 64] | dropLast,
     [42, 97, 6, 12, 64] | dropLast(3),
     1 | to(5) | dropLast,
     1 | to(5) | dropLast(3),
 ]
 >> [
+    "fooba",
+    "foob",
     [42, 97, 6, 12],
     [42, 97],
     [1, 2, 3, 4],
     [1, 2],
 ]
 ```
+
+### count|count
+
+Returns the number of elements in the sequence matching the specified condition.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to count from.
+- `condition` (_function_): A function that returns `true` for elements to count.
+
+Returns:
+
+- (_number_): The number of elements for which `condition` returns `true`.
 
 ```
 # Counting
@@ -1577,6 +1752,19 @@ Returns:
 ]
 >> [4, 4]
 ```
+
+### forAll|forAll
+
+Tests whether the specified condition is true for all elements in the sequence.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to test.
+- `condition` (_function_): A function that returns `true` for acceptable elements.
+
+Returns:
+
+- (_boolean_): Whether all elements match the condition.
 
 ```
 # True for all elements
@@ -1589,6 +1777,19 @@ Returns:
 >> [true, false, true, false]
 ```
 
+### forSome|forSome
+
+Tests whether the specified condition is true for at least one element in the sequence.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to test.
+- `condition` (_function_): A function that returns `true` for acceptable elements.
+
+Returns:
+
+- (_boolean_): Whether any elements match the condition.
+
 ```
 # True for some elements
 [
@@ -1599,6 +1800,18 @@ Returns:
 ]
 >> [true, false, true, false]
 ```
+
+### reverse|reverse
+
+Returns an array containing all the elements of the specified sequence in reverse order.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to reverse.
+
+Returns:
+
+- (_array_): The reversed array.
 
 ```
 # Reversing
@@ -1654,6 +1867,19 @@ Returns:
 >> ["bar", "foo", "eggs", "spam"]
 ```
 
+### group|group
+
+Groups a sequence of pairs by their first element.
+
+Parameters:
+
+- `pairs` (_sequence_): A sequence of pairs whose first element is the grouping key.
+- `onGroup:` (_function_, default `(x) => x`): A function to call on each group after assembling it.
+
+Returns:
+
+- (_array_): A sequence of pairs whose first element is the grouping key, and whose second element is the result of calling `onGroup` on an array of the second elements of the input pairs with that grouping key.
+
 ```
 # Grouping
 [["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]] | group
@@ -1674,6 +1900,20 @@ Returns:
     ["spam", 1],
 ]
 ```
+
+### groupBy|groupBy
+
+Groups a sequence by a key function.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to group.
+- `by` (_function_): A function that returns a grouping key for a given value.
+- `onGroup:` (_function_, default `(x) => x`): A function to call on each group after assembling it.
+
+Returns:
+
+- (_array_): A sequence of pairs whose first element is the grouping key, and whose second element is the result of calling `onGroup` on an array of the elements with that grouping key.
 
 ```
 # Grouping by a key function
@@ -1720,6 +1960,18 @@ result.elements()
 
 These functions calculate a scalar value from a stream, but only access a finite number of elements to do so. Therefore, they are safe to call even on infinite streams.
 
+### isEmpty|isEmpty
+
+Tests whether the specified sequence has no elements.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to check for emptiness.
+
+Returns:
+
+- (_boolean_): Whether the sequence is empty.
+
 ```
 # Is empty
 [
@@ -1737,6 +1989,18 @@ These functions calculate a scalar value from a stream, but only access a finite
     false,
 ]
 ```
+
+### first|first
+
+Returns the first element of the specified sequence. Equivalent to indexing with `1`.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to get the first element of.
+
+Returns:
+
+- (_any_): The first element.
 
 ```
 # First element
@@ -1812,7 +2076,7 @@ Returns:
 
 ### keepFirst|keepFirst
 
-Returns a stream containing only the first `n` elements of the input.
+Retains only the first `n` elements of the input.
 
 Parameters:
 
@@ -1821,15 +2085,17 @@ Parameters:
 
 Returns:
 
-- (_stream_): A stream of at most `n` elements.
+- (_stream or string_): A stream of at most `n` elements, or a string containing the first `n` characters if `sequence` is a string.
 
 ```
 # Keeping leading elements
 [
+    "foobar" | keepFirst(3),
     [42, 97, 6, 12, 64] | keepFirst(3) | toArray,
     1 | build(| times(2)) | keepFirst(3) | toArray,
 ]
 >> [
+    "foo",
     [42, 97, 6],
     [1, 2, 4],
 ]
@@ -1837,7 +2103,7 @@ Returns:
 
 ### dropFirst|dropFirst
 
-Returns a stream with the first `n` elements skipped.
+Skips the first `n` elements of the input.
 
 Parameters:
 
@@ -1846,31 +2112,55 @@ Parameters:
 
 Returns:
 
-- (_stream_): A stream with the first `n` elements skipped.
+- (_stream or string_): A stream with the first `n` elements skipped, or a string with the first `n` characters skipped if `sequence` is a string.
 
 ```
 # Dropping leading elements
 [
+    "foobar" | dropFirst,
+    "foobar" | dropFirst(2),
     [42, 97, 6, 12, 64] | dropFirst | toArray,
     [42, 97, 6, 12, 64] | dropFirst(3) | toArray,
     1 | build(| times(2)) | dropFirst(3) | keepFirst(3) | toArray,
 ]
 >> [
+    "oobar",
+    "obar",
     [97, 6, 12, 64],
     [12, 64],
     [8, 16, 32],
 ]
 ```
 
+### slice|slice
+
+Extracts a sub-sequence of the specified sequence.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to take values from.
+- `from:` (_number_): The index of the first element to take.
+- `to:` (_number_): The index of the last element to take.
+
+Returns:
+
+- (_stream or string_): A stream containing only the elements from index `from` to index `to`, or a string with the characters at those indices if `sequence` is a string.
+
 ```
 # Slicing
 [
+    "foobar" | slice(from: 2, to: 4),
+    "foobar" | slice(from: 2, to: 10),
+    "foobar" | slice(from: 0, to: 4),
     [42, 97, 6, 12, 64] | slice(from: 2, to: 4) | toArray,
     [42, 97, 6, 12, 64] | slice(from: 2, to: 10) | toArray,
     [42, 97, 6, 12, 64] | slice(from: 0, to: 4) | toArray,
     1 | build(| times(2)) | slice(from: 2, to: 4) | toArray,
 ]
 >> [
+    "oob",
+    "oobar",
+    "foob",
     [97, 6, 12],
     [97, 6, 12, 64],
     [42, 97, 6, 12],
@@ -1900,8 +2190,6 @@ Returns:
 >> [1, 2, 4, 8, 16, 32, 64]
 ```
 
-The `continueIf` function is like `while`, except it includes one extra element—the first element that doesn't satisfy the condition. This make some stopping conditions easier to express.
-
 ### continueIf|continueIf
 
 Creates a stream of elements from the input sequence, continuing to the next element if a condition holds. The resulting stream has one extra element compared to `while`—the first element that doesn't satisfy the condition—which makes some stopping conditions easier to express.
@@ -1924,12 +2212,40 @@ Returns:
 >> [1, 2, 4, 8, 16, 32, 64, 128]
 ```
 
-Conversely, the `thenRepeat` function adds endless copies of a constant value to the end of a finite sequence, useful if subsequent steps need to continue past the end of the stream.
+### thenRepeat|thenRepeat
+
+Adds endless copies of a constant value to the end of the sequence.
+
+This is useful if subsequent steps need to continue past the end of the stream.
+
+Parameters:
+
+- `sequence` (_sequence_): The initial sequence.
+- `value` (_value_): The value to repeat after `sequence` is exhausted.
 
 ```
 # Then repeat
 [2, 8, 9, 3, 7] | thenRepeat(null) | keepFirst(8) | toArray
 >> [2, 8, 9, 3, 7, null, null, null]
+```
+
+### sliding|sliding
+
+Returns a stream containing arrays of adjacent elements in the input sequence.
+
+Parameters:
+
+- `sequence` (_sequence_): The input sequence.
+- `size` (_number_): The number of adjacent elements in each output array.
+
+Returns:
+
+- (_stream_): A stream containing arrays with `size` consecutive elements each. The first array starts with the first element of the input sequence, the second array with the second element, and so on, with the last array ending on the last element of the input sequence.
+
+```
+# Sliding window
+[2, 8, 9, 3, 7] | sliding(3) | toArray
+>> [[2, 8, 9], [8, 9, 3], [9, 3, 7]]
 ```
 
 ```
@@ -2093,6 +2409,19 @@ Returns:
 ]
 ```
 
+### chunk|chunk
+
+Splits a sequence into arrays of a fixed size.
+
+Parameters:
+
+- `sequence` (_sequence_): The sequence to split.
+- `size` (_number_): The number of elements in each output array.
+
+Returns:
+
+- (_stream_): A stream containing arrays with `size` elements each, except that the last array may have fewer elements.
+
 ```
 # Chunking into arrays of a fixed size
 [
@@ -2166,21 +2495,37 @@ properties | toObject
 >> {error: "wrongType", details: {value: 1, expectedType: {either: ["sequence", "object"]}}, calls: []}
 ```
 
-```
-# Indexing with default
-object = {foo: "bar", spam: "eggs"};
-[
-    object | at("foo", default: $ "nothing"),
-    object | at("baz", default: $ "nothing"),
-]
->> ["bar", "nothing"]
-```
+### properties|properties
+
+Returns an array of the key-value pairs in the object.
+
+Parameters:
+
+- `object` (_object_): The object whose properties to retrieve.
+
+Returns:
+
+- (_array_): An array of the object's properties.
 
 ```
 # Array of properties
 {foo: 1, bar: 2} | properties
 >> [["foo", 1], ["bar", 2]]
 ```
+
+### merge|merge
+
+Combines the properties of the specified objects into a new object.
+
+If the same key appears in more than one input object, the resulting object takes the property value from the last such object.
+
+Parameters:
+
+- `objects` (_array of object_): The objects to combine.
+
+Returns:
+
+- (_object_): The combined object.
 
 ```
 # Merging
@@ -2240,6 +2585,18 @@ Parameters:
 >> [4, 4, 42]
 ```
 
+```
+# Indexing objects
+object = {foo: "bar", spam: "eggs"};
+[
+    object | at("foo"),
+    object | at("foo", default: $ "nothing"),
+    object | at("baz", default: $ "nothing"),
+]
+>> ["bar", "bar", "nothing"]
+
+```
+
 ## Utilities|utilities
 
 ### debug|debug
@@ -2256,6 +2613,12 @@ Parameters:
 Returns:
 
 - (_any_): The `value` argument.
+
+```
+# Debug
+1 | build(| times(2) | debug) @ 10 // Open the console to see the debug output!
+>> 512
+```
 
 ### itself|itself
 
@@ -2968,6 +3331,19 @@ map = [[["foo"], 42]] | mutableMap;
     97,
 ]
 ```
+
+### also
+
+Performs an action on a value, then returns it for further processing.
+
+Parameters:
+
+- `value` (_any_): The value to perform the action on.
+- `action` (_function_): The function to apply.
+
+Returns:
+
+- (_any_): The `value` argument.
 
 ```
 # Doing side effects on an expression result as it flies by
