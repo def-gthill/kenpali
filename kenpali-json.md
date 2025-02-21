@@ -2,7 +2,7 @@
 
 ## Literals|literals
 
-A literal expression has the form `{"literal": <value>}`. The value can be `null`, `true`, `false`, or [any valid JSON string or number](https://www.json.org/json-en.html).
+A _literal expression_ has the form `{"literal": <value>}`. The value can be `null`, `true`, `false`, or [any valid JSON string or number](https://www.json.org/json-en.html).
 
 Examples:
 
@@ -38,6 +38,14 @@ Examples:
 
 ## Names|names
 
+Names are defined using a _defining expression_, which has the form `{"defining": <definitions>, "result": <result>}`. The `<definitions>` node must be an array of pairs, where the first element of each pair is a _name pattern_ and the second element is any expression. The `<result>` node can be any expression. The value of the defining expression is the value of the `<result>` node.
+
+The name pattern is usually a string, but other pattern types are possible—see [Arrays](#arrays) and [Objects](#objects) for more complex types of name patterns.
+
+A _name expression_ evaluates to the value previously assigned to the specified name. It has the form `{"name": <name>}`, where the `<name>` is a string.
+
+Examples:
+
 ```
 # Binding a name
 {
@@ -60,6 +68,8 @@ Examples:
 >> 42
 ```
 
+Names are defined in the order they appear in the defining expression. It's an error to reference a name before it is defined.
+
 ```
 # Name used before assignment
 {
@@ -73,6 +83,8 @@ Examples:
 !! nameUsedBeforeAssignment {"name": "baz"}
 ```
 
+It's an error to declare the same name more than once in the same defining expression.
+
 ```
 # Name declared more than once in the same scope
 {
@@ -84,6 +96,8 @@ Examples:
 }
 !! duplicateName {"name": "foo"}
 ```
+
+A defining expression creates a _scope_; all names defined within it are only accessible within it.
 
 ```
 # Scope
@@ -120,6 +134,8 @@ Examples:
 >> 42
 ```
 
+A defining expression can define a name that duplicates one in an enclosing defining expression. References to that name evaluate to the _innermost_ accessible version of the name—the inner name _shadows_ the outer one.
+
 ```
 # Shadowing
 {
@@ -136,6 +152,8 @@ Examples:
 >> 73
 ```
 
+The name pattern can be `null`, which creates an _expression statement_. An expression statement evaluates the expression (usually for its side effects) and then discards the result.
+
 ```
 # Expression statements
 {
@@ -148,6 +166,8 @@ Examples:
 ```
 
 ## Arrays|arrays
+
+An _array expression_ has the form `{"array": <elements>}`. The `<elements>` node is a JSON array containing expressions, which are evaluated to obtain the array's elements.
 
 ```
 # Empty array
@@ -182,6 +202,8 @@ Examples:
 >> [42]
 ```
 
+Instead of an expression, any of the array's elements can be a _spread_ instead. A spread has the form `{"spread": <value>}`, where `<value>` is any expression. The `<value>` expression is expected to evaluate to a sequence, whose elements are added to the array.
+
 ```
 # Array with spread
 {
@@ -201,6 +223,8 @@ Examples:
 }
 >> [42, 1, 2, 3, 97]
 ```
+
+When defining [names](#names), an _array pattern_ can be used to extract individual elements from an array and assign them to names. An array pattern has the form `{"arrayPattern": <names>}`, where `<names>` is an array of name patterns.
 
 ```
 # Array destructuring
@@ -226,6 +250,8 @@ Examples:
 }
 >> [97, 97, 42]
 ```
+
+One of the elements of an array pattern can be a _rest pattern_, of the form `{"rest": <name>}`. The `<name>` is bound to an array containing whatever elements are left over after the other name patterns have taken theirs.
 
 ```
 # Array destructuring with rest
@@ -256,6 +282,8 @@ Examples:
 ```
 
 ## Objects|objects
+
+An _object expression_ has the form `{"object": <entries>}`. The `<entries>` node is a JSON array containing name-value pairs. In each pair, the first element can be a string or an expression evaluating to a string, while the second element can be any expression.
 
 ```
 # Empty object
@@ -328,6 +356,8 @@ Examples:
 >> {foo: 42}
 ```
 
+Instead of a name-value pair, any of the object's elements can be a _spread_ instead. A spread has the form `{"spread": <value>}`, where `<value>` is any expression. The `<value>` expression is expected to evaluate to an object, whose entries are added to the containing object.
+
 ```
 # Object with spread
 {
@@ -346,6 +376,8 @@ Examples:
 }
 >> {answer: 42, bar: 1, baz: 2, question: 69}
 ```
+
+When defining [names](#names), an _object pattern_ can be used to extract property values from an object and assign them to names. An object pattern has the form `{"objectPattern": <names>}`, where `<names>` is an array of property names to extract.
 
 ```
 # Object destructuring
@@ -372,6 +404,8 @@ Examples:
 >> [97, 97, 42]
 ```
 
+One of the elements of an object pattern can be a _rest pattern_, of the form `{"rest": <name>}`. The `<name>` is bound to an object containing whatever properties aren't mentioned explicitly in the object pattern.
+
 ```
 # Object destructuring with rest
 {
@@ -396,6 +430,8 @@ Examples:
 }
 >> [42, {baz: 216, foo: 97}]
 ```
+
+Any of an object pattern's elements can be an _alias pattern_, of the form `{"name": <pattern>, "property": <property-name>}`. The property `<property-name>` is extracted and bound to `<pattern>`, which can be any name pattern.
 
 ```
 # Object destructuring with aliases
@@ -428,6 +464,10 @@ Examples:
 ```
 
 ## Defining and Calling Functions|functions
+
+Functions are defined using a _given expression_, which has the form `{"given": <param-spec>, "result": <body>}`. The `<param-spec>` is an object with two optional properties: `params`, giving the function's positional parameters, with the same format as the value in an [array pattern](#arrays); and `namedParams`, giving the function's named parameters, with the same format as the value in an [object pattern](#objects). The `<body>` can be any expression, and it defines what the function returns.
+
+Functions are called using a _calling expression_, which has the form `{"calling": <function>, "args": <pos-arg-spec>, "namedArgs": <named-arg-spec>}`. Both `args` and `namedArgs` are optional. The `<function>` must be an expression, and its result is the function to call. The `<pos-arg-spec>` indicates the positional arguments to pass to the function, with the same format as the value in an [array expression](#arrays); the `<named-arg-spec>` indicates the named arguments to pass to the function, with the same format as the value in an [object expression](#objects).
 
 ```
 # No parameters, no arguments
@@ -743,6 +783,8 @@ Examples:
 !! notCallable {"value": 42}
 ```
 
+A function can reference names defined in an enclosing scope.
+
 ```
 # A name from an enclosing function
 {
@@ -767,7 +809,7 @@ Examples:
 >> [73, 42]
 ```
 
-A function body can reference names that were in scope when the function was defined, even if those names are out of scope when the function is called.
+A function can reference names that were in scope when the function was _defined_, even if those names are out of scope when the function is _called_.
 
 ```
 # Closure
@@ -816,6 +858,8 @@ On the other hand, names that are in scope when the function is called don't lea
 ```
 
 ## Indexing|indexing
+
+An _indexing expression_ extracts the value at a specific index from a collection. It has the form `{"indexing": <collection>, "at": <index>}`, where both `<collection>` and `<index>` are expressions.
 
 ```
 # Indexing strings
@@ -948,6 +992,7 @@ On the other hand, names that are in scope when the function is called don't lea
 ```
 
 ```
+# Indexing objects - property not in object
 {
     "indexing": {
         "object": [
@@ -957,7 +1002,7 @@ On the other hand, names that are in scope when the function is called don't lea
     },
     "at": {"literal": "baz"}
 }
-!! missingProperty {"value": {foo: "bar", spam: "eggs"}, "key": "baz"}
+!! missingProperty {"value": {"foo": "bar", "spam": "eggs"}, "key": "baz"}
 ```
 
 ```
@@ -970,6 +1015,8 @@ On the other hand, names that are in scope when the function is called don't lea
 ```
 
 ## Errors|errors
+
+If an expression throws an error, that error propagates outward through enclosing expressions, aborting further evaluation.
 
 ```
 # Error short-circuiting through function calls
@@ -1022,6 +1069,8 @@ On the other hand, names that are in scope when the function is called don't lea
 }
 !! missingElement {"value": [], "name": "foo"}
 ```
+
+But if the error encounters a _catching expression_, the catching expression returns the error as a value, stopping its propagation. A catching expression has the form `{"catching": <expression>}`.
 
 ```
 # Error catching
