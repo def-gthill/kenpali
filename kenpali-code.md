@@ -1,6 +1,38 @@
 # Kenpali Code Specification
 
+## Tokens|tokens
+
+Kenpali code is first split into tokens.
+
+The following regular expressions are used for number and string literals:
+
+`NUMBER = -?(0|[1-9](\d*))(.\d+)?([Ee][+-]?\d+)?`
+
+`STRING = "(\\"|[^"])*"`
+
+``RAW_STRING = `[^`]*` ``
+
+The following regular expression is used for names:
+
+`NAME = [A-Za-z][A-Za-z0-9]*`
+
+The keywords `null`, `false`, and `true` are treated as literal tokens even though they match the name pattern.
+
+The following character sequences are tokens:
+
+`( ) [ ] { } , ; : => = |. | @ . ! $ ** *`
+
+All spaces, tabs, carriage returns, and linefeeds are considered whitespace and discarded.
+
+Comments consist of the characters `//` and all following text until the end of the line. They are also discarded when parsing.
+
+Any characters not matching the above token patterns cause parsing to fail.
+
 ## Literals|literals
+
+`literal ::= "null" | "false" | "true" | NUMBER | STRING | RAW_STRING`
+
+A literal parses to a [literal expression](/docs/json#literals).
 
 ```
 # Literal null
@@ -38,13 +70,36 @@ true
 >> {"literal": "foobar"}
 ```
 
+Kenpali supports "raw string" syntax, delimited using backticks instead of quotes. Raw strings treat all backslashes as literal backslashes, rather than creating escape sequences, which can make backslash-heavy strings (e.g. regexes) easier to write and read. Raw strings parse to ordinary literal expressions.
+
 ```
 # Raw literal string
 `f\o\o\b\a\r`
 >> {"literal": "f\\o\\o\\b\\a\\r"}
 ```
 
+## Comments|comments
+
+```
+# A comment on its own line
+// A billion-dollar mistake
+null
+>> {"literal": null}
+```
+
+```
+# A comment at the end of a line
+null // A billion-dollar mistake
+>> {"literal": null}
+```
+
 ## Names|names
+
+`name ::= NAME`
+
+A name normally parses to a [name expression](/docs/json#names), though some other syntactic structures use names for other purposes.
+
+Kenpali uses `camelCase` for names by convention.
 
 ```
 # Name with only letters
@@ -65,6 +120,14 @@ f00
 ```
 
 ## Arrays|arrays
+
+`array ::= "[" [array_element ("," array_element)* [","]] "]"`
+
+`array_element ::= assignable | array_spread`
+
+`array_spread ::= "*" assignable`
+
+An array parses to an [array expression](/docs/json#arrays).
 
 ```
 # Empty array
@@ -110,32 +173,25 @@ f00
 
 ```
 # Arrays with spread
-foo = [1, 2, 3];
 [42, *foo, 97]
 >> {
-    "defining": [
-        [
-            "foo",
-            {
-                "array": [
-                    {"literal": 1},
-                    {"literal": 2},
-                    {"literal": 3}
-                ]
-            }
-        ]
-    ],
-    "result": {
-        "array": [
-            {"literal": 42},
-            {"spread": {"name": "foo"}},
-            {"literal": 97}
-        ]
-    }
+    "array": [
+        {"literal": 42},
+        {"spread": {"name": "foo"}},
+        {"literal": 97}
+    ]
 }
 ```
 
 ## Objects|objects
+
+`object ::= "{" [object_element ("," object_element)* [","]] "}"`
+
+`object_element ::= assignable ":" assignable | name ":" | object_spread`
+
+`object_spread ::= "**" assignable`
+
+An object parses to an [object expression](/docs/json#objects).
 
 ```
 # Empty object
@@ -167,22 +223,24 @@ If a key is a valid Kenpali name, the quotes can be omitted.
 }
 ```
 
+If the key is meant to actually reference a name from the surrounding scope, enclose it in parentheses.
+
+```
+# Object with expression keys and values
+{(key): value}
+>> {"object": [[{"name": "key"}, {"name": "value"}]]}
+```
+
+If the value is omitted, it defaults to reading the property name from the surrounding scope: `{foo:}` is equivalent to `{foo: foo}`.
+
 ```
 # Object taking properties from names
-foo = "bar";
-spam = "eggs";
 {foo:, spam:}
 >> {
-    "defining": [
-        ["foo", {"literal": "bar"}],
-        ["spam", {"literal": "eggs"}]
-    ],
-    "result": {
-        "object": [
-            ["foo", {"name": "foo"}],
-            ["spam", {"name": "spam"}]
-        ]
-    }
+    "object": [
+        ["foo", {"name": "foo"}],
+        ["spam", {"name": "spam"}]
+    ]
 }
 ```
 
@@ -214,162 +272,208 @@ spam = "eggs";
 ```
 
 ```
-# Object with expression keys and values
-{(key): value}
->> {"object": [[{"name": "key"}, {"name": "value"}]]}
+# Objects with spread
+{answer: 42, **foo, question: 69}
+>> {
+    "object": [
+        ["answer", {"literal": 42}],
+        {"spread": {"name": "foo"}},
+        ["question", {"literal": 69}]
+    ]
+}
+```
+
+## Groups|groups
+
+`group ::= "(" expression ")"`
+
+Any expression can be enclosed in parentheses to force it to be parsed first, overriding precedence rules and special processing rules. A group parses to the same JSON as the expression it contains would if parsed on its own.
+
+```
+# Groups
+(foo)
+>> {"name": "foo"}
+```
+
+## Scopes|scopes
+
+`scope ::= statement* assignable`
+
+`statement ::= [defining_pattern "="] assignable ";"`
+
+`defining_pattern ::= name | array_pattern | object_pattern`
+
+`array_pattern ::= "[" [array_pattern_element ("," array_pattern_element)* [","]] "]"`
+
+`array_pattern_element ::= defining_pattern ["=" assignable] | "*" defining_pattern`
+
+`object_pattern ::= "{" [object_pattern_element ("," object_pattern_element)* [","]] "}"`
+
+`object_pattern_element ::= object_pattern_simple ["=" assignable] | "**" defining_pattern`
+
+`object_pattern_simple ::= assignable ":" defining_pattern | name ":"`
+
+A scope parses to a [defining expression](/docs/json#names)
+
+```
+# Simple declaration
+foo = 42; foo
+>> {
+    "defining": [
+        ["foo", {"literal": 42}]
+    ],
+    "result": {"name": "foo"}
+}
 ```
 
 ```
-# Objects with spread
-foo = {bar: 1, baz: 2};
-{answer: 42, **foo, question: 69}
+# Nested scopes
+foo = (bar = 1; bar); foo
 >> {
     "defining": [
         [
             "foo",
             {
-                "object": [
-                    ["bar", {"literal": 1}],
-                    ["baz", {"literal": 2}]
-                ]
+                "defining": [
+                    ["bar", {"literal": 1}]
+                ],
+                "result": {"name": "bar"}
             }
         ]
     ],
-    "result": {
-        "object": [
-            ["answer", {"literal": 42}],
-            {"spread": {"name": "foo"}},
-            ["question", {"literal": 69}]
+    "result": {"name": "foo"}
+}
+```
+
+```
+# Array destructuring declaration
+[foo, bar] = arr; foo
+>> {
+    "defining": [
+        [
+            {"arrayPattern": ["foo", "bar"]},
+            {"name": "arr"}
         ]
-    }
-}
-```
-
-## Comments|comments
-
-```
-# A comment on its own line
-// A billion-dollar mistake
-null
->> {"literal": null}
-```
-
-```
-# A comment at the end of a line
-null // A billion-dollar mistake
->> {"literal": null}
-```
-
-## Function Calls|function-calls
-
-```
-# One positional argument
-foo(1)
->> {
-    "calling": {"name": "foo"},
-    "args": [{"literal": 1}]
+    ],
+    "result": {"name": "foo"}
 }
 ```
 
 ```
-# Two positional arguments
-foo(1, 2)
+# Nested array destructuring
+[foo, [spam, eggs]] = arr; foo
 >> {
-    "calling": {"name": "foo"},
-    "args": [{"literal": 1}, {"literal": 2}]
+    "defining": [
+        [
+            {
+                "arrayPattern": [
+                    "foo",
+                    {"arrayPattern": ["spam", "eggs"]}
+                ]
+            },
+            {"name": "arr"}
+        ]
+    ],
+    "result": {"name": "foo"}
 }
 ```
 
 ```
-# Spread positional arguments
-foo(*bar)
+# Object destructuring declaration
+{foo:, bar:} = obj; foo
 >> {
-    "calling": {"name": "foo"},
-    "args": [{"spread": {"name": "bar"}}]
+    "defining": [
+        [
+            {"objectPattern": ["foo", "bar"]},
+            {"name": "obj"}
+        ]
+    ],
+    "result": {"name": "foo"}
 }
 ```
 
 ```
-# Positional and spread positional arguments
-foo(1, *bar)
+# Object destructuring with aliases
+{foo: spam, bar: eggs} = obj; spam
 >> {
-    "calling": {"name": "foo"},
-    "args": [
-        {"literal": 1},
-        {"spread": {"name": "bar"}}
-    ]
+    "defining": [
+        [
+            {
+                "objectPattern": [
+                    {"name": "spam", "property": "foo"},
+                    {"name": "eggs", "property": "bar"}
+                ]
+            },
+            {"name": "obj"}
+        ]
+    ],
+    "result": {"name": "spam"}
 }
 ```
 
 ```
-# One named argument
-foo(bar: 1)
+# Expression statements
+foo; 42
 >> {
-    "calling": {"name": "foo"},
-    "namedArgs": [["bar", {"literal": 1}]]
+    "defining": [
+        [null, {"name": "foo"}]
+    ],
+    "result": {"literal": 42}
 }
 ```
 
 ```
-# Two named arguments
-foo(bar: 1, baz: 2)
->> {
-    "calling": {"name": "foo"},
-    "namedArgs": [["bar", {"literal": 1}], ["baz", {"literal": 2}]]
-}
+# Assignment as the scope result
+foo = 42
+!! missingStatementSeparator {"line": 1, "column": 9}
 ```
 
 ```
-# Named arguments from names
-foo(bar:, baz:)
+# Chained assignment
+foo = bar = 42; foo
+!! missingStatementSeparator {"line": 1, "column": 11}
+```
+
+## Property Access|property-access
+
+`tight_pipeline ::= atomic ("." name)*`
+
+`atomic ::= group | array | object | literal | name`
+
+A single property can be extracted from an object by putting the property name after a dot. This parses to an [indexing expression](/docs/json#indexing).
+
+```
+# Tight-binding property access
+foo.bar
 >> {
-    "calling": {"name": "foo"},
-    "namedArgs": [["bar", {"name": "bar"}], ["baz", {"name": "baz"}]]
+    "indexing": {"name": "foo"},
+    "at": {"literal": "bar"}
 }
 ```
 
-```
-# Spread named arguments
-foo(**bar)
->> {
-    "calling": {"name": "foo"},
-    "namedArgs": [{"spread": {"name": "bar"}}]
-}
-```
+Property access can be chained, and associates left to right.
 
 ```
-# Positional and named arguments
-foo(1, 2, bar: 3, baz: 4)
+# Chained tight-binding property access
+foo.bar.baz
 >> {
-    "calling": {"name": "foo"},
-    "args": [{"literal": 1}, {"literal": 2}],
-    "namedArgs": [["bar", {"literal": 3}], ["baz", {"literal": 4}]]
-}
-```
-
-```
-# Calling the result of a function call
-foo(x)(y)
->> {
-    "calling": {
-        "calling": {"name": "foo"},
-        "args": [{"name": "x"}]
+    "indexing": {
+        "indexing": {"name": "foo"},
+        "at": {"literal": "bar"}
     },
-    "args": [{"name": "y"}]
-}
-```
-
-## Error Catching|error-catching
-
-```
-# Error catching
-foo !
->> {
-    "catching": {"name": "foo"}
+    "at": {"literal": "baz"}
 }
 ```
 
 ## Function Definitions|function-definitions
+
+`arrow_function ::= parameter_list "=>" assignable`
+
+`parameter_list ::= "(" [parameter ("," parameter)* [","]] ")"`
+
+`parameter ::= array_pattern_element | object_pattern_element`
+
+A function definition parses to a [given expression](/docs/json#functions).
 
 ```
 # No parameters
@@ -494,15 +598,6 @@ foo !
 ```
 
 ```
-# Constant function shorthand
-$ foo
->> {
-    "given": {},
-    "result": {"name": "foo"}
-}
-```
-
-```
 # Scope in function body
 (x) => (y = plus(x, 3); y)
 >> {
@@ -524,7 +619,138 @@ $ foo
 }
 ```
 
-## Forward Pipe|forward-pipe
+## Pipelines|pipelines
+
+Most of Kenpali's operators are pipeline operators. All pipeline operators have the same precedence, and associate left to right.
+
+`assignable ::= arrow_function | pipeline | point_free_pipeline | constant_function`
+
+`pipeline ::= tight_pipeline pipeline_step*`
+
+`pipeline_step ::= call | pipe | pipe_call | pipe_dot | at | "!"`
+
+`call ::= argument_list`
+
+`pipe ::= "|" tight_pipeline`
+
+`pipe_call ::= "|" tight_pipeline argument_list`
+
+`pipe_dot ::= "|." name`
+
+`at ::= "@" tight_pipeline`
+
+`argument_list ::= "(" [argument ("," argument)* [","]] ")"`
+
+`argument ::= positional_argument | named_argument | array_spread | object_spread`
+
+`positional_argument ::= assignable`
+
+`named_argument ::= name ":" [assignable]`
+
+### Function Calls|function-calls
+
+Function call steps parse to [calling expressions](/docs/json#functions).
+
+```
+# One positional argument
+foo(1)
+>> {
+    "calling": {"name": "foo"},
+    "args": [{"literal": 1}]
+}
+```
+
+```
+# Two positional arguments
+foo(1, 2)
+>> {
+    "calling": {"name": "foo"},
+    "args": [{"literal": 1}, {"literal": 2}]
+}
+```
+
+```
+# Spread positional arguments
+foo(*bar)
+>> {
+    "calling": {"name": "foo"},
+    "args": [{"spread": {"name": "bar"}}]
+}
+```
+
+```
+# Positional and spread positional arguments
+foo(1, *bar)
+>> {
+    "calling": {"name": "foo"},
+    "args": [
+        {"literal": 1},
+        {"spread": {"name": "bar"}}
+    ]
+}
+```
+
+```
+# One named argument
+foo(bar: 1)
+>> {
+    "calling": {"name": "foo"},
+    "namedArgs": [["bar", {"literal": 1}]]
+}
+```
+
+```
+# Two named arguments
+foo(bar: 1, baz: 2)
+>> {
+    "calling": {"name": "foo"},
+    "namedArgs": [["bar", {"literal": 1}], ["baz", {"literal": 2}]]
+}
+```
+
+```
+# Named arguments from names
+foo(bar:, baz:)
+>> {
+    "calling": {"name": "foo"},
+    "namedArgs": [["bar", {"name": "bar"}], ["baz", {"name": "baz"}]]
+}
+```
+
+```
+# Spread named arguments
+foo(**bar)
+>> {
+    "calling": {"name": "foo"},
+    "namedArgs": [{"spread": {"name": "bar"}}]
+}
+```
+
+```
+# Positional and named arguments
+foo(1, 2, bar: 3, baz: 4)
+>> {
+    "calling": {"name": "foo"},
+    "args": [{"literal": 1}, {"literal": 2}],
+    "namedArgs": [["bar", {"literal": 3}], ["baz", {"literal": 4}]]
+}
+```
+
+```
+# Calling the result of a function call
+foo(x)(y)
+>> {
+    "calling": {
+        "calling": {"name": "foo"},
+        "args": [{"name": "x"}]
+    },
+    "args": [{"name": "y"}]
+}
+```
+
+### Pipes and Pipe-Calls|forward-pipe
+
+Pipe and pipe-call steps are transformed into ordinary function calls, producting [calling expressions](/docs/json#functions).
 
 ```
 # Forward pipe into a bare name
@@ -595,6 +821,18 @@ $ foo
 }
 ```
 
+### Error Catching|error-catching
+
+Error catching steps parse to [catching expressions](/docs/json#errors).
+
+```
+# Error catching
+foo !
+>> {
+    "catching": {"name": "foo"}
+}
+```
+
 ```
 # Error catching in pipeline
 1 | foo ! | bar
@@ -611,25 +849,9 @@ $ foo
 }
 ```
 
-```
-# Point-free pipeline starting with |
-| foo | bar(2)
->> {
-    "given": {"params": ["pipelineArg"]},
-    "result": {
-        "calling": {"name": "bar"},
-        "args": [
-            {
-                "calling": {"name": "foo"},
-                "args": [{"name": "pipelineArg"}]
-            },
-            {"literal": 2}
-        ]
-    }
-}
-```
+### Indexing|indexing
 
-## Indexing|indexing
+Indexing steps parse to [indexing expressions](/docs/json#indexing).
 
 ```
 # Indexing
@@ -669,7 +891,7 @@ $ foo
 ```
 
 ```
-# Tight-binding property access
+# Correct precedence of tight-binding property access
 x | y.z
 >> {
     "calling": {
@@ -701,177 +923,41 @@ x @ "y"
 }
 ```
 
-## Scopes|scopes
+## Function Definition Shorthand
+
+Kenpali has two kinds of shorthand syntax for compactly defining common function types.
+
+A _constant function_ ignores any arguments passed to it. The shorthand syntax is a `$` followed by an expression for the function's return value.
+
+`constant_function ::= "$" assignable`
 
 ```
-# Simple declaration
-foo = 42; foo
+# Constant function shorthand
+$ foo
 >> {
-    "defining": [
-        ["foo", {"literal": 42}]
-    ],
+    "given": {},
     "result": {"name": "foo"}
 }
 ```
 
-```
-# Nested scopes
-foo = (bar = 1; bar); foo
->> {
-    "defining": [
-        [
-            "foo",
-            {
-                "defining": [
-                    ["bar", {"literal": 1}]
-                ],
-                "result": {"name": "bar"}
-            }
-        ]
-    ],
-    "result": {"name": "foo"}
-}
-```
+A _point-free pipeline_ is written as a pipeline missing the initial value. It parses to a function with one positional parameter, which becomes the missing initial value.
+
+`point_free_pipeline ::= pipeline_step*`
 
 ```
-# Array destructuring declaration
-[foo, bar] = [42, 97];
-plus(foo, bar)
+# Point-free pipeline starting with |
+| foo | bar(2)
 >> {
-    "defining": [
-        [
-            {"arrayPattern": ["foo", "bar"]},
-            {
-                "array": [
-                    {"literal": 42},
-                    {"literal": 97}
-                ]
-            }
-        ]
-    ],
+    "given": {"params": ["pipelineArg"]},
     "result": {
-        "calling": {"name": "plus"},
+        "calling": {"name": "bar"},
         "args": [
-            {"name": "foo"},
-            {"name": "bar"}
-        ]
-    }
-}
-```
-
-```
-# Nested array destructuring
-[foo, [spam, eggs]] = [42, [97, 216]];
-plus(foo, spam, eggs)
->> {
-    "defining": [
-        [
             {
-                "arrayPattern": [
-                    "foo",
-                    {"arrayPattern": ["spam", "eggs"]}
-                ]
+                "calling": {"name": "foo"},
+                "args": [{"name": "pipelineArg"}]
             },
-            {
-                "array": [
-                    {"literal": 42},
-                    {"array": [
-                        {"literal": 97},
-                        {"literal": 216}
-                    ]}
-                ]
-            }
-        ]
-    ],
-    "result": {
-        "calling": {"name": "plus"},
-        "args": [
-            {"name": "foo"},
-            {"name": "spam"},
-            {"name": "eggs"}
+            {"literal": 2}
         ]
     }
 }
-```
-
-```
-# Object destructuring declaration
-{foo:, bar:} = {foo: 42, bar: 97};
-plus(foo, bar)
->> {
-    "defining": [
-        [
-            {"objectPattern": ["foo", "bar"]},
-            {
-                "object": [
-                    ["foo", {"literal": 42}],
-                    ["bar", {"literal": 97}]
-                ]
-            }
-        ]
-    ],
-    "result": {
-        "calling": {"name": "plus"},
-        "args": [
-            {"name": "foo"},
-            {"name": "bar"}
-        ]
-    }
-}
-```
-
-```
-# Object destructuring with aliases
-{foo: spam, bar: eggs} = {foo: 42, bar: 97};
-plus(spam, eggs)
->> {
-    "defining": [
-        [
-            {
-                "objectPattern": [
-                    {"name": "spam", "property": "foo"},
-                    {"name": "eggs", "property": "bar"}
-                ]
-            },
-            {
-                "object": [
-                    ["foo", {"literal": 42}],
-                    ["bar", {"literal": 97}]
-                ]
-            }
-        ]
-    ],
-    "result": {
-        "calling": {"name": "plus"},
-        "args": [
-            {"name": "spam"},
-            {"name": "eggs"}
-        ]
-    }
-}
-```
-
-```
-# Expression statements
-frobnicate();
-42
->> {
-    "defining": [
-        [null, {"calling": {"name": "frobnicate"}}]
-    ],
-    "result": {"literal": 42}
-}
-```
-
-```
-# Assignment as the scope result
-foo = 42
-!! missingStatementSeparator {"line": 1, "column": 9}
-```
-
-```
-# Chained assignment
-foo = bar = 42;
-foo
-!! missingStatementSeparator {"line": 1, "column": 11}
 ```
