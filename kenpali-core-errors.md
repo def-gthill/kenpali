@@ -127,6 +127,12 @@ toNumber("42a")
 ```
 
 ```
+# Mutable array - reading an index of the wrong type
+["foo", "bar", "baz"] | mutableArray |.at("foo")
+!! wrongArgumentType {"value": "foo", "expectedType": "number"}
+```
+
+```
 # Mutable array - writing to a bad index
 ["foo", "bar", "baz"] | mutableArray |.set(4, "spam")
 !! indexOutOfBounds {"length": 3, "index": 4}
