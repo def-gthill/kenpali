@@ -37,8 +37,8 @@ Returns:
 
 ```
 # Sum
-sum(1 | to(10))
->> 55
+sum([1, 2, 3, 4, 5])
+>> 15
 ```
 
 ### minus|minus

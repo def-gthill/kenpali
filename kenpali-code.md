@@ -95,9 +95,11 @@ null // A billion-dollar mistake
 
 ## Names|names
 
-`name ::= NAME`
+`name ::= [NAME "/"] NAME`
 
 A name normally parses to a [name expression](/docs/json#names), though some other syntactic structures use names for other purposes.
+
+The form with a slash indicates that the name is found in a module. The module name is added as the `from` property of the name expression.
 
 Kenpali uses `camelCase` for names by convention.
 
@@ -117,6 +119,12 @@ FOO
 # Name with numbers
 f00
 >> {"name": "f00"}
+```
+
+```
+# Name in a module
+foo/bar
+>> {"name": "bar", "from": "foo"}
 ```
 
 ## Arrays|arrays
