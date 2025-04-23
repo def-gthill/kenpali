@@ -1013,10 +1013,10 @@ foo = $ (
     foo()() | toString,
 ]
 >> [
-    "function $anon1",
-    "function foo",
-    "function foo/$anon1",
-    "function foo/bar",
+    "function $main/$anon1",
+    "function $main/foo",
+    "function $main/foo/$anon1",
+    "function $main/foo/bar",
 ]
 ```
 

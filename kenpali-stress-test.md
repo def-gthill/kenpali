@@ -235,9 +235,9 @@ main = $ (
 );
 main()
 >> [
-    {function: "bar/$anon1"},
-    {function: "bar"},
-    {function: "foo"},
-    {function: "main/baz"},
+    {function: "$main/bar/$anon1"},
+    {function: "$main/bar"},
+    {function: "$main/foo"},
+    {function: "$main/main/baz"},
 ]
 ```
