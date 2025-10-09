@@ -38,7 +38,7 @@ Examples:
 
 ## Names|names
 
-Names are defined using a _defining expression_, which has the form `{"defining": <definitions>, "result": <result>}`. The `<definitions>` node must be an array of pairs, where the first element of each pair is a _name pattern_ and the second element is any expression. The `<result>` node can be any expression. The value of the defining expression is the value of the `<result>` node.
+Names are defined using a _block expression_, which has the form `{"defs": <definitions>, "result": <result>}`. The `<definitions>` node must be an array of pairs, where the first element of each pair is a _name pattern_ and the second element is any expression. The `<result>` node can be any expression. The value of the block expression is the value of the `<result>` node.
 
 The name pattern is usually a string, but other pattern types are possible—see [Arrays](#arrays) and [Objects](#objects) for more complex types of name patterns.
 
@@ -49,7 +49,7 @@ Examples:
 ```
 # Binding a name
 {
-    "defining": [["foo", {"literal": 42}]],
+    "defs": [["foo", {"literal": 42}]],
     "result": {"name": "foo"}
 }
 >> 42
@@ -58,7 +58,7 @@ Examples:
 ```
 # Binding multiple names
 {
-    "defining": [
+    "defs": [
         ["bar", {"literal": 42}],
         ["baz", {"name": "bar"}],
         ["foo", {"name": "baz"}]
@@ -68,12 +68,12 @@ Examples:
 >> 42
 ```
 
-Names are defined in the order they appear in the defining expression. It's an error to reference a name before it is defined.
+Names are defined in the order they appear in the block. It's an error to reference a name before it is defined.
 
 ```
 # Name used before assignment
 {
-    "defining": [
+    "defs": [
         ["foo", {"name": "baz"}],
         ["bar", {"literal": 42}],
         ["baz", {"name": "bar"}]
@@ -83,12 +83,12 @@ Names are defined in the order they appear in the defining expression. It's an e
 !! nameUsedBeforeAssignment {"name": "baz"}
 ```
 
-It's an error to declare the same name more than once in the same defining expression.
+It's an error to declare the same name more than once in the same block.
 
 ```
 # Name declared more than once in the same scope
 {
-    "defining": [
+    "defs": [
         ["foo", {"literal": 42}],
         ["foo", {"literal": 97}]
     ],
@@ -97,16 +97,16 @@ It's an error to declare the same name more than once in the same defining expre
 !! duplicateName {"name": "foo"}
 ```
 
-A defining expression creates a _scope_; all names defined within it are only accessible within it.
+A block creates a _scope_; all names defined within it are only accessible within it.
 
 ```
 # Scope
 {
-    "defining": [
+    "defs": [
         [
             "foo",
             {
-                "defining": [
+                "defs": [
                     ["bar", {"literal": 42}]
                 ],
                 "result": {"literal": null}
@@ -118,14 +118,16 @@ A defining expression creates a _scope_; all names defined within it are only ac
 !! nameNotDefined {"name": "bar"}
 ```
 
+But expressions in a block can reference names defined in a containing block.
+
 ```
 # A name from an enclosing scope
 {
-    "defining": [
+    "defs": [
         ["foo", {"literal": 42}]
     ],
     "result": {
-        "defining": [
+        "defs": [
             ["bar", {"literal": 73}]
         ],
         "result": {"name": "foo"}
@@ -134,16 +136,16 @@ A defining expression creates a _scope_; all names defined within it are only ac
 >> 42
 ```
 
-A defining expression can define a name that duplicates one in an enclosing defining expression. References to that name evaluate to the _innermost_ accessible version of the name—the inner name _shadows_ the outer one.
+A block can define a name that duplicates one in an enclosing block. References to that name evaluate to the _innermost_ accessible version of the name—the inner name _shadows_ the outer one.
 
 ```
 # Shadowing
 {
-    "defining": [
+    "defs": [
         ["foo", {"literal": 42}]
     ],
     "result": {
-        "defining": [
+        "defs": [
             ["foo", {"literal": 73}]
         ],
         "result": {"name": "foo"}
@@ -157,7 +159,7 @@ The name pattern can be `null`, which creates an _expression statement_. An expr
 ```
 # Expression statements
 {
-    "defining": [
+    "defs": [
         [null, {"literal": 42}]
     ],
     "result": {"literal": 73}
@@ -196,7 +198,7 @@ An _array expression_ has the form `{"array": <elements>}`. The `<elements>` nod
 ```
 # Array containing an expression to evaluate
 {
-    "defining": [["foo", {"literal": 42}]],
+    "defs": [["foo", {"literal": 42}]],
     "result": {"array": [{"name": "foo"}]}
 }
 >> [42]
@@ -229,7 +231,7 @@ When defining [names](#names), an _array pattern_ can be used to extract individ
 ```
 # Array destructuring
 {
-    "defining": [
+    "defs": [
         [
             {"arrayPattern": ["foo", "bar"]},
             {
@@ -256,7 +258,7 @@ One of the elements of an array pattern can be a _rest pattern_, of the form `{"
 ```
 # Array destructuring with rest
 {
-    "defining": [
+    "defs": [
         [
             {"arrayPattern": ["foo", {"rest": "bar"}, "baz"]},
             {
@@ -343,7 +345,7 @@ An _object expression_ has the form `{"object": <entries>}`. The `<entries>` nod
 ```
 # Object with expression keys and values
 {
-    "defining": [
+    "defs": [
         ["key", {"literal": "foo"}],
         ["value", {"literal": 42}]
     ],
@@ -382,7 +384,7 @@ When defining [names](#names), an _object pattern_ can be used to extract proper
 ```
 # Object destructuring
 {
-    "defining": [
+    "defs": [
         [
             {"objectPattern": ["foo", "bar"]},
             {
@@ -409,7 +411,7 @@ One of the elements of an object pattern can be a _rest pattern_, of the form `{
 ```
 # Object destructuring with rest
 {
-    "defining": [
+    "defs": [
         [
             {"objectPattern": ["bar", {"rest": "others"}]},
             {
@@ -436,7 +438,7 @@ Any of an object pattern's elements can be an _alias pattern_, of the form `{"na
 ```
 # Object destructuring with aliases
 {
-    "defining": [
+    "defs": [
         [
             {
                 "objectPattern": [
@@ -472,7 +474,7 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # No parameters, no arguments
 {
-    "defining": [
+    "defs": [
         ["foo", {"given": {}, "result": {"literal": 42}}]
     ],
     "result": {"calling": {"name": "foo"}}
@@ -483,7 +485,7 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # One positional parameter, one positional argument
 {
-    "defining": [
+    "defs": [
         ["foo", {"given": {"params": ["x"]}, "result": {"name": "x"}}]
     ],
     "result": {
@@ -497,7 +499,7 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # One positional parameter, no arguments
 {
-    "defining": [
+    "defs": [
         ["foo", {"given": {"params": ["x"]}, "result": {"name": "x"}}]
     ],
     "result": {"calling": {"name": "foo"}}
@@ -508,7 +510,7 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # One optional positional parameter, one positional argument
 {
-    "defining": [
+    "defs": [
         [
             "foo",
             {
@@ -532,7 +534,7 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # One optional positional parameter, no arguments
 {
-    "defining": [
+    "defs": [
         [
             "foo",
             {
@@ -556,7 +558,7 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # Default value referencing a name
 {
-    "defining": [
+    "defs": [
         ["foo", {"literal": 73}],
         [
             "bar",
@@ -581,7 +583,7 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # Positional rest parameter
 {
-    "defining": [
+    "defs": [
         [
             "foo",
             {
@@ -603,7 +605,7 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # Spread positional argument
 {
-    "defining": [
+    "defs": [
         [
             "foo",
             {
@@ -640,7 +642,7 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # One named parameter, one argument with that name
 {
-    "defining": [
+    "defs": [
         ["foo", {"given": {"namedParams": ["x"]}, "result": {"name": "x"}}]
     ],
     "result": {
@@ -654,7 +656,7 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # One named parameter, no arguments
 {
-    "defining": [
+    "defs": [
         ["foo", {"given": {"namedParams": ["x"]}, "result": {"name": "x"}}]
     ],
     "result": {"calling": {"name": "foo"}}
@@ -665,7 +667,7 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # One named parameter, one positional argument
 {
-    "defining": [
+    "defs": [
         ["foo", {"given": {"namedParams": ["x"]}, "result": {"name": "x"}}]
     ],
     "result": {
@@ -679,7 +681,7 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # Named rest parameter
 {
-    "defining": [
+    "defs": [
         [
             "foo",
             {
@@ -704,7 +706,7 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # Spread named argument
 {
-    "defining": [
+    "defs": [
         [
             "foo",
             {
@@ -741,7 +743,7 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # Array destructuring in parameters
 {
-    "defining": [
+    "defs": [
         [
             "foo",
             {
@@ -788,7 +790,7 @@ A function can reference names defined in an enclosing scope.
 ```
 # A name from an enclosing function
 {
-    "defining": [
+    "defs": [
         ["x", {"literal": 73}],
         [
             "foo",
@@ -818,7 +820,7 @@ A function can reference names that were in scope when the function was _defined
         "calling": {
             "given": {},
             "result": {
-                "defining": [["x", {"literal": 73}]],
+                "defs": [["x", {"literal": 73}]],
                 "result": {
                     "given": {"params": ["y"]},
                     "result": {
@@ -841,14 +843,14 @@ On the other hand, names that are in scope when the function is called don't lea
 ```
 # Leakage
 {
-    "defining": [
+    "defs": [
         [
             "leaky",
             {"given": {"params": ["x"]}, "result": {"name": "intruder"}}
         ]
     ],
     "result": {
-        "defining": [
+        "defs": [
             ["intruder", {"literal": 42}]
         ],
         "result": {"calling": {"name": "leaky"}, "args": [{"literal": 73}]}
@@ -1027,7 +1029,7 @@ If an expression throws an error, that error propagates outward through enclosin
     },
     "args": [
         {
-            "defining": [
+            "defs": [
                 [{"arrayPattern": ["foo"]}, {"array": []}]
             ],
             "result": {"name": "foo"}
@@ -1042,7 +1044,7 @@ If an expression throws an error, that error propagates outward through enclosin
 {
     "array": [
         {
-            "defining": [
+            "defs": [
                 [{"arrayPattern": ["foo"]}, {"array": []}]
             ],
             "result": {"name": "foo"}
@@ -1059,7 +1061,7 @@ If an expression throws an error, that error propagates outward through enclosin
         [
             "foo",
             {
-                "defining": [
+                "defs": [
                     [{"arrayPattern": ["foo"]}, {"array": []}]
                 ],
                 "result": {"name": "foo"}
@@ -1082,7 +1084,7 @@ But if the error encounters a _catching expression_, the catching expression ret
     "args": [
         {
             "catching": {
-                "defining": [
+                "defs": [
                     [{"arrayPattern": ["foo"]}, {"array": []}]
                 ],
                 "result": {"name": "foo"}

@@ -307,27 +307,27 @@ Any expression can be enclosed in parentheses to force it to be parsed first, ov
 
 `scope ::= statement* assignable`
 
-`statement ::= [defining_pattern "="] assignable ";"`
+`statement ::= [name_pattern "="] assignable ";"`
 
-`defining_pattern ::= name | array_pattern | object_pattern`
+`name_pattern ::= name | array_pattern | object_pattern`
 
 `array_pattern ::= "[" [array_pattern_element ("," array_pattern_element)* [","]] "]"`
 
-`array_pattern_element ::= defining_pattern ["=" assignable] | "*" defining_pattern`
+`array_pattern_element ::= name_pattern ["=" assignable] | "*" name_pattern`
 
 `object_pattern ::= "{" [object_pattern_element ("," object_pattern_element)* [","]] "}"`
 
-`object_pattern_element ::= object_pattern_simple ["=" assignable] | "**" defining_pattern`
+`object_pattern_element ::= object_pattern_simple ["=" assignable] | "**" name_pattern`
 
-`object_pattern_simple ::= assignable ":" defining_pattern | name ":"`
+`object_pattern_simple ::= assignable ":" name_pattern | name ":"`
 
-A scope parses to a [defining expression](/docs/json#names)
+A scope parses to a [block expression](/docs/json#names)
 
 ```
 # Simple declaration
 foo = 42; foo
 >> {
-    "defining": [
+    "defs": [
         ["foo", {"literal": 42}]
     ],
     "result": {"name": "foo"}
@@ -338,11 +338,11 @@ foo = 42; foo
 # Nested scopes
 foo = (bar = 1; bar); foo
 >> {
-    "defining": [
+    "defs": [
         [
             "foo",
             {
-                "defining": [
+                "defs": [
                     ["bar", {"literal": 1}]
                 ],
                 "result": {"name": "bar"}
@@ -357,7 +357,7 @@ foo = (bar = 1; bar); foo
 # Array destructuring declaration
 [foo, bar] = arr; foo
 >> {
-    "defining": [
+    "defs": [
         [
             {"arrayPattern": ["foo", "bar"]},
             {"name": "arr"}
@@ -371,7 +371,7 @@ foo = (bar = 1; bar); foo
 # Nested array destructuring
 [foo, [spam, eggs]] = arr; foo
 >> {
-    "defining": [
+    "defs": [
         [
             {
                 "arrayPattern": [
@@ -390,7 +390,7 @@ foo = (bar = 1; bar); foo
 # Object destructuring declaration
 {foo:, bar:} = obj; foo
 >> {
-    "defining": [
+    "defs": [
         [
             {"objectPattern": ["foo", "bar"]},
             {"name": "obj"}
@@ -404,7 +404,7 @@ foo = (bar = 1; bar); foo
 # Object destructuring with aliases
 {foo: spam, bar: eggs} = obj; spam
 >> {
-    "defining": [
+    "defs": [
         [
             {
                 "objectPattern": [
@@ -423,7 +423,7 @@ foo = (bar = 1; bar); foo
 # Expression statements
 foo; 42
 >> {
-    "defining": [
+    "defs": [
         [null, {"name": "foo"}]
     ],
     "result": {"literal": 42}
@@ -613,7 +613,7 @@ A function definition parses to a [given expression](/docs/json#functions).
         "params": ["x"]
     },
     "result": {
-        "defining": [
+        "defs": [
             [
                 "y",
                 {
