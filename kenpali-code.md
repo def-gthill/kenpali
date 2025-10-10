@@ -508,7 +508,7 @@ foo = bar = 42; foo
 
 `atomic ::= group | array | object | literal | name`
 
-A single property can be extracted from an object by putting the property name after a dot. This parses to an [indexing expression](/docs/json#indexing).
+A single property can be extracted from an object by putting the property name after a dot. This parses to an [index expression](/docs/json#indexing).
 
 ```
 # Tight-binding property access
@@ -719,7 +719,7 @@ Most of Kenpali's operators are pipeline operators. All pipeline operators have 
 
 ### Function Calls|function-calls
 
-Function call steps parse to [calling expressions](/docs/json#functions).
+Function call steps parse to [call expressions](/docs/json#functions).
 
 ```
 # One positional argument
@@ -831,7 +831,7 @@ foo(x)(y)
 
 ### Pipes and Pipe-Calls|forward-pipe
 
-Pipe and pipe-call steps are transformed into ordinary function calls, producting [calling expressions](/docs/json#functions).
+Pipe and pipe-call steps are transformed into ordinary function calls, producting [call expressions](/docs/json#functions).
 
 ```
 # Forward pipe into a bare name
@@ -911,7 +911,7 @@ Pipe and pipe-call steps are transformed into ordinary function calls, productin
 
 ### Error Catching|error-catching
 
-Error catching steps parse to [catching expressions](/docs/json#errors).
+Error catching steps parse to [catch expressions](/docs/json#errors).
 
 ```
 # Error catching
@@ -943,7 +943,7 @@ foo !
 
 ### Indexing|indexing
 
-Indexing steps parse to [indexing expressions](/docs/json#indexing).
+Indexing steps parse to [index expressions](/docs/json#indexing).
 
 ```
 # Indexing
