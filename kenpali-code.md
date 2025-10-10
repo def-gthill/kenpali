@@ -37,37 +37,37 @@ A literal parses to a [literal expression](/docs/json#literals).
 ```
 # Literal null
 null
->> {"literal": null}
+>> {"type": "literal", "value": null}
 ```
 
 ```
 # Literal false
 false
->> {"literal": false}
+>> {"type": "literal", "value": false}
 ```
 
 ```
 # Literal true
 true
->> {"literal": true}
+>> {"type": "literal", "value": true}
 ```
 
 ```
 # Literal integer
 1
->> {"literal": 1}
+>> {"type": "literal", "value": 1}
 ```
 
 ```
 # Literal decimal
 -2.5
->> {"literal": -2.5}
+>> {"type": "literal", "value": -2.5}
 ```
 
 ```
 # Literal string
 "foobar"
->> {"literal": "foobar"}
+>> {"type": "literal", "value": "foobar"}
 ```
 
 Kenpali supports "raw string" syntax, delimited using backticks instead of quotes. Raw strings treat all backslashes as literal backslashes, rather than creating escape sequences, which can make backslash-heavy strings (e.g. regexes) easier to write and read. Raw strings parse to ordinary literal expressions.
@@ -75,7 +75,7 @@ Kenpali supports "raw string" syntax, delimited using backticks instead of quote
 ```
 # Raw literal string
 `f\o\o\b\a\r`
->> {"literal": "f\\o\\o\\b\\a\\r"}
+>> {"type": "literal", "value": "f\\o\\o\\b\\a\\r"}
 ```
 
 ## Comments|comments
@@ -84,13 +84,13 @@ Kenpali supports "raw string" syntax, delimited using backticks instead of quote
 # A comment on its own line
 // A billion-dollar mistake
 null
->> {"literal": null}
+>> {"type": "literal", "value": null}
 ```
 
 ```
 # A comment at the end of a line
 null // A billion-dollar mistake
->> {"literal": null}
+>> {"type": "literal", "value": null}
 ```
 
 ## Names|names
@@ -106,25 +106,25 @@ Kenpali uses `camelCase` for names by convention.
 ```
 # Name with only letters
 foo
->> {"name": "foo"}
+>> {"type": "name", "name": "foo"}
 ```
 
 ```
 # Name with uppercase letters
 FOO
->> {"name": "FOO"}
+>> {"type": "name", "name": "FOO"}
 ```
 
 ```
 # Name with numbers
 f00
->> {"name": "f00"}
+>> {"type": "name", "name": "f00"}
 ```
 
 ```
 # Name in a module
 foo/bar
->> {"name": "bar", "from": "foo"}
+>> {"type": "name", "name": "bar", "from": "foo"}
 ```
 
 ## Arrays|arrays
@@ -140,53 +140,79 @@ An array parses to an [array expression](/docs/json#arrays).
 ```
 # Empty array
 []
->> {"array": []}
+>> {"type": "array", "elements": []}
 ```
 
 ```
 # Single-element array
 [1]
->> {"array": [{"literal": 1}]}
+>> {"type": "array", "elements": [{"type": "literal", "value": 1}]}
 ```
 
 ```
 # Array of literals
 [1, 2, 3]
->> {"array": [{"literal": 1}, {"literal": 2}, {"literal": 3}]}
+>> {
+    "type": "array",
+    "elements": [
+        {"type": "literal", "value": 1},
+        {"type": "literal", "value": 2},
+        {"type": "literal", "value": 3}
+    ]
+}
 ```
 
 ```
 # Trailing comma
 [1, 2, 3,]
->> {"array": [{"literal": 1}, {"literal": 2}, {"literal": 3}]}
+>> {
+    "type": "array",
+    "elements": [
+        {"type": "literal", "value": 1},
+        {"type": "literal", "value": 2},
+        {"type": "literal", "value": 3}
+    ]
+}
 ```
 
 ```
 # Array with elements of mixed types
 [null, 1, "foo"]
->> {"array": [{"literal": null}, {"literal": 1}, {"literal": "foo"}]}
+>> {
+    "type": "array",
+    "elements": [
+        {"type": "literal", "value": null}, {"type": "literal", "value": 1},
+        {"type": "literal", "value": "foo"}
+    ]
+}
 ```
 
 ```
 # Nested arrays
 [[1]]
->> {"array": [{"array": [{"literal": 1}]}]}
+>> {
+    "type": "array",
+    "elements": [
+        {"type": "array", "elements": [{"type": "literal", "value": 1}]}
+    ]
+}
 ```
 
 ```
 # Array containing an expression to evaluate
 [foo]
->> {"array": [{"name": "foo"}]}
+>> {"type": "array", "elements": [{"type": "name", "name": "foo"}]}
 ```
 
 ```
 # Arrays with spread
 [42, *foo, 97]
 >> {
-    "array": [
-        {"literal": 42},
-        {"spread": {"name": "foo"}},
-        {"literal": 97}
+    "type": "array",
+    "elements": [
+        {"type": "literal", "value": 42},
+        {"spread": {"type": "name", "name": "foo"}},
+        {"type": "literal", "value": 97}
     ]
 }
 ```
@@ -204,16 +230,17 @@ An object parses to an [object expression](/docs/json#objects).
 ```
 # Empty object
 {}
->> {"object": []}
+>> {"type": "object", "entries": []}
 ```
 
 ```
 # Object with literal values
 {"foo": "bar", "spam": "eggs"}
 >> {
-    "object": [
-        ["foo", {"literal": "bar"}],
-        ["spam", {"literal": "eggs"}]
+    "type": "object",
+    "entries": [
+        [{"type": "literal", "value": "foo"}, {"type": "literal", "value": "bar"}],
+        [{"type": "literal", "value": "spam"}, {"type": "literal", "value": "eggs"}]
     ]
 }
 ```
@@ -224,9 +251,10 @@ If a key is a valid Kenpali name, the quotes can be omitted.
 # Object with shorthand keys
 {foo: "bar", spam: "eggs"}
 >> {
-    "object": [
-        ["foo", {"literal": "bar"}],
-        ["spam", {"literal": "eggs"}]
+    "type": "object",
+    "entries": [
+        [{"type": "literal", "value": "foo"}, {"type": "literal", "value": "bar"}],
+        [{"type": "literal", "value": "spam"}, {"type": "literal", "value": "eggs"}]
     ]
 }
 ```
@@ -236,7 +264,12 @@ If the key is meant to actually reference a name from the surrounding scope, enc
 ```
 # Object with expression keys and values
 {(key): value}
->> {"object": [[{"name": "key"}, {"name": "value"}]]}
+>> {
+    "type": "object",
+    "entries": [
+        [{"type": "name", "name": "key"}, {"type": "name", "name": "value"}]
+    ]
+}
 ```
 
 If the value is omitted, it defaults to reading the property name from the surrounding scope: `{foo:}` is equivalent to `{foo: foo}`.
@@ -245,9 +278,10 @@ If the value is omitted, it defaults to reading the property name from the surro
 # Object taking properties from names
 {foo:, spam:}
 >> {
-    "object": [
-        ["foo", {"name": "foo"}],
-        ["spam", {"name": "spam"}]
+    "type": "object",
+    "entries": [
+        [{"type": "literal", "value": "foo"}, {"type": "name", "name": "foo"}],
+        [{"type": "literal", "value": "spam"}, {"type": "name", "name": "spam"}]
     ]
 }
 ```
@@ -256,10 +290,23 @@ If the value is omitted, it defaults to reading the property name from the surro
 # Object with values of mixed types
 {foo: null, bar: 1, baz: [2]}
 >> {
-    "object": [
-        ["foo", {"literal": null}],
-        ["bar", {"literal": 1}],
-        ["baz", {"array": [{"literal": 2}]}]
+    "type": "object",
+    "entries": [
+        [
+            {"type": "literal", "value": "foo"},
+            {"type": "literal", "value": null}
+        ],
+        [
+            {"type": "literal", "value": "bar"},
+            {"type": "literal", "value": 1}
+        ],
+        [
+            {"type": "literal", "value": "baz"},
+            {
+                "type": "array",
+                "elements": [{"type": "literal", "value": 2}]
+            }
+        ]
     ]
 }
 ```
@@ -268,11 +315,15 @@ If the value is omitted, it defaults to reading the property name from the surro
 # Nested objects
 {foo: {bar: "baz"}}
 >> {
-    "object": [
+    "type": "object",
+    "entries": [
         [
-            "foo",
+            {"type": "literal", "value": "foo"},
             {
-                "object": [["bar", {"literal": "baz"}]]
+                "type": "object",
+                "entries": [
+                    [{"type": "literal", "value": "bar"}, {"type": "literal", "value": "baz"}]
+                ]
             }
         ]
     ]
@@ -283,10 +334,11 @@ If the value is omitted, it defaults to reading the property name from the surro
 # Objects with spread
 {answer: 42, **foo, question: 69}
 >> {
-    "object": [
-        ["answer", {"literal": 42}],
-        {"spread": {"name": "foo"}},
-        ["question", {"literal": 69}]
+    "type": "object",
+    "entries": [
+        [{"type": "literal", "value": "answer"}, {"type": "literal", "value": 42}],
+        {"spread": {"type": "name", "name": "foo"}},
+        [{"type": "literal", "value": "question"}, {"type": "literal", "value": 69}]
     ]
 }
 ```
@@ -300,7 +352,7 @@ Any expression can be enclosed in parentheses to force it to be parsed first, ov
 ```
 # Groups
 (foo)
->> {"name": "foo"}
+>> {"type": "name", "name": "foo"}
 ```
 
 ## Scopes|scopes
@@ -327,10 +379,11 @@ A scope parses to a [block expression](/docs/json#names)
 # Simple declaration
 foo = 42; foo
 >> {
+    "type": "block",
     "defs": [
-        ["foo", {"literal": 42}]
+        ["foo", {"type": "literal", "value": 42}]
     ],
-    "result": {"name": "foo"}
+    "result": {"type": "name", "name": "foo"}
 }
 ```
 
@@ -338,18 +391,20 @@ foo = 42; foo
 # Nested scopes
 foo = (bar = 1; bar); foo
 >> {
+    "type": "block",
     "defs": [
         [
             "foo",
             {
+                "type": "block",
                 "defs": [
-                    ["bar", {"literal": 1}]
+                    ["bar", {"type": "literal", "value": 1}]
                 ],
-                "result": {"name": "bar"}
+                "result": {"type": "name", "name": "bar"}
             }
         ]
     ],
-    "result": {"name": "foo"}
+    "result": {"type": "name", "name": "foo"}
 }
 ```
 
@@ -357,13 +412,14 @@ foo = (bar = 1; bar); foo
 # Array destructuring declaration
 [foo, bar] = arr; foo
 >> {
+    "type": "block",
     "defs": [
         [
             {"arrayPattern": ["foo", "bar"]},
-            {"name": "arr"}
+            {"type": "name", "name": "arr"}
         ]
     ],
-    "result": {"name": "foo"}
+    "result": {"type": "name", "name": "foo"}
 }
 ```
 
@@ -371,6 +427,7 @@ foo = (bar = 1; bar); foo
 # Nested array destructuring
 [foo, [spam, eggs]] = arr; foo
 >> {
+    "type": "block",
     "defs": [
         [
             {
@@ -379,10 +436,10 @@ foo = (bar = 1; bar); foo
                     {"arrayPattern": ["spam", "eggs"]}
                 ]
             },
-            {"name": "arr"}
+            {"type": "name", "name": "arr"}
         ]
     ],
-    "result": {"name": "foo"}
+    "result": {"type": "name", "name": "foo"}
 }
 ```
 
@@ -390,13 +447,14 @@ foo = (bar = 1; bar); foo
 # Object destructuring declaration
 {foo:, bar:} = obj; foo
 >> {
+    "type": "block",
     "defs": [
         [
             {"objectPattern": ["foo", "bar"]},
-            {"name": "obj"}
+            {"type": "name", "name": "obj"}
         ]
     ],
-    "result": {"name": "foo"}
+    "result": {"type": "name", "name": "foo"}
 }
 ```
 
@@ -404,6 +462,7 @@ foo = (bar = 1; bar); foo
 # Object destructuring with aliases
 {foo: spam, bar: eggs} = obj; spam
 >> {
+    "type": "block",
     "defs": [
         [
             {
@@ -412,10 +471,10 @@ foo = (bar = 1; bar); foo
                     {"name": "eggs", "property": "bar"}
                 ]
             },
-            {"name": "obj"}
+            {"type": "name", "name": "obj"}
         ]
     ],
-    "result": {"name": "spam"}
+    "result": {"type": "name", "name": "spam"}
 }
 ```
 
@@ -423,10 +482,11 @@ foo = (bar = 1; bar); foo
 # Expression statements
 foo; 42
 >> {
+    "type": "block",
     "defs": [
-        [null, {"name": "foo"}]
+        [null, {"type": "name", "name": "foo"}]
     ],
-    "result": {"literal": 42}
+    "result": {"type": "literal", "value": 42}
 }
 ```
 
@@ -454,8 +514,9 @@ A single property can be extracted from an object by putting the property name a
 # Tight-binding property access
 foo.bar
 >> {
-    "indexing": {"name": "foo"},
-    "at": {"literal": "bar"}
+    "type": "index",
+    "collection": {"type": "name", "name": "foo"},
+    "index": {"type": "literal", "value": "bar"}
 }
 ```
 
@@ -465,11 +526,13 @@ Property access can be chained, and associates left to right.
 # Chained tight-binding property access
 foo.bar.baz
 >> {
-    "indexing": {
-        "indexing": {"name": "foo"},
-        "at": {"literal": "bar"}
+    "type": "index",
+    "collection": {
+        "type": "index",
+        "collection": {"type": "name", "name": "foo"},
+        "index": {"type": "literal", "value": "bar"}
     },
-    "at": {"literal": "baz"}
+    "index": {"type": "literal", "value": "baz"}
 }
 ```
 
@@ -481,24 +544,24 @@ foo.bar.baz
 
 `parameter ::= array_pattern_element | object_pattern_element`
 
-A function definition parses to a [given expression](/docs/json#functions).
+A function definition parses to a [function expression](/docs/json#functions).
 
 ```
 # No parameters
 () => 42
->> {"given": {}, "result": {"literal": 42}}
+>> {"type": "function", "body": {"type": "literal", "value": 42}}
 ```
 
 ```
 # One positional parameter
 (x) => plus(x, 3)
 >> {
-    "given": {
-        "params": ["x"]
-    },
-    "result": {
-        "calling": {"name": "plus"},
-        "args": [{"name": "x"}, {"literal": 3}]
+    "type": "function",
+    "params": ["x"],
+    "body": {
+        "type": "call",
+        "callee": {"type": "name", "name": "plus"},
+        "args": [{"type": "name", "name": "x"}, {"type": "literal", "value": 3}]
     }
 }
 ```
@@ -507,15 +570,15 @@ A function definition parses to a [given expression](/docs/json#functions).
 # Optional positional parameter
 (x, y = 3) => plus(x, y)
 >> {
-    "given": {
-        "params": [
-            "x",
-            {"name": "y", "defaultValue": {"literal": 3}}
-        ]
-    },
-    "result": {
-        "calling": {"name": "plus"},
-        "args": [{"name": "x"}, {"name": "y"}]
+    "type": "function",
+    "params": [
+        "x",
+        {"name": "y", "defaultValue": {"type": "literal", "value": 3}}
+    ],
+    "body": {
+        "type": "call",
+        "callee": {"type": "name", "name": "plus"},
+        "args": [{"type": "name", "name": "x"}, {"type": "name", "name": "y"}]
     }
 }
 ```
@@ -524,12 +587,12 @@ A function definition parses to a [given expression](/docs/json#functions).
 # Positional rest parameter
 (*args) => length(args)
 >> {
-    "given": {
-        "params": [{"rest": "args"}]
-    },
-    "result": {
-        "calling": {"name": "length"},
-        "args": [{"name": "args"}]
+    "type": "function",
+    "params": [{"rest": "args"}],
+    "body": {
+        "type": "call",
+        "callee": {"type": "name", "name": "length"},
+        "args": [{"type": "name", "name": "args"}]
     }
 }
 ```
@@ -538,13 +601,13 @@ A function definition parses to a [given expression](/docs/json#functions).
 # Named parameter
 (x, y:) => plus(x, y)
 >> {
-    "given": {
-        "params": ["x"],
-        "namedParams": ["y"]
-    },
-    "result": {
-        "calling": {"name": "plus"},
-        "args": [{"name": "x"}, {"name": "y"}]
+    "type": "function",
+    "params": ["x"],
+    "namedParams": ["y"],
+    "body": {
+        "type": "call",
+        "callee": {"type": "name", "name": "plus"},
+        "args": [{"type": "name", "name": "x"}, {"type": "name", "name": "y"}]
     }
 }
 ```
@@ -553,15 +616,15 @@ A function definition parses to a [given expression](/docs/json#functions).
 # Optional named parameter
 (x, y: = 3) => plus(x, y)
 >> {
-    "given": {
-        "params": ["x"],
-        "namedParams": [
-            {"name": "y", "defaultValue": {"literal": 3}}
-        ]
-    },
-    "result": {
-        "calling": {"name": "plus"},
-        "args": [{"name": "x"}, {"name": "y"}]
+    "type": "function",
+    "params": ["x"],
+    "namedParams": [
+        {"name": "y", "defaultValue": {"type": "literal", "value": 3}}
+    ],
+    "body": {
+        "type": "call",
+        "callee": {"type": "name", "name": "plus"},
+        "args": [{"type": "name", "name": "x"}, {"type": "name", "name": "y"}]
     }
 }
 ```
@@ -570,10 +633,9 @@ A function definition parses to a [given expression](/docs/json#functions).
 # Named rest parameter
 (**namedArgs) => namedArgs
 >> {
-    "given": {
-        "namedParams": [{"rest": "namedArgs"}]
-    },
-    "result": {"name": "namedArgs"}
+    "type": "function",
+    "namedParams": [{"rest": "namedArgs"}],
+    "body": {"type": "name", "name": "namedArgs"}
 }
 ```
 
@@ -581,13 +643,13 @@ A function definition parses to a [given expression](/docs/json#functions).
 # Named parameter with alias
 (x, y: z) => plus(x, z)
 >> {
-    "given": {
-        "params": ["x"],
-        "namedParams": [{"name": "z", "property": "y"}]
-    },
-    "result": {
-        "calling": {"name": "plus"},
-        "args": [{"name": "x"}, {"name": "z"}]
+    "type": "function",
+    "params": ["x"],
+    "namedParams": [{"name": "z", "property": "y"}],
+    "body": {
+        "type": "call",
+        "callee": {"type": "name", "name": "plus"},
+        "args": [{"type": "name", "name": "x"}, {"type": "name", "name": "z"}]
     }
 }
 ```
@@ -596,12 +658,11 @@ A function definition parses to a [given expression](/docs/json#functions).
 # Array destructuring in parameters
 ([foo, bar]) => foo
 >> {
-    "given": {
-        "params": [
-            {"arrayPattern": ["foo", "bar"]}
-        ]
-    },
-    "result": {"name": "foo"}
+    "type": "function",
+    "params": [
+        {"arrayPattern": ["foo", "bar"]}
+    ],
+    "body": {"type": "name", "name": "foo"}
 }
 ```
 
@@ -609,20 +670,21 @@ A function definition parses to a [given expression](/docs/json#functions).
 # Scope in function body
 (x) => (y = plus(x, 3); y)
 >> {
-    "given": {
-        "params": ["x"]
-    },
-    "result": {
+    "type": "function",
+    "params": ["x"],
+    "body": {
+        "type": "block",
         "defs": [
             [
                 "y",
                 {
-                    "calling": {"name": "plus"},
-                    "args": [{"name": "x"}, {"literal": 3}]
+                    "type": "call",
+                    "callee": {"type": "name", "name": "plus"},
+                    "args": [{"type": "name", "name": "x"}, {"type": "literal", "value": 3}]
                 }
             ]
         ],
-        "result": {"name": "y"}
+        "result": {"type": "name", "name": "y"}
     }
 }
 ```
@@ -663,8 +725,9 @@ Function call steps parse to [calling expressions](/docs/json#functions).
 # One positional argument
 foo(1)
 >> {
-    "calling": {"name": "foo"},
-    "args": [{"literal": 1}]
+    "type": "call",
+    "callee": {"type": "name", "name": "foo"},
+    "args": [{"type": "literal", "value": 1}]
 }
 ```
 
@@ -672,8 +735,9 @@ foo(1)
 # Two positional arguments
 foo(1, 2)
 >> {
-    "calling": {"name": "foo"},
-    "args": [{"literal": 1}, {"literal": 2}]
+    "type": "call",
+    "callee": {"type": "name", "name": "foo"},
+    "args": [{"type": "literal", "value": 1}, {"type": "literal", "value": 2}]
 }
 ```
 
@@ -681,8 +745,9 @@ foo(1, 2)
 # Spread positional arguments
 foo(*bar)
 >> {
-    "calling": {"name": "foo"},
-    "args": [{"spread": {"name": "bar"}}]
+    "type": "call",
+    "callee": {"type": "name", "name": "foo"},
+    "args": [{"spread": {"type": "name", "name": "bar"}}]
 }
 ```
 
@@ -690,10 +755,11 @@ foo(*bar)
 # Positional and spread positional arguments
 foo(1, *bar)
 >> {
-    "calling": {"name": "foo"},
+    "type": "call",
+    "callee": {"type": "name", "name": "foo"},
     "args": [
-        {"literal": 1},
-        {"spread": {"name": "bar"}}
+        {"type": "literal", "value": 1},
+        {"spread": {"type": "name", "name": "bar"}}
     ]
 }
 ```
@@ -702,8 +768,9 @@ foo(1, *bar)
 # One named argument
 foo(bar: 1)
 >> {
-    "calling": {"name": "foo"},
-    "namedArgs": [["bar", {"literal": 1}]]
+    "type": "call",
+    "callee": {"type": "name", "name": "foo"},
+    "namedArgs": [["bar", {"type": "literal", "value": 1}]]
 }
 ```
 
@@ -711,8 +778,9 @@ foo(bar: 1)
 # Two named arguments
 foo(bar: 1, baz: 2)
 >> {
-    "calling": {"name": "foo"},
-    "namedArgs": [["bar", {"literal": 1}], ["baz", {"literal": 2}]]
+    "type": "call",
+    "callee": {"type": "name", "name": "foo"},
+    "namedArgs": [["bar", {"type": "literal", "value": 1}], ["baz", {"type": "literal", "value": 2}]]
 }
 ```
 
@@ -720,8 +788,9 @@ foo(bar: 1, baz: 2)
 # Named arguments from names
 foo(bar:, baz:)
 >> {
-    "calling": {"name": "foo"},
-    "namedArgs": [["bar", {"name": "bar"}], ["baz", {"name": "baz"}]]
+    "type": "call",
+    "callee": {"type": "name", "name": "foo"},
+    "namedArgs": [["bar", {"type": "name", "name": "bar"}], ["baz", {"type": "name", "name": "baz"}]]
 }
 ```
 
@@ -729,8 +798,9 @@ foo(bar:, baz:)
 # Spread named arguments
 foo(**bar)
 >> {
-    "calling": {"name": "foo"},
-    "namedArgs": [{"spread": {"name": "bar"}}]
+    "type": "call",
+    "callee": {"type": "name", "name": "foo"},
+    "namedArgs": [{"spread": {"type": "name", "name": "bar"}}]
 }
 ```
 
@@ -738,9 +808,10 @@ foo(**bar)
 # Positional and named arguments
 foo(1, 2, bar: 3, baz: 4)
 >> {
-    "calling": {"name": "foo"},
-    "args": [{"literal": 1}, {"literal": 2}],
-    "namedArgs": [["bar", {"literal": 3}], ["baz", {"literal": 4}]]
+    "type": "call",
+    "callee": {"type": "name", "name": "foo"},
+    "args": [{"type": "literal", "value": 1}, {"type": "literal", "value": 2}],
+    "namedArgs": [["bar", {"type": "literal", "value": 3}], ["baz", {"type": "literal", "value": 4}]]
 }
 ```
 
@@ -748,11 +819,13 @@ foo(1, 2, bar: 3, baz: 4)
 # Calling the result of a function call
 foo(x)(y)
 >> {
-    "calling": {
-        "calling": {"name": "foo"},
-        "args": [{"name": "x"}]
+    "type": "call",
+    "callee": {
+        "type": "call",
+        "callee": {"type": "name", "name": "foo"},
+        "args": [{"type": "name", "name": "x"}]
     },
-    "args": [{"name": "y"}]
+    "args": [{"type": "name", "name": "y"}]
 }
 ```
 
@@ -764,8 +837,9 @@ Pipe and pipe-call steps are transformed into ordinary function calls, productin
 # Forward pipe into a bare name
 1 | foo
 >> {
-    "calling": {"name": "foo"},
-    "args": [{"literal": 1}]
+    "type": "call",
+    "callee": {"type": "name", "name": "foo"},
+    "args": [{"type": "literal", "value": 1}]
 }
 ```
 
@@ -773,8 +847,9 @@ Pipe and pipe-call steps are transformed into ordinary function calls, productin
 # Forward pipe injecting a first argument
 1 | bar(2)
 >> {
-    "calling": {"name": "bar"},
-    "args": [{"literal": 1}, {"literal": 2}]
+    "type": "call",
+    "callee": {"type": "name", "name": "bar"},
+    "args": [{"type": "literal", "value": 1}, {"type": "literal", "value": 2}]
 }
 ```
 
@@ -782,9 +857,10 @@ Pipe and pipe-call steps are transformed into ordinary function calls, productin
 # Forward pipe injecting alongside a named argument
 1 | bar(foo: 2)
 >> {
-    "calling": {"name": "bar"},
-    "args": [{"literal": 1}],
-    "namedArgs": [["foo", {"literal": 2}]]
+    "type": "call",
+    "callee": {"type": "name", "name": "bar"},
+    "args": [{"type": "literal", "value": 1}],
+    "namedArgs": [["foo", {"type": "literal", "value": 2}]]
 }
 ```
 
@@ -792,13 +868,15 @@ Pipe and pipe-call steps are transformed into ordinary function calls, productin
 # Chaining forward pipes
 1 | foo | bar(2)
 >> {
-    "calling": {"name": "bar"},
+    "type": "call",
+    "callee": {"type": "name", "name": "bar"},
     "args": [
         {
-            "calling": {"name": "foo"},
-            "args": [{"literal": 1}]
+            "type": "call",
+            "callee": {"type": "name", "name": "foo"},
+            "args": [{"type": "literal", "value": 1}]
         },
-        {"literal": 2}
+        {"type": "literal", "value": 2}
     ]
 }
 ```
@@ -807,11 +885,13 @@ Pipe and pipe-call steps are transformed into ordinary function calls, productin
 # Blocking first-argument injection
 1 | (bar(2))
 >> {
-    "calling": {
-        "calling": {"name": "bar"},
-        "args": [{"literal": 2}]
+    "type": "call",
+    "callee": {
+        "type": "call",
+        "callee": {"type": "name", "name": "bar"},
+        "args": [{"type": "literal", "value": 2}]
     },
-    "args": [{"literal": 1}]
+    "args": [{"type": "literal", "value": 1}]
 }
 ```
 
@@ -819,12 +899,12 @@ Pipe and pipe-call steps are transformed into ordinary function calls, productin
 # Pipe in an arrow
 (x) => x | plus(3)
 >> {
-    "given": {
-        "params": ["x"]
-    },
-    "result": {
-        "calling": {"name": "plus"},
-        "args": [{"name": "x"}, {"literal": 3}]
+    "type": "function",
+    "params": ["x"],
+    "body": {
+        "type": "call",
+        "callee": {"type": "name", "name": "plus"},
+        "args": [{"type": "name", "name": "x"}, {"type": "literal", "value": 3}]
     }
 }
 ```
@@ -837,7 +917,8 @@ Error catching steps parse to [catching expressions](/docs/json#errors).
 # Error catching
 foo !
 >> {
-    "catching": {"name": "foo"}
+    "type": "catch",
+    "expression": {"type": "name", "name": "foo"}
 }
 ```
 
@@ -845,12 +926,15 @@ foo !
 # Error catching in pipeline
 1 | foo ! | bar
 >> {
-    "calling": {"name": "bar"},
+    "type": "call",
+    "callee": {"type": "name", "name": "bar"},
     "args": [
         {
-            "catching": {
-                "calling": {"name": "foo"},
-                "args": [{"literal": 1}]
+            "type": "catch",
+            "expression": {
+                "type": "call",
+                "callee": {"type": "name", "name": "foo"},
+                "args": [{"type": "literal", "value": 1}]
             }
         }
     ]
@@ -865,11 +949,15 @@ Indexing steps parse to [indexing expressions](/docs/json#indexing).
 # Indexing
 ["foo", "bar"] @ 2
 >> {
-    "indexing": {"array": [
-        {"literal": "foo"},
-        {"literal": "bar"}
-    ]},
-    "at": {"literal": 2}
+    "type": "index",
+    "collection": {
+        "type": "array",
+        "elements": [
+            {"type": "literal", "value": "foo"},
+            {"type": "literal", "value": "bar"}
+        ]
+    },
+    "index": {"type": "literal", "value": 2}
 }
 ```
 
@@ -877,22 +965,27 @@ Indexing steps parse to [indexing expressions](/docs/json#indexing).
 # Correct precedence of @
 [x @ 1 | f, x | f @ 1]
 >> {
-    "array": [
+    "type": "array",
+    "elements": [
         {
-            "calling": {"name": "f"},
+            "type": "call",
+            "callee": {"type": "name", "name": "f"},
             "args": [
                 {
-                    "indexing": {"name": "x"},
-                    "at": {"literal": 1}
+                    "type": "index",
+                    "collection": {"type": "name", "name": "x"},
+                    "index": {"type": "literal", "value": 1}
                 }
             ]
         },
         {
-            "indexing": {
-                "calling": {"name": "f"},
-                "args": [{"name": "x"}]
+            "type": "index",
+            "collection": {
+                "type": "call",
+                "callee": {"type": "name", "name": "f"},
+                "args": [{"type": "name", "name": "x"}]
             },
-            "at": {"literal": 1}
+            "index": {"type": "literal", "value": 1}
         }
     ]
 }
@@ -902,11 +995,13 @@ Indexing steps parse to [indexing expressions](/docs/json#indexing).
 # Correct precedence of tight-binding property access
 x | y.z
 >> {
-    "calling": {
-        "indexing": {"name": "y"},
-        "at": {"literal": "z"}
+    "type": "call",
+    "callee": {
+        "type": "index",
+        "collection": {"type": "name", "name": "y"},
+        "index": {"type": "literal", "value": "z"}
     },
-    "args": [{"name": "x"}]
+    "args": [{"type": "name", "name": "x"}]
 }
 ```
 
@@ -914,11 +1009,13 @@ x | y.z
 # Loose-binding property access
 x | y |.z
 >> {
-    "indexing": {
-        "calling": {"name": "y"},
-        "args": [{"name": "x"}]
+    "type": "index",
+    "collection": {
+        "type": "call",
+        "callee": {"type": "name", "name": "y"},
+        "args": [{"type": "name", "name": "x"}]
     },
-    "at": {"literal": "z"}
+    "index": {"type": "literal", "value": "z"}
 }
 ```
 
@@ -926,8 +1023,9 @@ x | y |.z
 # Indexing with an explicit string
 x @ "y"
 >> {
-    "indexing": {"name": "x"},
-    "at": {"literal": "y"}
+    "type": "index",
+    "collection": {"type": "name", "name": "x"},
+    "index": {"type": "literal", "value": "y"}
 }
 ```
 
@@ -943,8 +1041,8 @@ A _constant function_ ignores any arguments passed to it. The shorthand syntax i
 # Constant function shorthand
 $ foo
 >> {
-    "given": {},
-    "result": {"name": "foo"}
+    "type": "function",
+    "body": {"type": "name", "name": "foo"}
 }
 ```
 
@@ -956,15 +1054,18 @@ A _point-free pipeline_ is written as a pipeline missing the initial value. It p
 # Point-free pipeline starting with |
 | foo | bar(2)
 >> {
-    "given": {"params": ["pipelineArg"]},
-    "result": {
-        "calling": {"name": "bar"},
+    "type": "function",
+    "params": ["pipelineArg"],
+    "body": {
+        "type": "call",
+        "callee": {"type": "name", "name": "bar"},
         "args": [
             {
-                "calling": {"name": "foo"},
-                "args": [{"name": "pipelineArg"}]
+                "type": "call",
+                "callee": {"type": "name", "name": "foo"},
+                "args": [{"type": "name", "name": "pipelineArg"}]
             },
-            {"literal": 2}
+            {"type": "literal", "value": 2}
         ]
     }
 }

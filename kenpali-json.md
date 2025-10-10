@@ -2,55 +2,56 @@
 
 ## Literals|literals
 
-A _literal expression_ has the form `{"literal": <value>}`. The value can be `null`, `true`, `false`, or [any valid JSON string or number](https://www.json.org/json-en.html).
+A _literal expression_ has the form `{"type": "literal", "value": <value>}`. The value can be `null`, `true`, `false`, or [any valid JSON string or number](https://www.json.org/json-en.html).
 
 Examples:
 
 ```
 # Literal null
-{"literal": null}
+{"type": "literal", "value": null}
 >> null
 ```
 
 ```
 # Literal false
-{"literal": false}
+{"type": "literal", "value": false}
 >> false
 ```
 
 ```
 # Literal true
-{"literal": true}
+{"type": "literal", "value": true}
 >> true
 ```
 
 ```
 # Literal number
-{"literal": 1}
+{"type": "literal", "value": 1}
 >> 1
 ```
 
 ```
 # Literal string
-{"literal": "foobar"}
+{"type": "literal", "value": "foobar"}
 >> "foobar"
 ```
 
 ## Names|names
 
-Names are defined using a _block expression_, which has the form `{"defs": <definitions>, "result": <result>}`. The `<definitions>` node must be an array of pairs, where the first element of each pair is a _name pattern_ and the second element is any expression. The `<result>` node can be any expression. The value of the block expression is the value of the `<result>` node.
+Names are defined using a _block expression_, which has the form `{"type": "block", "defs": <definitions>, "result": <result>}`. The `<definitions>` node must be an array of pairs, where the first element of each pair is a _name pattern_ and the second element is any expression. The `<result>` node can be any expression. The value of the block expression is the value of the `<result>` node.
 
 The name pattern is usually a string, but other pattern types are possible—see [Arrays](#arrays) and [Objects](#objects) for more complex types of name patterns.
 
-A _name expression_ evaluates to the value previously assigned to the specified name. It has the form `{"name": <name>}`, where the `<name>` is a string.
+A _name expression_ evaluates to the value previously assigned to the specified name. It has the form `{"type": "name", "name": <name>}`, where the `<name>` is a string.
 
 Examples:
 
 ```
 # Binding a name
 {
-    "defs": [["foo", {"literal": 42}]],
-    "result": {"name": "foo"}
+    "type": "block",
+    "defs": [["foo", {"type": "literal", "value": 42}]],
+    "result": {"type": "name", "name": "foo"}
 }
 >> 42
 ```
@@ -58,12 +59,13 @@ Examples:
 ```
 # Binding multiple names
 {
+    "type": "block",
     "defs": [
-        ["bar", {"literal": 42}],
-        ["baz", {"name": "bar"}],
-        ["foo", {"name": "baz"}]
+        ["bar", {"type": "literal", "value": 42}],
+        ["baz", {"type": "name", "name": "bar"}],
+        ["foo", {"type": "name", "name": "baz"}]
     ],
-    "result": {"name": "foo"}
+    "result": {"type": "name", "name": "foo"}
 }
 >> 42
 ```
@@ -73,12 +75,13 @@ Names are defined in the order they appear in the block. It's an error to refere
 ```
 # Name used before assignment
 {
+    "type": "block",
     "defs": [
-        ["foo", {"name": "baz"}],
-        ["bar", {"literal": 42}],
-        ["baz", {"name": "bar"}]
+        ["foo", {"type": "name", "name": "baz"}],
+        ["bar", {"type": "literal", "value": 42}],
+        ["baz", {"type": "name", "name": "bar"}]
     ],
-    "result": {"name": "foo"}
+    "result": {"type": "name", "name": "foo"}
 }
 !! nameUsedBeforeAssignment {"name": "baz"}
 ```
@@ -88,11 +91,12 @@ It's an error to declare the same name more than once in the same block.
 ```
 # Name declared more than once in the same scope
 {
+    "type": "block",
     "defs": [
-        ["foo", {"literal": 42}],
-        ["foo", {"literal": 97}]
+        ["foo", {"type": "literal", "value": 42}],
+        ["foo", {"type": "literal", "value": 97}]
     ],
-    "result": {"name": "foo"}
+    "result": {"type": "name", "name": "foo"}
 }
 !! duplicateName {"name": "foo"}
 ```
@@ -102,18 +106,20 @@ A block creates a _scope_; all names defined within it are only accessible withi
 ```
 # Scope
 {
+    "type": "block",
     "defs": [
         [
             "foo",
             {
+                "type": "block",
                 "defs": [
-                    ["bar", {"literal": 42}]
+                    ["bar", {"type": "literal", "value": 42}]
                 ],
-                "result": {"literal": null}
+                "result": {"type": "literal", "value": null}
             }
         ]
     ],
-    "result": {"name": "bar"}
+    "result": {"type": "name", "name": "bar"}
 }
 !! nameNotDefined {"name": "bar"}
 ```
@@ -123,14 +129,16 @@ But expressions in a block can reference names defined in a containing block.
 ```
 # A name from an enclosing scope
 {
+    "type": "block",
     "defs": [
-        ["foo", {"literal": 42}]
+        ["foo", {"type": "literal", "value": 42}]
     ],
     "result": {
+        "type": "block",
         "defs": [
-            ["bar", {"literal": 73}]
+            ["bar", {"type": "literal", "value": 73}]
         ],
-        "result": {"name": "foo"}
+        "result": {"type": "name", "name": "foo"}
     }
 }
 >> 42
@@ -141,14 +149,16 @@ A block can define a name that duplicates one in an enclosing block. References 
 ```
 # Shadowing
 {
+    "type": "block",
     "defs": [
-        ["foo", {"literal": 42}]
+        ["foo", {"type": "literal", "value": 42}]
     ],
     "result": {
+        "type": "block",
         "defs": [
-            ["foo", {"literal": 73}]
+            ["foo", {"type": "literal", "value": 73}]
         ],
-        "result": {"name": "foo"}
+        "result": {"type": "name", "name": "foo"}
     }
 }
 >> 73
@@ -159,47 +169,71 @@ The name pattern can be `null`, which creates an _expression statement_. An expr
 ```
 # Expression statements
 {
+    "type": "block",
     "defs": [
-        [null, {"literal": 42}]
+        [null, {"type": "literal", "value": 42}]
     ],
-    "result": {"literal": 73}
+    "result": {"type": "literal", "value": 73}
 }
 >> 73
 ```
 
 ## Arrays|arrays
 
-An _array expression_ has the form `{"array": <elements>}`. The `<elements>` node is a JSON array containing expressions, which are evaluated to obtain the array's elements.
+An _array expression_ has the form `{"type": "array", "elements": <elements>}`. The `<elements>` node is a JSON array containing expressions, which are evaluated to obtain the array's elements.
 
 ```
 # Empty array
-{"array": []}
+{"type": "array", "elements": []}
 >> []
 ```
 
 ```
 # Array of literals
-{"array": [{"literal": 1}, {"literal": 2}, {"literal": 3}]}
+{
+    "type": "array",
+    "elements": [
+        {"type": "literal", "value": 1},
+        {"type": "literal", "value": 2},
+        {"type": "literal", "value": 3}
+    ]
+}
 >> [1, 2, 3]
 ```
 
 ```
 # Array with elements of mixed types
-{"array": [{"literal": null}, {"literal": 1}, {"literal": "foo"}]}
+{
+    "type": "array",
+    "elements": [
+        {"type": "literal", "value": null},
+        {"type": "literal", "value": 1},
+        {"type": "literal", "value": "foo"}
+    ]
+}
 >> [null, 1, "foo"]
 ```
 
 ```
 # Nested arrays
-{"array": [{"array": [{"literal": 1}]}]}
+{
+    "type": "array",
+    "elements": [
+        {"type": "array", "elements": [{"type": "literal", "value": 1}]}
+    ]
+}
 >> [[1]]
 ```
 
 ```
 # Array containing an expression to evaluate
 {
-    "defs": [["foo", {"literal": 42}]],
-    "result": {"array": [{"name": "foo"}]}
+    "type": "block",
+    "defs": [["foo", {"type": "literal", "value": 42}]],
+    "result": {
+        "type": "array",
+        "elements": [{"type": "name", "name": "foo"}]
+    }
 }
 >> [42]
 ```
@@ -209,18 +243,20 @@ Instead of an expression, any of the array's elements can be a _spread_ instead.
 ```
 # Array with spread
 {
-    "array": [
-        {"literal": 42},
+    "type": "array",
+    "elements": [
+        {"type": "literal", "value": 42},
         {
             "spread": {
-                "array": [
-                    {"literal": 1},
-                    {"literal": 2},
-                    {"literal": 3}
+                "type": "array",
+                "elements": [
+                    {"type": "literal", "value": 1},
+                    {"type": "literal", "value": 2},
+                    {"type": "literal", "value": 3}
                 ]
             }
         },
-        {"literal": 97}
+        {"type": "literal", "value": 97}
     ]
 }
 >> [42, 1, 2, 3, 97]
@@ -231,22 +267,25 @@ When defining [names](#names), an _array pattern_ can be used to extract individ
 ```
 # Array destructuring
 {
+    "type": "block",
     "defs": [
         [
             {"arrayPattern": ["foo", "bar"]},
             {
-                "array": [
-                    {"literal": 42},
-                    {"literal": 97}
+                "type": "array",
+                "elements": [
+                    {"type": "literal", "value": 42},
+                    {"type": "literal", "value": 97}
                 ]
             }
         ]
     ],
     "result": {
-        "array": [
-            {"name": "bar"},
-            {"name": "bar"},
-            {"name": "foo"}
+        "type": "array",
+        "elements": [
+            {"type": "name", "name": "bar"},
+            {"type": "name", "name": "bar"},
+            {"type": "name", "name": "foo"}
         ]
     }
 }
@@ -258,25 +297,28 @@ One of the elements of an array pattern can be a _rest pattern_, of the form `{"
 ```
 # Array destructuring with rest
 {
+    "type": "block",
     "defs": [
         [
             {"arrayPattern": ["foo", {"rest": "bar"}, "baz"]},
             {
-                "array": [
-                    {"literal": 42},
-                    {"literal": 1},
-                    {"literal": 2},
-                    {"literal": 3},
-                    {"literal": 97}
+                "type": "array",
+                "elements": [
+                    {"type": "literal", "value": 42},
+                    {"type": "literal", "value": 1},
+                    {"type": "literal", "value": 2},
+                    {"type": "literal", "value": 3},
+                    {"type": "literal", "value": 97}
                 ]
             }
         ]
     ],
     "result": {
-        "array": [
-            {"name": "baz"},
-            {"name": "foo"},
-            {"name": "bar"}
+        "type": "array",
+        "elements": [
+            {"type": "name", "name": "baz"},
+            {"type": "name", "name": "foo"},
+            {"type": "name", "name": "bar"}
         ]
     }
 }
@@ -285,20 +327,21 @@ One of the elements of an array pattern can be a _rest pattern_, of the form `{"
 
 ## Objects|objects
 
-An _object expression_ has the form `{"object": <entries>}`. The `<entries>` node is a JSON array containing name-value pairs. In each pair, the first element can be a string or an expression evaluating to a string, while the second element can be any expression.
+An _object expression_ has the form `{"type": "object", "entries": <entries>}`. The `<entries>` node is a JSON array containing name-value pairs. In each pair, the first element can be a string or an expression evaluating to a string, while the second element can be any expression.
 
 ```
 # Empty object
-{"object": []}
+{"type": "object", "entries": []}
 >> {}
 ```
 
 ```
 # Object with literal values
 {
-    "object": [
-        ["foo", {"literal": "bar"}],
-        ["spam", {"literal": "eggs"}]
+    "type": "object",
+    "entries": [
+        ["foo", {"type": "literal", "value": "bar"}],
+        ["spam", {"type": "literal", "value": "eggs"}]
     ]
 }
 >> {foo: "bar", spam: "eggs"}
@@ -307,9 +350,10 @@ An _object expression_ has the form `{"object": <entries>}`. The `<entries>` nod
 ```
 # Object with explicit literal keys
 {
-    "object": [
-        [{"literal": "foo"}, {"literal": "bar"}],
-        [{"literal": "spam"}, {"literal": "eggs"}]
+    "type": "object",
+    "entries": [
+        [{"type": "literal", "value": "foo"}, {"type": "literal", "value": "bar"}],
+        [{"type": "literal", "value": "spam"}, {"type": "literal", "value": "eggs"}]
     ]
 }
 >> {foo: "bar", spam: "eggs"}
@@ -318,10 +362,11 @@ An _object expression_ has the form `{"object": <entries>}`. The `<entries>` nod
 ```
 # Object with values of mixed types
 {
-    "object": [
-        ["foo", {"literal": null}],
-        ["bar", {"literal": 1}],
-        ["baz", {"array": [{"literal": 2}]}]
+    "type": "object",
+    "entries": [
+        ["foo", {"type": "literal", "value": null}],
+        ["bar", {"type": "literal", "value": 1}],
+        ["baz", {"type": "array", "elements": [{"type": "literal", "value": 2}]}]
     ]
 }
 >> {foo: null, bar: 1, baz: [2]}
@@ -330,11 +375,13 @@ An _object expression_ has the form `{"object": <entries>}`. The `<entries>` nod
 ```
 # Nested objects
 {
-    "object": [
+    "type": "object",
+    "entries": [
         [
             "foo",
             {
-                "object": [["bar", {"literal": "baz"}]]
+                "type": "object",
+                "entries": [["bar", {"type": "literal", "value": "baz"}]]
             }
         ]
     ]
@@ -345,13 +392,15 @@ An _object expression_ has the form `{"object": <entries>}`. The `<entries>` nod
 ```
 # Object with expression keys and values
 {
+    "type": "block",
     "defs": [
-        ["key", {"literal": "foo"}],
-        ["value", {"literal": 42}]
+        ["key", {"type": "literal", "value": "foo"}],
+        ["value", {"type": "literal", "value": 42}]
     ],
     "result": {
-        "object": [
-            [{"name": "key"}, {"name": "value"}]
+        "type": "object",
+        "entries": [
+            [{"type": "name", "name": "key"}, {"type": "name", "name": "value"}]
         ]
     }
 }
@@ -363,17 +412,19 @@ Instead of a name-value pair, any of the object's elements can be a _spread_ ins
 ```
 # Object with spread
 {
-    "object": [
-        ["answer", {"literal": 42}],
+    "type": "object",
+    "entries": [
+        ["answer", {"type": "literal", "value": 42}],
         {
             "spread": {
-                "object": [
-                    ["bar", {"literal": 1}],
-                    ["baz", {"literal": 2}]
+                "type": "object",
+                "entries": [
+                    ["bar", {"type": "literal", "value": 1}],
+                    ["baz", {"type": "literal", "value": 2}]
                 ]
             }
         },
-        ["question", {"literal": 69}]
+        ["question", {"type": "literal", "value": 69}]
     ]
 }
 >> {answer: 42, bar: 1, baz: 2, question: 69}
@@ -384,22 +435,25 @@ When defining [names](#names), an _object pattern_ can be used to extract proper
 ```
 # Object destructuring
 {
+    "type": "block",
     "defs": [
         [
             {"objectPattern": ["foo", "bar"]},
             {
-                "object": [
-                    ["bar", {"literal": 42}],
-                    ["foo", {"literal": 97}]
+                "type": "object",
+                "entries": [
+                    ["bar", {"type": "literal", "value": 42}],
+                    ["foo", {"type": "literal", "value": 97}]
                 ]
             }
         ]
     ],
     "result": {
-        "array": [
-            {"name": "foo"},
-            {"name": "foo"},
-            {"name": "bar"}
+        "type": "array",
+        "elements": [
+            {"type": "name", "name": "foo"},
+            {"type": "name", "name": "foo"},
+            {"type": "name", "name": "bar"}
         ]
     }
 }
@@ -411,22 +465,25 @@ One of the elements of an object pattern can be a _rest pattern_, of the form `{
 ```
 # Object destructuring with rest
 {
+    "type": "block",
     "defs": [
         [
             {"objectPattern": ["bar", {"rest": "others"}]},
             {
-                "object": [
-                    ["baz", {"literal": 216}],
-                    ["bar", {"literal": 42}],
-                    ["foo", {"literal": 97}]
+                "type": "object",
+                "entries": [
+                    ["baz", {"type": "literal", "value": 216}],
+                    ["bar", {"type": "literal", "value": 42}],
+                    ["foo", {"type": "literal", "value": 97}]
                 ]
             }
         ]
     ],
     "result": {
-        "array": [
-            {"name": "bar"},
-            {"name": "others"}
+        "type": "array",
+        "elements": [
+            {"type": "name", "name": "bar"},
+            {"type": "name", "name": "others"}
         ]
     }
 }
@@ -438,6 +495,7 @@ Any of an object pattern's elements can be an _alias pattern_, of the form `{"na
 ```
 # Object destructuring with aliases
 {
+    "type": "block",
     "defs": [
         [
             {
@@ -447,18 +505,20 @@ Any of an object pattern's elements can be an _alias pattern_, of the form `{"na
                 ]
             },
             {
-                "object": [
-                    ["foo", {"literal": 42}],
-                    ["bar", {"literal": 97}]
+                "type": "object",
+                "entries": [
+                    ["foo", {"type": "literal", "value": 42}],
+                    ["bar", {"type": "literal", "value": 97}]
                 ]
             }
         ]
     ],
     "result": {
-        "array": [
-            {"name": "eggs"},
-            {"name": "eggs"},
-            {"name": "spam"}
+        "type": "array",
+        "elements": [
+            {"type": "name", "name": "eggs"},
+            {"type": "name", "name": "eggs"},
+            {"type": "name", "name": "spam"}
         ]
     }
 }
@@ -467,17 +527,18 @@ Any of an object pattern's elements can be an _alias pattern_, of the form `{"na
 
 ## Defining and Calling Functions|functions
 
-Functions are defined using a _given expression_, which has the form `{"given": <param-spec>, "result": <body>}`. The `<param-spec>` is an object with two optional properties: `params`, giving the function's positional parameters, with the same format as the value in an [array pattern](#arrays); and `namedParams`, giving the function's named parameters, with the same format as the value in an [object pattern](#objects). The `<body>` can be any expression, and it defines what the function returns.
+Functions are defined using a _function expression_, which has the form `{"type": "function", "params": <pos-param-spec>, "namedParams": <named-param-spec>, "body": <body>}`. Both `<pos-param-spec>` and `<named-param-spec>` are optional. The `<pos-param-spec>` indicates the positional parameters the function accepts, with the same format as the value in an [array pattern](#arrays); the `<named-param-spec>` indicates the named parameters the function accepts, with the same format as the value in an [object pattern](#objects). The `<body>` can be any expression, and it defines what the function returns. It can reference the parameters as if they were names defined in the function's scope.
 
-Functions are called using a _calling expression_, which has the form `{"calling": <function>, "args": <pos-arg-spec>, "namedArgs": <named-arg-spec>}`. Both `args` and `namedArgs` are optional. The `<function>` must be an expression, and its result is the function to call. The `<pos-arg-spec>` indicates the positional arguments to pass to the function, with the same format as the value in an [array expression](#arrays); the `<named-arg-spec>` indicates the named arguments to pass to the function, with the same format as the value in an [object expression](#objects).
+Functions are called using a _call expression_, which has the form `{"type": "call", "callee": <callee>, "args": <pos-arg-spec>, "namedArgs": <named-arg-spec>}`. Both `args` and `namedArgs` are optional. The `<callee>` must be an expression, and its result is the function to call. The `<pos-arg-spec>` indicates the positional arguments to pass to the function, with the same format as the value in an [array expression](#arrays); the `<named-arg-spec>` indicates the named arguments to pass to the function, with the same format as the value in an [object expression](#objects).
 
 ```
 # No parameters, no arguments
 {
+    "type": "block",
     "defs": [
-        ["foo", {"given": {}, "result": {"literal": 42}}]
+        ["foo", {"type": "function", "body": {"type": "literal", "value": 42}}]
     ],
-    "result": {"calling": {"name": "foo"}}
+    "result": {"type": "call", "callee": {"type": "name", "name": "foo"}}
 }
 >> 42
 ```
@@ -485,12 +546,14 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # One positional parameter, one positional argument
 {
+    "type": "block",
     "defs": [
-        ["foo", {"given": {"params": ["x"]}, "result": {"name": "x"}}]
+        ["foo", {"type": "function", "params": ["x"], "body": {"type": "name", "name": "x"}}]
     ],
     "result": {
-        "calling": {"name": "foo"},
-        "args": [{"literal": 42}]
+        "type": "call",
+        "callee": {"type": "name", "name": "foo"},
+        "args": [{"type": "literal", "value": 42}]
     }
 }
 >> 42
@@ -499,10 +562,11 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # One positional parameter, no arguments
 {
+    "type": "block",
     "defs": [
-        ["foo", {"given": {"params": ["x"]}, "result": {"name": "x"}}]
+        ["foo", {"type": "function", "params": ["x"], "body": {"type": "name", "name": "x"}}]
     ],
-    "result": {"calling": {"name": "foo"}}
+    "result": {"type": "call", "callee": {"type": "name", "name": "foo"}}
 }
 !! missingArgument {"name": "x"}
 ```
@@ -510,23 +574,23 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # One optional positional parameter, one positional argument
 {
+    "type": "block",
     "defs": [
         [
             "foo",
             {
-                "given": {
-                    "params": [
-                        {
-                            "name": "x",
-                            "defaultValue": {"literal": 73}
-                        }
-                    ]
-                },
-                "result": {"name": "x"}
+                "type": "function",
+                "params": [
+                    {
+                        "name": "x",
+                        "defaultValue": {"type": "literal", "value": 73}
+                    }
+                ],
+                "body": {"type": "name", "name": "x"}
             }
         ]
     ],
-    "result": {"calling": {"name": "foo"}, "args": [{"literal": 42}]}
+    "result": {"type": "call", "callee": {"type": "name", "name": "foo"}, "args": [{"type": "literal", "value": 42}]}
 }
 >> 42
 ```
@@ -534,23 +598,23 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # One optional positional parameter, no arguments
 {
+    "type": "block",
     "defs": [
         [
             "foo",
             {
-                "given": {
-                    "params": [
-                        {
-                            "name": "x",
-                            "defaultValue": {"literal": 73}
-                        }
-                    ]
-                },
-                "result": {"name": "x"}
+                "type": "function",
+                "params": [
+                    {
+                        "name": "x",
+                        "defaultValue": {"type": "literal", "value": 73}
+                    }
+                ],
+                "body": {"type": "name", "name": "x"}
             }
         ]
     ],
-    "result": {"calling": {"name": "foo"}}
+    "result": {"type": "call", "callee": {"type": "name", "name": "foo"}}
 }
 >> 73
 ```
@@ -558,24 +622,24 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # Default value referencing a name
 {
+    "type": "block",
     "defs": [
-        ["foo", {"literal": 73}],
+        ["foo", {"type": "literal", "value": 73}],
         [
             "bar",
             {
-                "given": {
-                    "params": [
-                        {
-                            "name": "x",
-                            "defaultValue": {"name": "foo"}
-                        }
-                    ]
-                },
-                "result": {"name": "x"}
+                "type": "function",
+                "params": [
+                    {
+                        "name": "x",
+                        "defaultValue": {"type": "name", "name": "foo"}
+                    }
+                ],
+                "body": {"type": "name", "name": "x"}
             }
         ]
     ],
-    "result": {"calling": {"name": "bar"}}
+    "result": {"type": "call", "callee": {"type": "name", "name": "bar"}}
 }
 >> 73
 ```
@@ -583,20 +647,21 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # Positional rest parameter
 {
+    "type": "block",
     "defs": [
         [
             "foo",
             {
-                "given": {
-                    "params": [{"rest": "args"}]
-                },
-                "result": {"name": "args"}
+                "type": "function",
+                "params": [{"rest": "args"}],
+                "body": {"type": "name", "name": "args"}
             }
         ]
     ],
     "result": {
-        "calling": {"name": "foo"},
-        "args": [{"literal": 42}, {"literal": 97}]
+        "type": "call",
+        "callee": {"type": "name", "name": "foo"},
+        "args": [{"type": "literal", "value": 42}, {"type": "literal", "value": 97}]
     }
 }
 >> [42, 97]
@@ -605,31 +670,34 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # Spread positional argument
 {
+    "type": "block",
     "defs": [
         [
             "foo",
             {
-                "given": {
-                    "params": ["bar", "baz"]
-                },
-                "result": {
-                    "array": [
-                        {"name": "baz"},
-                        {"name": "baz"},
-                        {"name": "bar"}
+                "type": "function",
+                "params": ["bar", "baz"],
+                "body": {
+                    "type": "array",
+                    "elements": [
+                        {"type": "name", "name": "baz"},
+                        {"type": "name", "name": "baz"},
+                        {"type": "name", "name": "bar"}
                     ]
                 }
             }
         ]
     ],
     "result": {
-        "calling": {"name": "foo"},
+        "type": "call",
+        "callee": {"type": "name", "name": "foo"},
         "args": [
             {
                 "spread": {
-                    "array": [
-                        {"literal": 42},
-                        {"literal": 97}
+                    "type": "array",
+                    "elements": [
+                        {"type": "literal", "value": 42},
+                        {"type": "literal", "value": 97}
                     ]
                 }
             }
@@ -642,12 +710,14 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # One named parameter, one argument with that name
 {
+    "type": "block",
     "defs": [
-        ["foo", {"given": {"namedParams": ["x"]}, "result": {"name": "x"}}]
+        ["foo", {"type": "function", "namedParams": ["x"], "body": {"type": "name", "name": "x"}}]
     ],
     "result": {
-        "calling": {"name": "foo"},
-        "namedArgs": [["x", {"literal": 42}]]
+        "type": "call",
+        "callee": {"type": "name", "name": "foo"},
+        "namedArgs": [["x", {"type": "literal", "value": 42}]]
     }
 }
 >> 42
@@ -656,10 +726,11 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # One named parameter, no arguments
 {
+    "type": "block",
     "defs": [
-        ["foo", {"given": {"namedParams": ["x"]}, "result": {"name": "x"}}]
+        ["foo", {"type": "function", "namedParams": ["x"], "body": {"type": "name", "name": "x"}}]
     ],
-    "result": {"calling": {"name": "foo"}}
+    "result": {"type": "call", "callee": {"type": "name", "name": "foo"}}
 }
 !! missingArgument {"name": "x"}
 ```
@@ -667,12 +738,14 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # One named parameter, one positional argument
 {
+    "type": "block",
     "defs": [
-        ["foo", {"given": {"namedParams": ["x"]}, "result": {"name": "x"}}]
+        ["foo", {"type": "function", "namedParams": ["x"], "body": {"type": "name", "name": "x"}}]
     ],
     "result": {
-        "calling": {"name": "foo"},
-        "args": [{"literal": 42}]
+        "type": "call",
+        "callee": {"type": "name", "name": "foo"},
+        "args": [{"type": "literal", "value": 42}]
     }
 }
 !! missingArgument {"name": "x"}
@@ -681,22 +754,23 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # Named rest parameter
 {
+    "type": "block",
     "defs": [
         [
             "foo",
             {
-                "given": {
-                    "namedParams": [{"rest": "namedArgs"}]
-                },
-                "result": {"name": "namedArgs"}
+                "type": "function",
+                "namedParams": [{"rest": "namedArgs"}],
+                "body": {"type": "name", "name": "namedArgs"}
             }
         ]
     ],
     "result": {
-        "calling": {"name": "foo"},
+        "type": "call",
+        "callee": {"type": "name", "name": "foo"},
         "namedArgs": [
-            ["bar", {"literal": 42}],
-            ["baz", {"literal": 97}]
+            ["bar", {"type": "literal", "value": 42}],
+            ["baz", {"type": "literal", "value": 97}]
         ]
     }
 }
@@ -706,31 +780,34 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # Spread named argument
 {
+    "type": "block",
     "defs": [
         [
             "foo",
             {
-                "given": {
-                    "namedParams": ["bar", "baz"]
-                },
-                "result": {
-                    "array": [
-                        {"name": "baz"},
-                        {"name": "baz"},
-                        {"name": "bar"}
+                "type": "function",
+                "namedParams": ["bar", "baz"],
+                "body": {
+                    "type": "array",
+                    "elements": [
+                        {"type": "name", "name": "baz"},
+                        {"type": "name", "name": "baz"},
+                        {"type": "name", "name": "bar"}
                     ]
                 }
             }
         ]
     ],
     "result": {
-        "calling": {"name": "foo"},
+        "type": "call",
+        "callee": {"type": "name", "name": "foo"},
         "namedArgs": [
             {
                 "spread": {
-                    "object": [
-                        ["bar", {"literal": 42}],
-                        ["baz", {"literal": 97}]
+                    "type": "object",
+                    "entries": [
+                        ["bar", {"type": "literal", "value": 42}],
+                        ["baz", {"type": "literal", "value": 97}]
                     ]
                 }
             }
@@ -743,32 +820,35 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # Array destructuring in parameters
 {
+    "type": "block",
     "defs": [
         [
             "foo",
             {
-                "given": {
-                    "params": [
-                        {"arrayPattern": ["foo", "bar"]}
-                    ]
-                },
-                "result": {
-                    "array": [
-                        {"name": "bar"},
-                        {"name": "bar"},
-                        {"name": "foo"}
+                "type": "function",
+                "params": [
+                    {"arrayPattern": ["foo", "bar"]}
+                ],
+                "body": {
+                    "type": "array",
+                    "elements": [
+                        {"type": "name", "name": "bar"},
+                        {"type": "name", "name": "bar"},
+                        {"type": "name", "name": "foo"}
                     ]
                 }
             }
         ]
     ],
     "result": {
-        "calling": {"name": "foo"},
+        "type": "call",
+        "callee": {"type": "name", "name": "foo"},
         "args": [
             {
-                "array": [
-                    {"literal": 42},
-                    {"literal": 97}
+                "type": "array",
+                "elements": [
+                    {"type": "literal", "value": 42},
+                    {"type": "literal", "value": 97}
                 ]
             }
         ]
@@ -780,7 +860,8 @@ Functions are called using a _calling expression_, which has the form `{"calling
 ```
 # Calling a non-function
 {
-    "calling": {"literal": 42}
+    "type": "call",
+    "callee": {"type": "literal", "value": 42}
 }
 !! notCallable {"value": 42}
 ```
@@ -790,22 +871,25 @@ A function can reference names defined in an enclosing scope.
 ```
 # A name from an enclosing function
 {
+    "type": "block",
     "defs": [
-        ["x", {"literal": 73}],
+        ["x", {"type": "literal", "value": 73}],
         [
             "foo",
             {
-                "given": {"params": ["y"]},
-                "result": {
-                    "array": [
-                        {"name": "x"},
-                        {"name": "y"}
+                "type": "function",
+                "params": ["y"],
+                "body": {
+                    "type": "array",
+                    "elements": [
+                        {"type": "name", "name": "x"},
+                        {"type": "name", "name": "y"}
                     ]
                 }
             }
         ]
     ],
-    "result": {"calling": {"name": "foo"}, "args": [{"literal": 42}]}
+    "result": {"type": "call", "callee": {"type": "name", "name": "foo"}, "args": [{"type": "literal", "value": 42}]}
 
 }
 >> [73, 42]
@@ -816,24 +900,29 @@ A function can reference names that were in scope when the function was _defined
 ```
 # Closure
 {
-    "calling": {
-        "calling": {
-            "given": {},
-            "result": {
-                "defs": [["x", {"literal": 73}]],
+    "type": "call",
+    "callee": {
+        "type": "call",
+        "callee": {
+            "type": "function",
+            "body": {
+                "type": "block",
+                "defs": [["x", {"type": "literal", "value": 73}]],
                 "result": {
-                    "given": {"params": ["y"]},
-                    "result": {
-                        "array": [
-                            {"name": "x"},
-                            {"name": "y"}
+                    "type": "function",
+                    "params": ["y"],
+                    "body": {
+                        "type": "array",
+                        "elements": [
+                            {"type": "name", "name": "x"},
+                            {"type": "name", "name": "y"}
                         ]
                     }
                 }
             }
         }
     },
-    "args": [{"literal": 42}]
+    "args": [{"type": "literal", "value": 42}]
 }
 >> [73, 42]
 ```
@@ -843,17 +932,19 @@ On the other hand, names that are in scope when the function is called don't lea
 ```
 # Leakage
 {
+    "type": "block",
     "defs": [
         [
             "leaky",
-            {"given": {"params": ["x"]}, "result": {"name": "intruder"}}
+            {"type": "function", "params": ["x"], "body": {"type": "name", "name": "intruder"}}
         ]
     ],
     "result": {
+        "type": "block",
         "defs": [
-            ["intruder", {"literal": 42}]
+            ["intruder", {"type": "literal", "value": 42}]
         ],
-        "result": {"calling": {"name": "leaky"}, "args": [{"literal": 73}]}
+        "result": {"type": "call", "callee": {"type": "name", "name": "leaky"}, "args": [{"type": "literal", "value": 73}]}
     }
 }
 !! nameNotDefined {"name": "intruder"}
@@ -861,13 +952,16 @@ On the other hand, names that are in scope when the function is called don't lea
 
 ## Indexing|indexing
 
-An _indexing expression_ extracts the value at a specific index from a collection. It has the form `{"indexing": <collection>, "at": <index>}`, where both `<collection>` and `<index>` are expressions.
+An _index expression_ extracts the value at a specific index from a collection. It has the form `{"type": "index", "collection": <collection>, "index": <index>}`, where both `<collection>` and `<index>` are expressions.
+
+All numeric indexes are one-based.
 
 ```
 # Indexing strings
 {
-    "indexing": {"literal": "foobar"},
-    "at": {"literal": 4}
+    "type": "index",
+    "collection": {"type": "literal", "value": "foobar"},
+    "index": {"type": "literal", "value": 4}
 }
 >> "b"
 ```
@@ -875,8 +969,9 @@ An _indexing expression_ extracts the value at a specific index from a collectio
 ```
 # Indexing strings - wrong index type
 {
-    "indexing": {"literal": "foobar"},
-    "at": {"literal": "baz"}
+    "type": "index",
+    "collection": {"type": "literal", "value": "foobar"},
+    "index": {"type": "literal", "value": "baz"}
 }
 !! wrongType {"value": "baz", "expectedType": "number"}
 ```
@@ -884,13 +979,15 @@ An _indexing expression_ extracts the value at a specific index from a collectio
 ```
 # Indexing arrays
 {
-    "indexing": {
-        "array": [
-            {"literal": "foo"},
-            {"literal": "bar"}
+    "type": "index",
+    "collection": {
+        "type": "array",
+        "elements": [
+            {"type": "literal", "value": "foo"},
+            {"type": "literal", "value": "bar"}
         ]
     },
-    "at": {"literal": 2}
+    "index": {"type": "literal", "value": 2}
 }
 >> "bar"
 ```
@@ -898,13 +995,15 @@ An _indexing expression_ extracts the value at a specific index from a collectio
 ```
 # Indexing arrays - index from end
 {
-    "indexing": {
-        "array": [
-            {"literal": "foo"},
-            {"literal": "bar"}
+    "type": "index",
+    "collection": {
+        "type": "array",
+        "elements": [
+            {"type": "literal", "value": "foo"},
+            {"type": "literal", "value": "bar"}
         ]
     },
-    "at": {"literal": -2}
+    "index": {"type": "literal", "value": -2}
 }
 >> "foo"
 ```
@@ -912,13 +1011,15 @@ An _indexing expression_ extracts the value at a specific index from a collectio
 ```
 # Indexing arrays - wrong index type
 {
-    "indexing": {
-        "array": [
-            {"literal": "foo"},
-            {"literal": "bar"}
+    "type": "index",
+    "collection": {
+        "type": "array",
+        "elements": [
+            {"type": "literal", "value": "foo"},
+            {"type": "literal", "value": "bar"}
         ]
     },
-    "at": {"literal": "baz"}
+    "index": {"type": "literal", "value": "baz"}
 }
 !! wrongType {"value": "baz", "expectedType": "number"}
 ```
@@ -926,13 +1027,15 @@ An _indexing expression_ extracts the value at a specific index from a collectio
 ```
 # Indexing arrays - index less than minus length
 {
-    "indexing": {
-        "array": [
-            {"literal": "foo"},
-            {"literal": "bar"}
+    "type": "index",
+    "collection": {
+        "type": "array",
+        "elements": [
+            {"type": "literal", "value": "foo"},
+            {"type": "literal", "value": "bar"}
         ]
     },
-    "at": {"literal": -3}
+    "index": {"type": "literal", "value": -3}
 }
 !! indexOutOfBounds {"value": ["foo", "bar"], "length": 2, "index": -3}
 ```
@@ -940,13 +1043,15 @@ An _indexing expression_ extracts the value at a specific index from a collectio
 ```
 # Indexing arrays - index 0
 {
-    "indexing": {
-        "array": [
-            {"literal": "foo"},
-            {"literal": "bar"}
+    "type": "index",
+    "collection": {
+        "type": "array",
+        "elements": [
+            {"type": "literal", "value": "foo"},
+            {"type": "literal", "value": "bar"}
         ]
     },
-    "at": {"literal": 0}
+    "index": {"type": "literal", "value": 0}
 }
 !! indexOutOfBounds {"value": ["foo", "bar"], "length": 2, "index": 0}
 ```
@@ -954,13 +1059,15 @@ An _indexing expression_ extracts the value at a specific index from a collectio
 ```
 # Indexing arrays - index greater than length
 {
-    "indexing": {
-        "array": [
-            {"literal": "foo"},
-            {"literal": "bar"}
+    "type": "index",
+    "collection": {
+        "type": "array",
+        "elements": [
+            {"type": "literal", "value": "foo"},
+            {"type": "literal", "value": "bar"}
         ]
     },
-    "at": {"literal": 3}
+    "index": {"type": "literal", "value": 3}
 }
 !! indexOutOfBounds {"value": ["foo", "bar"], "length": 2, "index": 3}
 ```
@@ -968,13 +1075,15 @@ An _indexing expression_ extracts the value at a specific index from a collectio
 ```
 # Indexing objects
 {
-    "indexing": {
-        "object": [
-            ["foo", {"literal": "bar"}],
-            ["spam", {"literal": "eggs"}]
+    "type": "index",
+    "collection": {
+        "type": "object",
+        "entries": [
+            ["foo", {"type": "literal", "value": "bar"}],
+            ["spam", {"type": "literal", "value": "eggs"}]
         ]
     },
-    "at": {"literal": "spam"}
+    "index": {"type": "literal", "value": "spam"}
 }
 >> "eggs"
 ```
@@ -982,13 +1091,15 @@ An _indexing expression_ extracts the value at a specific index from a collectio
 ```
 # Indexing objects - wrong index type
 {
-    "indexing": {
-        "object": [
-            ["foo", {"literal": "bar"}],
-            ["spam", {"literal": "eggs"}]
+    "type": "index",
+    "collection": {
+        "type": "object",
+        "entries": [
+            ["foo", {"type": "literal", "value": "bar"}],
+            ["spam", {"type": "literal", "value": "eggs"}]
         ]
     },
-    "at": {"literal": 42}
+    "index": {"type": "literal", "value": 42}
 }
 !! wrongType {"value": 42, "expectedType": "string"}
 ```
@@ -996,13 +1107,15 @@ An _indexing expression_ extracts the value at a specific index from a collectio
 ```
 # Indexing objects - property not in object
 {
-    "indexing": {
-        "object": [
-            ["foo", {"literal": "bar"}],
-            ["spam", {"literal": "eggs"}]
+    "type": "index",
+    "collection": {
+        "type": "object",
+        "entries": [
+            ["foo", {"type": "literal", "value": "bar"}],
+            ["spam", {"type": "literal", "value": "eggs"}]
         ]
     },
-    "at": {"literal": "baz"}
+    "index": {"type": "literal", "value": "baz"}
 }
 !! missingProperty {"value": {"foo": "bar", "spam": "eggs"}, "key": "baz"}
 ```
@@ -1010,8 +1123,9 @@ An _indexing expression_ extracts the value at a specific index from a collectio
 ```
 # Indexing something non-indexable
 {
-    "indexing": {"literal": 42},
-    "at": {"literal": 2}
+    "type": "index",
+    "collection": {"type": "literal", "value": 42},
+    "index": {"type": "literal", "value": 2}
 }
 !! wrongType {"value": 42, "expectedType": {"either": ["sequence", "object"]}}
 ```
@@ -1023,16 +1137,18 @@ If an expression throws an error, that error propagates outward through enclosin
 ```
 # Error short-circuiting through function calls
 {
-    "calling": {
-        "given": {},
-        "result": {"literal": 42}
+    "type": "call",
+    "callee": {
+        "type": "function",
+        "body": {"type": "literal", "value": 42}
     },
     "args": [
         {
+            "type": "block",
             "defs": [
-                [{"arrayPattern": ["foo"]}, {"array": []}]
+                [{"arrayPattern": ["foo"]}, {"type": "array", "elements": []}]
             ],
-            "result": {"name": "foo"}
+            "result": {"type": "name", "name": "foo"}
         }
     ]
 }
@@ -1042,12 +1158,14 @@ If an expression throws an error, that error propagates outward through enclosin
 ```
 # Error short-circuiting through arrays
 {
-    "array": [
+    "type": "array",
+    "elements": [
         {
+            "type": "block",
             "defs": [
-                [{"arrayPattern": ["foo"]}, {"array": []}]
+                [{"arrayPattern": ["foo"]}, {"type": "array", "elements": []}]
             ],
-            "result": {"name": "foo"}
+            "result": {"type": "name", "name": "foo"}
         }
     ]
 }
@@ -1057,14 +1175,16 @@ If an expression throws an error, that error propagates outward through enclosin
 ```
 # Error short-circuiting through objects
 {
-    "object": [
+    "type": "object",
+    "entries": [
         [
             "foo",
             {
+                "type": "block",
                 "defs": [
-                    [{"arrayPattern": ["foo"]}, {"array": []}]
+                    [{"arrayPattern": ["foo"]}, {"type": "array", "elements": []}]
                 ],
-                "result": {"name": "foo"}
+                "result": {"type": "name", "name": "foo"}
             }
         ]
     ]
@@ -1072,22 +1192,25 @@ If an expression throws an error, that error propagates outward through enclosin
 !! missingElement {"value": [], "name": "foo"}
 ```
 
-But if the error encounters a _catching expression_, the catching expression returns the error as a value, stopping its propagation. A catching expression has the form `{"catching": <expression>}`.
+But if the error encounters a _catch expression_, the catch expression returns the error as a value, stopping its propagation. A catch expression has the form `{"type": "catch", "expression": <expression>}`.
 
 ```
 # Error catching
 {
-    "calling": {
-        "given": {},
-        "result": {"literal": 42}
+    "type": "call",
+    "callee": {
+        "type": "function",
+        "body": {"type": "literal", "value": 42}
     },
     "args": [
         {
-            "catching": {
+            "type": "catch",
+            "expression": {
+                "type": "block",
                 "defs": [
-                    [{"arrayPattern": ["foo"]}, {"array": []}]
+                    [{"arrayPattern": ["foo"]}, {"type": "array", "elements": []}]
                 ],
-                "result": {"name": "foo"}
+                "result": {"type": "name", "name": "foo"}
             }
         }
     ]
