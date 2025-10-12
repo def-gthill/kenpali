@@ -238,7 +238,7 @@ An _array expression_ has the form `{"type": "array", "elements": <elements>}`. 
 >> [42]
 ```
 
-Instead of an expression, any of the array's elements can be a _spread_ instead. A spread has the form `{"spread": <value>}`, where `<value>` is any expression. The `<value>` expression is expected to evaluate to a sequence, whose elements are added to the array.
+Instead of an expression, any of the array's elements can be a _spread_ instead. A spread has the form `{"type": "spread", "value": <value>}`, where `<value>` is any expression. The `<value>` expression is expected to evaluate to a sequence, whose elements are added to the array.
 
 ```
 # Array with spread
@@ -247,7 +247,8 @@ Instead of an expression, any of the array's elements can be a _spread_ instead.
     "elements": [
         {"type": "literal", "value": 42},
         {
-            "spread": {
+            "type": "spread",
+            "value": {
                 "type": "array",
                 "elements": [
                     {"type": "literal", "value": 1},
@@ -262,7 +263,7 @@ Instead of an expression, any of the array's elements can be a _spread_ instead.
 >> [42, 1, 2, 3, 97]
 ```
 
-When defining [names](#names), an _array pattern_ can be used to extract individual elements from an array and assign them to names. An array pattern has the form `{"arrayPattern": <names>}`, where `<names>` is an array of name patterns.
+When defining [names](#names), an _array pattern_ can be used to extract individual elements from an array and assign them to names. An array pattern has the form `{"type": "arrayPattern", "names": <names>}`, where `<names>` is an array of name patterns.
 
 ```
 # Array destructuring
@@ -270,7 +271,7 @@ When defining [names](#names), an _array pattern_ can be used to extract individ
     "type": "block",
     "defs": [
         [
-            {"arrayPattern": ["foo", "bar"]},
+            {"type": "arrayPattern", "names": ["foo", "bar"]},
             {
                 "type": "array",
                 "elements": [
@@ -292,7 +293,43 @@ When defining [names](#names), an _array pattern_ can be used to extract individ
 >> [97, 97, 42]
 ```
 
-One of the elements of an array pattern can be a _rest pattern_, of the form `{"rest": <name>}`. The `<name>` is bound to an array containing whatever elements are left over after the other name patterns have taken theirs.
+Wrapping one of the names in an _optional pattern_ allows the assignment to work even if there aren't enough elements in the array. An optional pattern has the form `{"type": "optional", "name": <name>, "defaultValue": <defaultValue>}`, where `<name>` is a name pattern and `<defaultValue>` is an expression to evaludate if the array doesn't have enough elements to provide a value for the name.
+
+```
+# Array destructuring with optional
+{
+    "type": "block",
+    "defs": [
+        [
+            {
+                "type": "arrayPattern",
+                "names": [
+                    "foo",
+                    {
+                        "type": "optional",
+                        "name": "bar", "defaultValue": {"type": "literal", "value": 73}
+                    }
+                ]
+            },
+            {
+                "type": "array",
+                "elements": [{"type": "literal", "value": 42}]
+            }
+        ]
+    ],
+    "result": {
+        "type": "array",
+        "elements": [
+            {"type": "name", "name": "bar"},
+            {"type": "name", "name": "bar"},
+            {"type": "name", "name": "foo"}
+        ]
+    }
+}
+>> [73, 73, 42]
+```
+
+One of the elements of an array pattern can be a _rest pattern_, of the form `{"type": "rest", "name": <name>}`. The `<name>` is bound to an array containing whatever elements are left over after the other name patterns have taken theirs.
 
 ```
 # Array destructuring with rest
@@ -300,7 +337,7 @@ One of the elements of an array pattern can be a _rest pattern_, of the form `{"
     "type": "block",
     "defs": [
         [
-            {"arrayPattern": ["foo", {"rest": "bar"}, "baz"]},
+            {"type": "arrayPattern", "names": ["foo", {"type": "rest", "name": "bar"}, "baz"]},
             {
                 "type": "array",
                 "elements": [
@@ -407,7 +444,7 @@ An _object expression_ has the form `{"type": "object", "entries": <entries>}`. 
 >> {foo: 42}
 ```
 
-Instead of a name-value pair, any of the object's elements can be a _spread_ instead. A spread has the form `{"spread": <value>}`, where `<value>` is any expression. The `<value>` expression is expected to evaluate to an object, whose entries are added to the containing object.
+Instead of a name-value pair, any of the object's elements can be a _spread_ instead. A spread has the form `{"type": "spread", "value": <value>}`, where `<value>` is any expression. The `<value>` expression is expected to evaluate to an object, whose entries are added to the containing object.
 
 ```
 # Object with spread
@@ -416,7 +453,8 @@ Instead of a name-value pair, any of the object's elements can be a _spread_ ins
     "entries": [
         ["answer", {"type": "literal", "value": 42}],
         {
-            "spread": {
+            "type": "spread",
+            "value": {
                 "type": "object",
                 "entries": [
                     ["bar", {"type": "literal", "value": 1}],
@@ -430,7 +468,7 @@ Instead of a name-value pair, any of the object's elements can be a _spread_ ins
 >> {answer: 42, bar: 1, baz: 2, question: 69}
 ```
 
-When defining [names](#names), an _object pattern_ can be used to extract property values from an object and assign them to names. An object pattern has the form `{"objectPattern": <names>}`, where `<names>` is an array of property names to extract.
+When defining [names](#names), an _object pattern_ can be used to extract property values from an object and assign them to names. An object pattern has the form `{"type": "objectPattern", "names": <names>}`, where `<names>` is an array of property names to extract.
 
 ```
 # Object destructuring
@@ -438,7 +476,7 @@ When defining [names](#names), an _object pattern_ can be used to extract proper
     "type": "block",
     "defs": [
         [
-            {"objectPattern": ["foo", "bar"]},
+            {"type": "objectPattern", "names": ["foo", "bar"]},
             {
                 "type": "object",
                 "entries": [
@@ -460,7 +498,7 @@ When defining [names](#names), an _object pattern_ can be used to extract proper
 >> [97, 97, 42]
 ```
 
-One of the elements of an object pattern can be a _rest pattern_, of the form `{"rest": <name>}`. The `<name>` is bound to an object containing whatever properties aren't mentioned explicitly in the object pattern.
+One of the elements of an object pattern can be a _rest pattern_, of the form `{"type": "rest", "name": <name>}`. The `<name>` is bound to an object containing whatever properties aren't mentioned explicitly in the object pattern.
 
 ```
 # Object destructuring with rest
@@ -468,7 +506,7 @@ One of the elements of an object pattern can be a _rest pattern_, of the form `{
     "type": "block",
     "defs": [
         [
-            {"objectPattern": ["bar", {"rest": "others"}]},
+            {"type": "objectPattern", "names": ["bar", {"type": "rest", "name": "others"}]},
             {
                 "type": "object",
                 "entries": [
@@ -499,7 +537,8 @@ Any of an object pattern's elements can be an _alias pattern_, of the form `{"na
     "defs": [
         [
             {
-                "objectPattern": [
+                "type": "objectPattern",
+                "names": [
                     {"name": "spam", "property": "foo"},
                     {"name": "eggs", "property": "bar"}
                 ]
@@ -582,6 +621,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
                 "type": "function",
                 "params": [
                     {
+                        "type": "optional",
                         "name": "x",
                         "defaultValue": {"type": "literal", "value": 73}
                     }
@@ -606,6 +646,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
                 "type": "function",
                 "params": [
                     {
+                        "type": "optional",
                         "name": "x",
                         "defaultValue": {"type": "literal", "value": 73}
                     }
@@ -631,6 +672,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
                 "type": "function",
                 "params": [
                     {
+                        "type": "optional",
                         "name": "x",
                         "defaultValue": {"type": "name", "name": "foo"}
                     }
@@ -653,7 +695,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
             "foo",
             {
                 "type": "function",
-                "params": [{"rest": "args"}],
+                "params": [{"type": "rest", "name": "args"}],
                 "body": {"type": "name", "name": "args"}
             }
         ]
@@ -693,7 +735,8 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
         "callee": {"type": "name", "name": "foo"},
         "args": [
             {
-                "spread": {
+                "type": "spread",
+                "value": {
                     "type": "array",
                     "elements": [
                         {"type": "literal", "value": 42},
@@ -760,7 +803,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
             "foo",
             {
                 "type": "function",
-                "namedParams": [{"rest": "namedArgs"}],
+                "namedParams": [{"type": "rest", "name": "namedArgs"}],
                 "body": {"type": "name", "name": "namedArgs"}
             }
         ]
@@ -803,7 +846,8 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
         "callee": {"type": "name", "name": "foo"},
         "namedArgs": [
             {
-                "spread": {
+                "type": "spread",
+                "value": {
                     "type": "object",
                     "entries": [
                         ["bar", {"type": "literal", "value": 42}],
@@ -827,7 +871,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
             {
                 "type": "function",
                 "params": [
-                    {"arrayPattern": ["foo", "bar"]}
+                    {"type": "arrayPattern", "names": ["foo", "bar"]}
                 ],
                 "body": {
                     "type": "array",
@@ -1146,7 +1190,7 @@ If an expression throws an error, that error propagates outward through enclosin
         {
             "type": "block",
             "defs": [
-                [{"arrayPattern": ["foo"]}, {"type": "array", "elements": []}]
+                [{"type": "arrayPattern", "names": ["foo"]}, {"type": "array", "elements": []}]
             ],
             "result": {"type": "name", "name": "foo"}
         }
@@ -1163,7 +1207,7 @@ If an expression throws an error, that error propagates outward through enclosin
         {
             "type": "block",
             "defs": [
-                [{"arrayPattern": ["foo"]}, {"type": "array", "elements": []}]
+                [{"type": "arrayPattern", "names": ["foo"]}, {"type": "array", "elements": []}]
             ],
             "result": {"type": "name", "name": "foo"}
         }
@@ -1182,7 +1226,7 @@ If an expression throws an error, that error propagates outward through enclosin
             {
                 "type": "block",
                 "defs": [
-                    [{"arrayPattern": ["foo"]}, {"type": "array", "elements": []}]
+                    [{"type": "arrayPattern", "names": ["foo"]}, {"type": "array", "elements": []}]
                 ],
                 "result": {"type": "name", "name": "foo"}
             }
@@ -1208,7 +1252,7 @@ But if the error encounters a _catch expression_, the catch expression returns t
             "expression": {
                 "type": "block",
                 "defs": [
-                    [{"arrayPattern": ["foo"]}, {"type": "array", "elements": []}]
+                    [{"type": "arrayPattern", "names": ["foo"]}, {"type": "array", "elements": []}]
                 ],
                 "result": {"type": "name", "name": "foo"}
             }

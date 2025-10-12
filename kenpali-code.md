@@ -211,7 +211,7 @@ An array parses to an [array expression](/docs/json#arrays).
     "type": "array",
     "elements": [
         {"type": "literal", "value": 42},
-        {"spread": {"type": "name", "name": "foo"}},
+        {"type": "spread", "value": {"type": "name", "name": "foo"}},
         {"type": "literal", "value": 97}
     ]
 }
@@ -337,7 +337,7 @@ If the value is omitted, it defaults to reading the property name from the surro
     "type": "object",
     "entries": [
         [{"type": "literal", "value": "answer"}, {"type": "literal", "value": 42}],
-        {"spread": {"type": "name", "name": "foo"}},
+        {"type": "spread", "value": {"type": "name", "name": "foo"}},
         [{"type": "literal", "value": "question"}, {"type": "literal", "value": 69}]
     ]
 }
@@ -415,7 +415,7 @@ foo = (bar = 1; bar); foo
     "type": "block",
     "defs": [
         [
-            {"arrayPattern": ["foo", "bar"]},
+            {"type": "arrayPattern", "names": ["foo", "bar"]},
             {"type": "name", "name": "arr"}
         ]
     ],
@@ -431,9 +431,10 @@ foo = (bar = 1; bar); foo
     "defs": [
         [
             {
-                "arrayPattern": [
+                "type": "arrayPattern",
+                "names": [
                     "foo",
-                    {"arrayPattern": ["spam", "eggs"]}
+                    {"type": "arrayPattern", "names": ["spam", "eggs"]}
                 ]
             },
             {"type": "name", "name": "arr"}
@@ -450,7 +451,7 @@ foo = (bar = 1; bar); foo
     "type": "block",
     "defs": [
         [
-            {"objectPattern": ["foo", "bar"]},
+            {"type": "objectPattern", "names": ["foo", "bar"]},
             {"type": "name", "name": "obj"}
         ]
     ],
@@ -466,7 +467,8 @@ foo = (bar = 1; bar); foo
     "defs": [
         [
             {
-                "objectPattern": [
+                "type": "objectPattern",
+                "names": [
                     {"name": "spam", "property": "foo"},
                     {"name": "eggs", "property": "bar"}
                 ]
@@ -573,7 +575,11 @@ A function definition parses to a [function expression](/docs/json#functions).
     "type": "function",
     "params": [
         "x",
-        {"name": "y", "defaultValue": {"type": "literal", "value": 3}}
+        {
+            "type": "optional",
+            "name": "y",
+            "defaultValue": {"type": "literal", "value": 3}
+        }
     ],
     "body": {
         "type": "call",
@@ -588,7 +594,7 @@ A function definition parses to a [function expression](/docs/json#functions).
 (*args) => length(args)
 >> {
     "type": "function",
-    "params": [{"rest": "args"}],
+    "params": [{"type": "rest", "name": "args"}],
     "body": {
         "type": "call",
         "callee": {"type": "name", "name": "length"},
@@ -619,7 +625,11 @@ A function definition parses to a [function expression](/docs/json#functions).
     "type": "function",
     "params": ["x"],
     "namedParams": [
-        {"name": "y", "defaultValue": {"type": "literal", "value": 3}}
+        {
+            "type": "optional",
+            "name": "y",
+            "defaultValue": {"type": "literal", "value": 3}
+        }
     ],
     "body": {
         "type": "call",
@@ -634,7 +644,7 @@ A function definition parses to a [function expression](/docs/json#functions).
 (**namedArgs) => namedArgs
 >> {
     "type": "function",
-    "namedParams": [{"rest": "namedArgs"}],
+    "namedParams": [{"type": "rest", "name": "namedArgs"}],
     "body": {"type": "name", "name": "namedArgs"}
 }
 ```
@@ -660,7 +670,7 @@ A function definition parses to a [function expression](/docs/json#functions).
 >> {
     "type": "function",
     "params": [
-        {"arrayPattern": ["foo", "bar"]}
+        {"type": "arrayPattern", "names": ["foo", "bar"]}
     ],
     "body": {"type": "name", "name": "foo"}
 }
@@ -747,7 +757,7 @@ foo(*bar)
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "foo"},
-    "args": [{"spread": {"type": "name", "name": "bar"}}]
+    "args": [{"type": "spread", "value": {"type": "name", "name": "bar"}}]
 }
 ```
 
@@ -759,7 +769,7 @@ foo(1, *bar)
     "callee": {"type": "name", "name": "foo"},
     "args": [
         {"type": "literal", "value": 1},
-        {"spread": {"type": "name", "name": "bar"}}
+        {"type": "spread", "value": {"type": "name", "name": "bar"}}
     ]
 }
 ```
@@ -800,7 +810,7 @@ foo(**bar)
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "foo"},
-    "namedArgs": [{"spread": {"type": "name", "name": "bar"}}]
+    "namedArgs": [{"type": "spread", "value": {"type": "name", "name": "bar"}}]
 }
 ```
 
