@@ -239,8 +239,8 @@ An object parses to an [object expression](/docs/json#objects).
 >> {
     "type": "object",
     "entries": [
-        [{"type": "literal", "value": "foo"}, {"type": "literal", "value": "bar"}],
-        [{"type": "literal", "value": "spam"}, {"type": "literal", "value": "eggs"}]
+        ["foo", {"type": "literal", "value": "bar"}],
+        ["spam", {"type": "literal", "value": "eggs"}]
     ]
 }
 ```
@@ -253,8 +253,8 @@ If a key is a valid Kenpali name, the quotes can be omitted.
 >> {
     "type": "object",
     "entries": [
-        [{"type": "literal", "value": "foo"}, {"type": "literal", "value": "bar"}],
-        [{"type": "literal", "value": "spam"}, {"type": "literal", "value": "eggs"}]
+        ["foo", {"type": "literal", "value": "bar"}],
+        ["spam", {"type": "literal", "value": "eggs"}]
     ]
 }
 ```
@@ -280,8 +280,8 @@ If the value is omitted, it defaults to reading the property name from the surro
 >> {
     "type": "object",
     "entries": [
-        [{"type": "literal", "value": "foo"}, {"type": "name", "name": "foo"}],
-        [{"type": "literal", "value": "spam"}, {"type": "name", "name": "spam"}]
+        ["foo", {"type": "name", "name": "foo"}],
+        ["spam", {"type": "name", "name": "spam"}]
     ]
 }
 ```
@@ -292,21 +292,9 @@ If the value is omitted, it defaults to reading the property name from the surro
 >> {
     "type": "object",
     "entries": [
-        [
-            {"type": "literal", "value": "foo"},
-            {"type": "literal", "value": null}
-        ],
-        [
-            {"type": "literal", "value": "bar"},
-            {"type": "literal", "value": 1}
-        ],
-        [
-            {"type": "literal", "value": "baz"},
-            {
-                "type": "array",
-                "elements": [{"type": "literal", "value": 2}]
-            }
-        ]
+        ["foo", {"type": "literal", "value": null}],
+        ["bar", {"type": "literal", "value": 1}],
+        ["baz", {"type": "array", "elements": [{"type": "literal", "value": 2}]}]
     ]
 }
 ```
@@ -318,11 +306,11 @@ If the value is omitted, it defaults to reading the property name from the surro
     "type": "object",
     "entries": [
         [
-            {"type": "literal", "value": "foo"},
+            "foo",
             {
                 "type": "object",
                 "entries": [
-                    [{"type": "literal", "value": "bar"}, {"type": "literal", "value": "baz"}]
+                    ["bar", {"type": "literal", "value": "baz"}]
                 ]
             }
         ]
@@ -336,9 +324,9 @@ If the value is omitted, it defaults to reading the property name from the surro
 >> {
     "type": "object",
     "entries": [
-        [{"type": "literal", "value": "answer"}, {"type": "literal", "value": 42}],
+        ["answer", {"type": "literal", "value": 42}],
         {"type": "spread", "value": {"type": "name", "name": "foo"}},
-        [{"type": "literal", "value": "question"}, {"type": "literal", "value": 69}]
+        ["question", {"type": "literal", "value": 69}]
     ]
 }
 ```
