@@ -439,7 +439,7 @@ foo = (bar = 1; bar); foo
     "type": "block",
     "defs": [
         [
-            {"type": "objectPattern", "names": ["foo", "bar"]},
+            {"type": "objectPattern", "entries": [["foo", "foo"], ["bar", "bar"]]},
             {"type": "name", "name": "obj"}
         ]
     ],
@@ -456,9 +456,9 @@ foo = (bar = 1; bar); foo
         [
             {
                 "type": "objectPattern",
-                "names": [
-                    {"name": "spam", "property": "foo"},
-                    {"name": "eggs", "property": "bar"}
+                "entries": [
+                    ["foo", "spam"],
+                    ["bar", "eggs"]
                 ]
             },
             {"type": "name", "name": "obj"}
@@ -597,7 +597,7 @@ A function definition parses to a [function expression](/docs/json#functions).
 >> {
     "type": "function",
     "params": ["x"],
-    "namedParams": ["y"],
+    "namedParams": [["y", "y"]],
     "body": {
         "type": "call",
         "callee": {"type": "name", "name": "plus"},
@@ -612,13 +612,14 @@ A function definition parses to a [function expression](/docs/json#functions).
 >> {
     "type": "function",
     "params": ["x"],
-    "namedParams": [
+    "namedParams": [[
+        "y",
         {
             "type": "optional",
             "name": "y",
             "defaultValue": {"type": "literal", "value": 3}
         }
-    ],
+    ]],
     "body": {
         "type": "call",
         "callee": {"type": "name", "name": "plus"},
@@ -643,7 +644,7 @@ A function definition parses to a [function expression](/docs/json#functions).
 >> {
     "type": "function",
     "params": ["x"],
-    "namedParams": [{"name": "z", "property": "y"}],
+    "namedParams": [["y", "z"]],
     "body": {
         "type": "call",
         "callee": {"type": "name", "name": "plus"},

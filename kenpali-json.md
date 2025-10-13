@@ -468,7 +468,7 @@ Instead of a name-value pair, any of the object's elements can be a _spread_ ins
 >> {answer: 42, bar: 1, baz: 2, question: 69}
 ```
 
-When defining [names](#names), an _object pattern_ can be used to extract property values from an object and assign them to names. An object pattern has the form `{"type": "objectPattern", "names": <names>}`, where `<names>` is an array of property names to extract.
+When defining [names](#names), an _object pattern_ can be used to extract property values from an object and assign them to names. An object pattern has the form `{"type": "objectPattern", "entries": <entries>}`. Each entry is a pair whose first element is the property name to extract, and whose second element is a name pattern to bind the property value to.
 
 ```
 # Object destructuring
@@ -476,7 +476,7 @@ When defining [names](#names), an _object pattern_ can be used to extract proper
     "type": "block",
     "defs": [
         [
-            {"type": "objectPattern", "names": ["foo", "bar"]},
+            {"type": "objectPattern", "entries": [["foo", "foo"], ["bar", "qux"]]},
             {
                 "type": "object",
                 "entries": [
@@ -491,14 +491,14 @@ When defining [names](#names), an _object pattern_ can be used to extract proper
         "elements": [
             {"type": "name", "name": "foo"},
             {"type": "name", "name": "foo"},
-            {"type": "name", "name": "bar"}
+            {"type": "name", "name": "qux"}
         ]
     }
 }
 >> [97, 97, 42]
 ```
 
-One of the elements of an object pattern can be a _rest pattern_, of the form `{"type": "rest", "name": <name>}`. The `<name>` is bound to an object containing whatever properties aren't mentioned explicitly in the object pattern.
+One of the entries of an object pattern can be a _rest pattern_, of the form `{"type": "rest", "name": <name>}`. The `<name>` is bound to an object containing whatever properties aren't mentioned explicitly in the object pattern.
 
 ```
 # Object destructuring with rest
@@ -506,7 +506,7 @@ One of the elements of an object pattern can be a _rest pattern_, of the form `{
     "type": "block",
     "defs": [
         [
-            {"type": "objectPattern", "names": ["bar", {"type": "rest", "name": "others"}]},
+            {"type": "objectPattern", "entries": [["bar", "bar"], {"type": "rest", "name": "others"}]},
             {
                 "type": "object",
                 "entries": [
@@ -528,45 +528,9 @@ One of the elements of an object pattern can be a _rest pattern_, of the form `{
 >> [42, {baz: 216, foo: 97}]
 ```
 
-Any of an object pattern's elements can be an _alias pattern_, of the form `{"name": <pattern>, "property": <property-name>}`. The property `<property-name>` is extracted and bound to `<pattern>`, which can be any name pattern.
-
-```
-# Object destructuring with aliases
-{
-    "type": "block",
-    "defs": [
-        [
-            {
-                "type": "objectPattern",
-                "names": [
-                    {"name": "spam", "property": "foo"},
-                    {"name": "eggs", "property": "bar"}
-                ]
-            },
-            {
-                "type": "object",
-                "entries": [
-                    ["foo", {"type": "literal", "value": 42}],
-                    ["bar", {"type": "literal", "value": 97}]
-                ]
-            }
-        ]
-    ],
-    "result": {
-        "type": "array",
-        "elements": [
-            {"type": "name", "name": "eggs"},
-            {"type": "name", "name": "eggs"},
-            {"type": "name", "name": "spam"}
-        ]
-    }
-}
->> [97, 97, 42]
-```
-
 ## Defining and Calling Functions|functions
 
-Functions are defined using a _function expression_, which has the form `{"type": "function", "params": <pos-param-spec>, "namedParams": <named-param-spec>, "body": <body>}`. Both `<pos-param-spec>` and `<named-param-spec>` are optional. The `<pos-param-spec>` indicates the positional parameters the function accepts, with the same format as the value in an [array pattern](#arrays); the `<named-param-spec>` indicates the named parameters the function accepts, with the same format as the value in an [object pattern](#objects). The `<body>` can be any expression, and it defines what the function returns. It can reference the parameters as if they were names defined in the function's scope.
+Functions are defined using a _function expression_, which has the form `{"type": "function", "params": <pos-param-spec>, "namedParams": <named-param-spec>, "body": <body>}`. Both `<pos-param-spec>` and `<named-param-spec>` are optional. The `<pos-param-spec>` indicates the positional parameters the function accepts, with the same format as the `names` in an [array pattern](#arrays); the `<named-param-spec>` indicates the named parameters the function accepts, with the same format as the `entries` in an [object pattern](#objects). The `<body>` can be any expression, and it defines what the function returns. It can reference the parameters as if they were names defined in the function's scope.
 
 Functions are called using a _call expression_, which has the form `{"type": "call", "callee": <callee>, "args": <pos-arg-spec>, "namedArgs": <named-arg-spec>}`. Both `args` and `namedArgs` are optional. The `<callee>` must be an expression, and its result is the function to call. The `<pos-arg-spec>` indicates the positional arguments to pass to the function, with the same format as the value in an [array expression](#arrays); the `<named-arg-spec>` indicates the named arguments to pass to the function, with the same format as the value in an [object expression](#objects).
 
@@ -755,7 +719,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
 {
     "type": "block",
     "defs": [
-        ["foo", {"type": "function", "namedParams": ["x"], "body": {"type": "name", "name": "x"}}]
+        ["foo", {"type": "function", "namedParams": [["x", "x"]], "body": {"type": "name", "name": "x"}}]
     ],
     "result": {
         "type": "call",
@@ -771,7 +735,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
 {
     "type": "block",
     "defs": [
-        ["foo", {"type": "function", "namedParams": ["x"], "body": {"type": "name", "name": "x"}}]
+        ["foo", {"type": "function", "namedParams": [["x", "x"]], "body": {"type": "name", "name": "x"}}]
     ],
     "result": {"type": "call", "callee": {"type": "name", "name": "foo"}}
 }
@@ -783,7 +747,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
 {
     "type": "block",
     "defs": [
-        ["foo", {"type": "function", "namedParams": ["x"], "body": {"type": "name", "name": "x"}}]
+        ["foo", {"type": "function", "namedParams": [["x", "x"]], "body": {"type": "name", "name": "x"}}]
     ],
     "result": {
         "type": "call",
@@ -829,7 +793,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
             "foo",
             {
                 "type": "function",
-                "namedParams": ["bar", "baz"],
+                "namedParams": [["bar", "bar"], ["baz", "baz"]],
                 "body": {
                     "type": "array",
                     "elements": [
