@@ -759,6 +759,39 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
 ```
 
 ```
+# Explicit literal named argument
+{
+    "type": "block",
+    "defs": [
+        ["foo", {"type": "function", "namedParams": [["x", "x"]], "body": {"type": "name", "name": "x"}}]
+    ],
+    "result": {
+        "type": "call",
+        "callee": {"type": "name", "name": "foo"},
+        "namedArgs": [[{"type": "literal", "value": "x"}, {"type": "literal", "value": 42}]]
+    }
+}
+>> 42
+```
+
+```
+# Expression named argument
+{
+    "type": "block",
+    "defs": [
+        ["foo", {"type": "function", "namedParams": [["x", "x"]], "body": {"type": "name", "name": "x"}}],
+        ["key", {"type": "literal", "value": "x"}]
+    ],
+    "result": {
+        "type": "call",
+        "callee": {"type": "name", "name": "foo"},
+        "namedArgs": [[{"type": "name", "name": "key"}, {"type": "literal", "value": 42}]]
+    }
+}
+>> 42
+```
+
+```
 # Named rest parameter
 {
     "type": "block",

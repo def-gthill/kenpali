@@ -784,6 +784,26 @@ foo(bar: 1, baz: 2)
 ```
 
 ```
+# Named argument with literal name
+foo("bar": 1)
+>> {
+    "type": "call",
+    "callee": {"type": "name", "name": "foo"},
+    "namedArgs": [["bar", {"type": "literal", "value": 1}]]
+}
+```
+
+```
+# Named argument with expression name
+foo((bar): 1)
+>> {
+    "type": "call",
+    "callee": {"type": "name", "name": "foo"},
+    "namedArgs": [[{"type": "name", "name": "bar"}, {"type": "literal", "value": 1}]]
+}
+```
+
+```
 # Named arguments from names
 foo(bar:, baz:)
 >> {
