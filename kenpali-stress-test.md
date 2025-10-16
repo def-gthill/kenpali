@@ -102,6 +102,14 @@ foo
 ```
 
 ```
+# Object destructure with a dynamic key
+key = "foo";
+{(key): bar} = {foo: 42};
+bar
+>> 42
+```
+
+```
 # Immediate property access on an object
 {foo: 42, bar: 97}.foo
 >> 42
