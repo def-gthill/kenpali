@@ -530,9 +530,9 @@ One of the entries of an object pattern can be a _rest pattern_, of the form `{"
 
 ## Defining and Calling Functions|functions
 
-Functions are defined using a _function expression_, which has the form `{"type": "function", "params": <pos-param-spec>, "namedParams": <named-param-spec>, "body": <body>}`. Both `<pos-param-spec>` and `<named-param-spec>` are optional. The `<pos-param-spec>` indicates the positional parameters the function accepts, with the same format as the `names` in an [array pattern](#arrays); the `<named-param-spec>` indicates the named parameters the function accepts, with the same format as the `entries` in an [object pattern](#objects). The `<body>` can be any expression, and it defines what the function returns. It can reference the parameters as if they were names defined in the function's scope.
+Functions are defined using a _function expression_, which has the form `{"type": "function", "posParams": <pos-param-spec>, "namedParams": <named-param-spec>, "body": <body>}`. Both `<pos-param-spec>` and `<named-param-spec>` are optional. The `<pos-param-spec>` indicates the positional parameters the function accepts, with the same format as the `names` in an [array pattern](#arrays); the `<named-param-spec>` indicates the named parameters the function accepts, with the same format as the `entries` in an [object pattern](#objects). The `<body>` can be any expression, and it defines what the function returns. It can reference the parameters as if they were names defined in the function's scope.
 
-Functions are called using a _call expression_, which has the form `{"type": "call", "callee": <callee>, "args": <pos-arg-spec>, "namedArgs": <named-arg-spec>}`. Both `args` and `namedArgs` are optional. The `<callee>` must be an expression, and its result is the function to call. The `<pos-arg-spec>` indicates the positional arguments to pass to the function, with the same format as the value in an [array expression](#arrays); the `<named-arg-spec>` indicates the named arguments to pass to the function, with the same format as the value in an [object expression](#objects).
+Functions are called using a _call expression_, which has the form `{"type": "call", "callee": <callee>, "posArgs": <pos-arg-spec>, "namedArgs": <named-arg-spec>}`. Both `posArgs` and `namedArgs` are optional. The `<callee>` must be an expression, and its result is the function to call. The `<pos-arg-spec>` indicates the positional arguments to pass to the function, with the same format as the value in an [array expression](#arrays); the `<named-arg-spec>` indicates the named arguments to pass to the function, with the same format as the value in an [object expression](#objects).
 
 ```
 # No parameters, no arguments
@@ -551,12 +551,12 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
 {
     "type": "block",
     "defs": [
-        ["foo", {"type": "function", "params": ["x"], "body": {"type": "name", "name": "x"}}]
+        ["foo", {"type": "function", "posParams": ["x"], "body": {"type": "name", "name": "x"}}]
     ],
     "result": {
         "type": "call",
         "callee": {"type": "name", "name": "foo"},
-        "args": [{"type": "literal", "value": 42}]
+        "posArgs": [{"type": "literal", "value": 42}]
     }
 }
 >> 42
@@ -567,7 +567,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
 {
     "type": "block",
     "defs": [
-        ["foo", {"type": "function", "params": ["x"], "body": {"type": "name", "name": "x"}}]
+        ["foo", {"type": "function", "posParams": ["x"], "body": {"type": "name", "name": "x"}}]
     ],
     "result": {"type": "call", "callee": {"type": "name", "name": "foo"}}
 }
@@ -583,7 +583,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
             "foo",
             {
                 "type": "function",
-                "params": [
+                "posParams": [
                     {
                         "type": "optional",
                         "name": "x",
@@ -594,7 +594,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
             }
         ]
     ],
-    "result": {"type": "call", "callee": {"type": "name", "name": "foo"}, "args": [{"type": "literal", "value": 42}]}
+    "result": {"type": "call", "callee": {"type": "name", "name": "foo"}, "posArgs": [{"type": "literal", "value": 42}]}
 }
 >> 42
 ```
@@ -608,7 +608,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
             "foo",
             {
                 "type": "function",
-                "params": [
+                "posParams": [
                     {
                         "type": "optional",
                         "name": "x",
@@ -634,7 +634,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
             "bar",
             {
                 "type": "function",
-                "params": [
+                "posParams": [
                     {
                         "type": "optional",
                         "name": "x",
@@ -659,7 +659,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
             "foo",
             {
                 "type": "function",
-                "params": [{"type": "rest", "name": "args"}],
+                "posParams": [{"type": "rest", "name": "args"}],
                 "body": {"type": "name", "name": "args"}
             }
         ]
@@ -667,7 +667,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
     "result": {
         "type": "call",
         "callee": {"type": "name", "name": "foo"},
-        "args": [{"type": "literal", "value": 42}, {"type": "literal", "value": 97}]
+        "posArgs": [{"type": "literal", "value": 42}, {"type": "literal", "value": 97}]
     }
 }
 >> [42, 97]
@@ -682,7 +682,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
             "foo",
             {
                 "type": "function",
-                "params": ["bar", "baz"],
+                "posParams": ["bar", "baz"],
                 "body": {
                     "type": "array",
                     "elements": [
@@ -697,7 +697,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
     "result": {
         "type": "call",
         "callee": {"type": "name", "name": "foo"},
-        "args": [
+        "posArgs": [
             {
                 "type": "spread",
                 "value": {
@@ -752,7 +752,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
     "result": {
         "type": "call",
         "callee": {"type": "name", "name": "foo"},
-        "args": [{"type": "literal", "value": 42}]
+        "posArgs": [{"type": "literal", "value": 42}]
     }
 }
 !! missingArgument {"name": "x"}
@@ -867,7 +867,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
             "foo",
             {
                 "type": "function",
-                "params": [
+                "posParams": [
                     {"type": "arrayPattern", "names": ["foo", "bar"]}
                 ],
                 "body": {
@@ -884,7 +884,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
     "result": {
         "type": "call",
         "callee": {"type": "name", "name": "foo"},
-        "args": [
+        "posArgs": [
             {
                 "type": "array",
                 "elements": [
@@ -919,7 +919,7 @@ A function can reference names defined in an enclosing scope.
             "foo",
             {
                 "type": "function",
-                "params": ["y"],
+                "posParams": ["y"],
                 "body": {
                     "type": "array",
                     "elements": [
@@ -930,8 +930,11 @@ A function can reference names defined in an enclosing scope.
             }
         ]
     ],
-    "result": {"type": "call", "callee": {"type": "name", "name": "foo"}, "args": [{"type": "literal", "value": 42}]}
-
+    "result": {
+        "type": "call",
+        "callee": {"type": "name", "name": "foo"},
+        "posArgs": [{"type": "literal", "value": 42}]
+    }
 }
 >> [73, 42]
 ```
@@ -951,7 +954,7 @@ A function can reference names that were in scope when the function was _defined
                 "defs": [["x", {"type": "literal", "value": 73}]],
                 "result": {
                     "type": "function",
-                    "params": ["y"],
+                    "posParams": ["y"],
                     "body": {
                         "type": "array",
                         "elements": [
@@ -963,7 +966,7 @@ A function can reference names that were in scope when the function was _defined
             }
         }
     },
-    "args": [{"type": "literal", "value": 42}]
+    "posArgs": [{"type": "literal", "value": 42}]
 }
 >> [73, 42]
 ```
@@ -977,7 +980,7 @@ On the other hand, names that are in scope when the function is called don't lea
     "defs": [
         [
             "leaky",
-            {"type": "function", "params": ["x"], "body": {"type": "name", "name": "intruder"}}
+            {"type": "function", "posParams": ["x"], "body": {"type": "name", "name": "intruder"}}
         ]
     ],
     "result": {
@@ -985,7 +988,11 @@ On the other hand, names that are in scope when the function is called don't lea
         "defs": [
             ["intruder", {"type": "literal", "value": 42}]
         ],
-        "result": {"type": "call", "callee": {"type": "name", "name": "leaky"}, "args": [{"type": "literal", "value": 73}]}
+        "result": {
+            "type": "call",
+            "callee": {"type": "name", "name": "leaky"},
+            "posArgs": [{"type": "literal", "value": 73}]
+        }
     }
 }
 !! nameNotDefined {"name": "intruder"}
@@ -1183,7 +1190,7 @@ If an expression throws an error, that error propagates outward through enclosin
         "type": "function",
         "body": {"type": "literal", "value": 42}
     },
-    "args": [
+    "posArgs": [
         {
             "type": "block",
             "defs": [
@@ -1243,7 +1250,7 @@ But if the error encounters a _catch expression_, the catch expression returns t
         "type": "function",
         "body": {"type": "literal", "value": 42}
     },
-    "args": [
+    "posArgs": [
         {
             "type": "catch",
             "expression": {

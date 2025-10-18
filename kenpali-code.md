@@ -547,11 +547,11 @@ A function definition parses to a [function expression](/docs/json#functions).
 (x) => plus(x, 3)
 >> {
     "type": "function",
-    "params": ["x"],
+    "posParams": ["x"],
     "body": {
         "type": "call",
         "callee": {"type": "name", "name": "plus"},
-        "args": [{"type": "name", "name": "x"}, {"type": "literal", "value": 3}]
+        "posArgs": [{"type": "name", "name": "x"}, {"type": "literal", "value": 3}]
     }
 }
 ```
@@ -561,7 +561,7 @@ A function definition parses to a [function expression](/docs/json#functions).
 (x, y = 3) => plus(x, y)
 >> {
     "type": "function",
-    "params": [
+    "posParams": [
         "x",
         {
             "type": "optional",
@@ -572,7 +572,7 @@ A function definition parses to a [function expression](/docs/json#functions).
     "body": {
         "type": "call",
         "callee": {"type": "name", "name": "plus"},
-        "args": [{"type": "name", "name": "x"}, {"type": "name", "name": "y"}]
+        "posArgs": [{"type": "name", "name": "x"}, {"type": "name", "name": "y"}]
     }
 }
 ```
@@ -582,11 +582,11 @@ A function definition parses to a [function expression](/docs/json#functions).
 (*args) => length(args)
 >> {
     "type": "function",
-    "params": [{"type": "rest", "name": "args"}],
+    "posParams": [{"type": "rest", "name": "args"}],
     "body": {
         "type": "call",
         "callee": {"type": "name", "name": "length"},
-        "args": [{"type": "name", "name": "args"}]
+        "posArgs": [{"type": "name", "name": "args"}]
     }
 }
 ```
@@ -596,12 +596,12 @@ A function definition parses to a [function expression](/docs/json#functions).
 (x, y:) => plus(x, y)
 >> {
     "type": "function",
-    "params": ["x"],
+    "posParams": ["x"],
     "namedParams": [["y", "y"]],
     "body": {
         "type": "call",
         "callee": {"type": "name", "name": "plus"},
-        "args": [{"type": "name", "name": "x"}, {"type": "name", "name": "y"}]
+        "posArgs": [{"type": "name", "name": "x"}, {"type": "name", "name": "y"}]
     }
 }
 ```
@@ -611,7 +611,7 @@ A function definition parses to a [function expression](/docs/json#functions).
 (x, y: = 3) => plus(x, y)
 >> {
     "type": "function",
-    "params": ["x"],
+    "posParams": ["x"],
     "namedParams": [[
         "y",
         {
@@ -623,7 +623,7 @@ A function definition parses to a [function expression](/docs/json#functions).
     "body": {
         "type": "call",
         "callee": {"type": "name", "name": "plus"},
-        "args": [{"type": "name", "name": "x"}, {"type": "name", "name": "y"}]
+        "posArgs": [{"type": "name", "name": "x"}, {"type": "name", "name": "y"}]
     }
 }
 ```
@@ -643,12 +643,12 @@ A function definition parses to a [function expression](/docs/json#functions).
 (x, y: z) => plus(x, z)
 >> {
     "type": "function",
-    "params": ["x"],
+    "posParams": ["x"],
     "namedParams": [["y", "z"]],
     "body": {
         "type": "call",
         "callee": {"type": "name", "name": "plus"},
-        "args": [{"type": "name", "name": "x"}, {"type": "name", "name": "z"}]
+        "posArgs": [{"type": "name", "name": "x"}, {"type": "name", "name": "z"}]
     }
 }
 ```
@@ -658,7 +658,7 @@ A function definition parses to a [function expression](/docs/json#functions).
 ([foo, bar]) => foo
 >> {
     "type": "function",
-    "params": [
+    "posParams": [
         {"type": "arrayPattern", "names": ["foo", "bar"]}
     ],
     "body": {"type": "name", "name": "foo"}
@@ -670,7 +670,7 @@ A function definition parses to a [function expression](/docs/json#functions).
 (x) => (y = plus(x, 3); y)
 >> {
     "type": "function",
-    "params": ["x"],
+    "posParams": ["x"],
     "body": {
         "type": "block",
         "defs": [
@@ -679,7 +679,7 @@ A function definition parses to a [function expression](/docs/json#functions).
                 {
                     "type": "call",
                     "callee": {"type": "name", "name": "plus"},
-                    "args": [{"type": "name", "name": "x"}, {"type": "literal", "value": 3}]
+                    "posArgs": [{"type": "name", "name": "x"}, {"type": "literal", "value": 3}]
                 }
             ]
         ],
@@ -726,7 +726,7 @@ foo(1)
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "foo"},
-    "args": [{"type": "literal", "value": 1}]
+    "posArgs": [{"type": "literal", "value": 1}]
 }
 ```
 
@@ -736,7 +736,7 @@ foo(1, 2)
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "foo"},
-    "args": [{"type": "literal", "value": 1}, {"type": "literal", "value": 2}]
+    "posArgs": [{"type": "literal", "value": 1}, {"type": "literal", "value": 2}]
 }
 ```
 
@@ -746,7 +746,7 @@ foo(*bar)
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "foo"},
-    "args": [{"type": "spread", "value": {"type": "name", "name": "bar"}}]
+    "posArgs": [{"type": "spread", "value": {"type": "name", "name": "bar"}}]
 }
 ```
 
@@ -756,7 +756,7 @@ foo(1, *bar)
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "foo"},
-    "args": [
+    "posArgs": [
         {"type": "literal", "value": 1},
         {"type": "spread", "value": {"type": "name", "name": "bar"}}
     ]
@@ -829,7 +829,7 @@ foo(1, 2, bar: 3, baz: 4)
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "foo"},
-    "args": [{"type": "literal", "value": 1}, {"type": "literal", "value": 2}],
+    "posArgs": [{"type": "literal", "value": 1}, {"type": "literal", "value": 2}],
     "namedArgs": [["bar", {"type": "literal", "value": 3}], ["baz", {"type": "literal", "value": 4}]]
 }
 ```
@@ -842,9 +842,9 @@ foo(x)(y)
     "callee": {
         "type": "call",
         "callee": {"type": "name", "name": "foo"},
-        "args": [{"type": "name", "name": "x"}]
+        "posArgs": [{"type": "name", "name": "x"}]
     },
-    "args": [{"type": "name", "name": "y"}]
+    "posArgs": [{"type": "name", "name": "y"}]
 }
 ```
 
@@ -858,7 +858,7 @@ Pipe and pipe-call steps are transformed into ordinary function calls, productin
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "foo"},
-    "args": [{"type": "literal", "value": 1}]
+    "posArgs": [{"type": "literal", "value": 1}]
 }
 ```
 
@@ -868,7 +868,7 @@ Pipe and pipe-call steps are transformed into ordinary function calls, productin
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "bar"},
-    "args": [{"type": "literal", "value": 1}, {"type": "literal", "value": 2}]
+    "posArgs": [{"type": "literal", "value": 1}, {"type": "literal", "value": 2}]
 }
 ```
 
@@ -878,7 +878,7 @@ Pipe and pipe-call steps are transformed into ordinary function calls, productin
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "bar"},
-    "args": [{"type": "literal", "value": 1}],
+    "posArgs": [{"type": "literal", "value": 1}],
     "namedArgs": [["foo", {"type": "literal", "value": 2}]]
 }
 ```
@@ -889,11 +889,11 @@ Pipe and pipe-call steps are transformed into ordinary function calls, productin
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "bar"},
-    "args": [
+    "posArgs": [
         {
             "type": "call",
             "callee": {"type": "name", "name": "foo"},
-            "args": [{"type": "literal", "value": 1}]
+            "posArgs": [{"type": "literal", "value": 1}]
         },
         {"type": "literal", "value": 2}
     ]
@@ -908,9 +908,9 @@ Pipe and pipe-call steps are transformed into ordinary function calls, productin
     "callee": {
         "type": "call",
         "callee": {"type": "name", "name": "bar"},
-        "args": [{"type": "literal", "value": 2}]
+        "posArgs": [{"type": "literal", "value": 2}]
     },
-    "args": [{"type": "literal", "value": 1}]
+    "posArgs": [{"type": "literal", "value": 1}]
 }
 ```
 
@@ -919,11 +919,11 @@ Pipe and pipe-call steps are transformed into ordinary function calls, productin
 (x) => x | plus(3)
 >> {
     "type": "function",
-    "params": ["x"],
+    "posParams": ["x"],
     "body": {
         "type": "call",
         "callee": {"type": "name", "name": "plus"},
-        "args": [{"type": "name", "name": "x"}, {"type": "literal", "value": 3}]
+        "posArgs": [{"type": "name", "name": "x"}, {"type": "literal", "value": 3}]
     }
 }
 ```
@@ -947,13 +947,13 @@ foo !
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "bar"},
-    "args": [
+    "posArgs": [
         {
             "type": "catch",
             "expression": {
                 "type": "call",
                 "callee": {"type": "name", "name": "foo"},
-                "args": [{"type": "literal", "value": 1}]
+                "posArgs": [{"type": "literal", "value": 1}]
             }
         }
     ]
@@ -989,7 +989,7 @@ Indexing steps parse to [index expressions](/docs/json#indexing).
         {
             "type": "call",
             "callee": {"type": "name", "name": "f"},
-            "args": [
+            "posArgs": [
                 {
                     "type": "index",
                     "collection": {"type": "name", "name": "x"},
@@ -1002,7 +1002,7 @@ Indexing steps parse to [index expressions](/docs/json#indexing).
             "collection": {
                 "type": "call",
                 "callee": {"type": "name", "name": "f"},
-                "args": [{"type": "name", "name": "x"}]
+                "posArgs": [{"type": "name", "name": "x"}]
             },
             "index": {"type": "literal", "value": 1}
         }
@@ -1020,7 +1020,7 @@ x | y.z
         "collection": {"type": "name", "name": "y"},
         "index": {"type": "literal", "value": "z"}
     },
-    "args": [{"type": "name", "name": "x"}]
+    "posArgs": [{"type": "name", "name": "x"}]
 }
 ```
 
@@ -1032,7 +1032,7 @@ x | y |.z
     "collection": {
         "type": "call",
         "callee": {"type": "name", "name": "y"},
-        "args": [{"type": "name", "name": "x"}]
+        "posArgs": [{"type": "name", "name": "x"}]
     },
     "index": {"type": "literal", "value": "z"}
 }
@@ -1074,15 +1074,15 @@ A _point-free pipeline_ is written as a pipeline missing the initial value. It p
 | foo | bar(2)
 >> {
     "type": "function",
-    "params": ["pipelineArg"],
+    "posParams": ["pipelineArg"],
     "body": {
         "type": "call",
         "callee": {"type": "name", "name": "bar"},
-        "args": [
+        "posArgs": [
             {
                 "type": "call",
                 "callee": {"type": "name", "name": "foo"},
-                "args": [{"type": "name", "name": "pipelineArg"}]
+                "posArgs": [{"type": "name", "name": "pipelineArg"}]
             },
             {"type": "literal", "value": 2}
         ]
