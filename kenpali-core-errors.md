@@ -1,6 +1,6 @@
 # Kenpali Core Error-Checking Specification
 
-All builtins must validate their arguments, and return appropriate error values if any arguments are invalid.
+All platform functions must validate their arguments, and return appropriate error values if any arguments are invalid.
 
 - If no argument is supplied for a non-optional parameter, return a `missingArgument` error.
 - If an argument of the wrong type is supplied, return a `wrongArgumentType` error.

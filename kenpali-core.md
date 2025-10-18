@@ -1,6 +1,6 @@
 # Kenpali Core Specification
 
-The Core functions must be available to any Kenpali program. Reference implementations for some of them in terms of the others are provided by `core.kpc`, enabling a complete implementation with fewer builtins.
+The Core functions must be available to any Kenpali program. Reference implementations for some of them in terms of the others are provided by `core.kpc`, enabling a complete implementation with fewer platform functions.
 
 ## Arithmetic|arithmetic
 
@@ -781,11 +781,10 @@ Returns:
     typeOf([1, 2, 3]),
     typeOf(1 | to(3)),
     typeOf({foo: 1, bar: 2}),
-    typeOf(typeOf),
     typeOf((x) => x),
     typeOf((1 @ 1)!),
 ]
->> ["null", "boolean", "boolean", "number", "string", "array", "stream", "object", "builtin", "given", "error"]
+>> ["null", "boolean", "boolean", "number", "string", "array", "stream", "object", "function", "error"]
 ```
 
 ### isNull|isNull
@@ -1001,7 +1000,7 @@ stream = 1 | to(4);
 ```
 
 ```
-# To string on givens
+# To string on functions
 foo = $ (
     bar = $ 42;
     $ bar
@@ -1136,39 +1135,9 @@ Returns:
 >> [false, false, false, false, false, false, false, true, false, false, false]
 ```
 
-### isBuiltin|isBuiltin
+### isFunction|isFunction
 
-Returns whether its argument is a builtin function, written in the platform language.
-
-Parameters:
-
-- `value` (_any_): The value to check.
-
-Returns:
-
-- (_boolean_): Whether `value` is a builtin function.
-
-```
-# Is builtin
-[
-    isBuiltin(null),
-    isBuiltin(false),
-    isBuiltin(true),
-    isBuiltin(42),
-    isBuiltin("foo"),
-    isBuiltin([1, 2, 3]),
-    isBuiltin(1 | to(3)),
-    isBuiltin({foo: 1, bar: 2}),
-    isBuiltin(typeOf),
-    isBuiltin((x) => x),
-    isBuiltin((1 @ 1)!),
-]
->> [false, false, false, false, false, false, false, false, true, false, false]
-```
-
-### isGiven|isGiven
-
-Returns whether its argument is a pure-Kenpali function.
+Returns whether its argument is a function.
 
 Parameters:
 
@@ -1176,24 +1145,24 @@ Parameters:
 
 Returns:
 
-- (_boolean_): Whether `value` is a pure-Kenpali function.
+- (_boolean_): Whether `value` is a function.
 
 ```
-# Is given
+# Is function
 [
-    isGiven(null),
-    isGiven(false),
-    isGiven(true),
-    isGiven(42),
-    isGiven("foo"),
-    isGiven([1, 2, 3]),
-    isGiven(1 | to(3)),
-    isGiven({foo: 1, bar: 2}),
-    isGiven(typeOf),
-    isGiven((x) => x),
-    isGiven((1 @ 1)!),
+    isFunction(null),
+    isFunction(false),
+    isFunction(true),
+    isFunction(42),
+    isFunction("foo"),
+    isFunction([1, 2, 3]),
+    isFunction(1 | to(3)),
+    isFunction({foo: 1, bar: 2}),
+    isFunction(typeOf),
+    isFunction((x) => x),
+    isFunction((1 @ 1)!),
 ]
->> [false, false, false, false, false, false, false, false, false, true, false]
+>> [false, false, false, false, false, false, false, false, true, true, false]
 ```
 
 ### isError|isError
@@ -1226,36 +1195,6 @@ Returns:
     isError((1 @ 1)!),
 ]
 >> [false, false, false, false, false, false, false, false, false, false, true]
-```
-
-### isFunction|isFunction
-
-Returns whether its argument is a function.
-
-Parameters:
-
-- `value` (_any_): The value to check.
-
-Returns:
-
-- (_boolean_): Whether `value` is a function.
-
-```
-# Is function
-[
-    isFunction(null),
-    isFunction(false),
-    isFunction(true),
-    isFunction(42),
-    isFunction("foo"),
-    isFunction([1, 2, 3]),
-    isFunction(1 | to(3)),
-    isFunction({foo: 1, bar: 2}),
-    isFunction(typeOf),
-    isFunction((x) => x),
-    isFunction((1 @ 1)!),
-]
->> [false, false, false, false, false, false, false, false, true, true, false]
 ```
 
 ### toFunction|toFunction
@@ -3379,7 +3318,7 @@ Kenpali is a dynamically typed language, but it does strict type checks at runti
 
 Values are checked against a _schema_. Valid schemas are:
 
-- A string representing the expected Kenpali type: one of `"null"`, `"boolean"`, `"number"`, `"string"`, `"array"`, `"stream"`, `"sequence"`, `"object",`, `"builtin"`, `"given"`, `"function"`, `"error"`, `"any"`.
+- A string representing the expected Kenpali type: one of `"null"`, `"boolean"`, `"number"`, `"string"`, `"array"`, `"stream"`, `"sequence"`, `"object",`, `"function"`, `"error"`, `"any"`.
 - An object of the form `{oneOf: [<values>]}`, which matches only the specified values.
 - An object of the form `{either: [<schemas>]}`, which matches a value if _at least one of_ the specified schemas matches it.
 - An object of the form `{type: <type>, ...}`. On its own, this is equivalent to a string schema, e.g. `{type: "number"}` matches the same values as `"number"`. But this format allows additional properties to narrow the range of accepted values:
@@ -3430,10 +3369,10 @@ Returns:
     {foo: 1, bar: 2} | matches("array"),
     {foo: 1, bar: 2} | matches("object"),
     typeOf | matches("object"),
-    typeOf | matches("builtin"),
-    ((x) => x) | matches("builtin"),
-    ((x) => x) | matches("given"),
-    (1 @ 1)! |  matches("given"),
+    typeOf | matches("function"),
+    ((x) => x) | matches("object"),
+    ((x) => x) | matches("function"),
+    (1 @ 1)! |  matches("function"),
     (1 @ 1)! | matches("error"),
     null | matches("error"),
 ]
