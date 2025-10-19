@@ -6,7 +6,7 @@
 # Destructuring an array with an object pattern
 {foo:, bar:} = [1, 2];
 foo
-!! wrongType {"value": [1, 2], "expectedType": "object"}
+!! wrongType {"value": [1, 2], "expectedType": "Object"}
 ```
 
 ```
@@ -91,7 +91,7 @@ after = stream | toArray;
 # Destructuring an object with an array pattern
 [foo, bar] = {foo: 42, bar: 97};
 foo
-!! wrongType {"value": {"foo": 42, "bar": 97}, "expectedType": {"either": ["array", "stream"]}}
+!! wrongType {"value": {"foo": 42, "bar": 97}, "expectedType": "either(Array, Stream)"}
 ```
 
 ```
@@ -228,7 +228,7 @@ set = [1, 2, 3, 4, 42] | newSet;
 ```
 # Error thrown after catching
 1 @ 1 ! @ 1
-!! wrongType {"expectedType": {"either": ["sequence", "object"]}}
+!! wrongType {"expectedType": "either(Sequence, Object, Instance)"}
 ```
 
 ```

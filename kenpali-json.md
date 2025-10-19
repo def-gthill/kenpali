@@ -1021,7 +1021,7 @@ All numeric indexes are one-based.
     "collection": {"type": "literal", "value": "foobar"},
     "index": {"type": "literal", "value": "baz"}
 }
-!! wrongType {"value": "baz", "expectedType": "number"}
+!! wrongType {"value": "baz", "expectedType": "Number"}
 ```
 
 ```
@@ -1069,7 +1069,7 @@ All numeric indexes are one-based.
     },
     "index": {"type": "literal", "value": "baz"}
 }
-!! wrongType {"value": "baz", "expectedType": "number"}
+!! wrongType {"value": "baz", "expectedType": "Number"}
 ```
 
 ```
@@ -1149,7 +1149,7 @@ All numeric indexes are one-based.
     },
     "index": {"type": "literal", "value": 42}
 }
-!! wrongType {"value": 42, "expectedType": "string"}
+!! wrongType {"value": 42, "expectedType": "String"}
 ```
 
 ```
@@ -1175,7 +1175,7 @@ All numeric indexes are one-based.
     "collection": {"type": "literal", "value": 42},
     "index": {"type": "literal", "value": 2}
 }
-!! wrongType {"value": 42, "expectedType": {"either": ["sequence", "object"]}}
+!! wrongType {"value": 42, "expectedType": "either(Sequence, Object, Instance)"}
 ```
 
 ## Errors|errors

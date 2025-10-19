@@ -11,7 +11,7 @@ All platform functions must validate their arguments, and return appropriate err
 ```
 # Plus - wrong argument type
 plus(1, "foo")
-!! wrongArgumentType {"value": "foo", "expectedType": "number"}
+!! wrongArgumentType {"value": "foo", "expectedType": "Number"}
 ```
 
 ```
@@ -23,7 +23,7 @@ negative()
 ```
 # Negative - wrong argument type
 negative("foo")
-!! wrongArgumentType {"value": "foo", "expectedType": "number"}
+!! wrongArgumentType {"value": "foo", "expectedType": "Number"}
 ```
 
 ## Strings
@@ -39,25 +39,25 @@ join(["foo", 1])
 ```
 # Less than - incomparable types
 {} | isLessThan(42)
-!! wrongArgumentType {"value": {}, "expectedType": {"either": ["number", "string", "boolean", "array"]}}
+!! wrongArgumentType {"value": {}, "expectedType": "either(Number, String, Boolean, Array)"}
 ```
 
 ```
 # Less than - incompatible types
 3 | isLessThan("4")
-!! wrongArgumentType {"value": "4", "expectedType": "number"}
+!! wrongArgumentType {"value": "4", "expectedType": "Number"}
 ```
 
 ```
 # Less than - incomparable types in array
 [1, 2, {}] | isLessThan([1, 2, 3])
-!! wrongArgumentType {"value": {}, "expectedType": {"either": ["number", "string", "boolean", "array"]}}
+!! wrongArgumentType {"value": {}, "expectedType": "either(Number, String, Boolean, Array)"}
 ```
 
 ```
 # Less than - incompatible types in array
 [1, 2, 3] | isLessThan([1, 2, "4"])
-!! wrongArgumentType {"value": "4", "expectedType": "number"}
+!! wrongArgumentType {"value": "4", "expectedType": "Number"}
 ```
 
 ## Logic
@@ -65,37 +65,37 @@ join(["foo", 1])
 ```
 # And - wrong first argument type
 and("foo", $ true)
-!! wrongArgumentType {"value": "foo", "expectedType": "boolean"}
+!! wrongArgumentType {"value": "foo", "expectedType": "Boolean"}
 ```
 
 ```
 # And - second argument not a function
 and(true, true)
-!! wrongArgumentType {"value": true, "expectedType": "function"}
+!! wrongArgumentType {"value": true, "expectedType": "Function"}
 ```
 
 ```
 # And - wrong callback return type
 and(true, $ "foo")
-!! wrongReturnType {"value": "foo", "expectedType": "boolean"}
+!! wrongReturnType {"value": "foo", "expectedType": "Boolean"}
 ```
 
 ```
 # Or - wrong first argument type
 or("foo", $ false)
-!! wrongArgumentType {"value": "foo", "expectedType": "boolean"}
+!! wrongArgumentType {"value": "foo", "expectedType": "Boolean"}
 ```
 
 ```
 # Or - second arugment not a function
 or(false, false)
-!! wrongArgumentType {"value": false, "expectedType": "function"}
+!! wrongArgumentType {"value": false, "expectedType": "Function"}
 ```
 
 ```
 # Or - wrong callback return type
 or(false, $ "foo")
-!! wrongReturnType {"value": "foo", "expectedType": "boolean"}
+!! wrongReturnType {"value": "foo", "expectedType": "Boolean"}
 ```
 
 ## Types and Type Conversion
@@ -103,7 +103,7 @@ or(false, $ "foo")
 ```
 # To number - wrong argument type
 toNumber([42])
-!! wrongArgumentType {"value": [42], "expectedType": {"either": ["string", "number"]}}
+!! wrongArgumentType {"value": [42], "expectedType": "either(String, Number)"}
 ```
 
 ```
@@ -129,7 +129,7 @@ toNumber("42a")
 ```
 # Mutable array - reading an index of the wrong type
 ["foo", "bar", "baz"] | mutableArray |.at("foo")
-!! wrongArgumentType {"value": "foo", "expectedType": "number"}
+!! wrongArgumentType {"value": "foo", "expectedType": "Number"}
 ```
 
 ```
