@@ -228,7 +228,7 @@ set = [1, 2, 3, 4, 42] | newSet;
 ```
 # Error thrown after catching
 1 @ 1 ! @ 1
-!! wrongType {"expectedType": "either(Sequence, Object, Instance)"}
+!! wrongType {"expectedType": "String"}
 ```
 
 ```

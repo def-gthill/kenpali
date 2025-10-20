@@ -985,10 +985,10 @@ Returns:
     "-2.5",
     "\"foo\"",
     "[1, 2, 3]",
-    "stream [...]",
+    "Stream [...]",
     "{foo: \"bar\", \"spam!\": \"eggs\"}",
     "Function {name: \"toString\"}",
-    "Error {error: \"wrongType\", details: {value: 1, expectedType: \"either(Sequence, Object, Instance)\"}}",
+    "Error {error: \"wrongType\", details: {value: 1, expectedType: \"either(Sequence, Object, Instance)\"}, calls: []}",
     "Class {name: \"Number\"}",
     "Protocol {name: \"Sequence\"}",
 ]
@@ -1009,9 +1009,9 @@ stream = 1 | to(4);
     ),
 ]
 >> [
-    "stream [...]",
-    "stream [1, 2, 3...]",
-    "stream [1, 2, 3, 4]",
+    "Stream [...]",
+    "Stream [1, 2, 3...]",
+    "Stream [1, 2, 3, 4]",
 ]
 ```
 
@@ -1310,6 +1310,70 @@ Returns:
     isSequence(Sequence),
 ]
 >> [false, false, false, false, true, true, true, false, false, false, false, false, false]
+```
+
+### isType|isType
+
+Returns whether its argument is a type—a class or protocol.
+
+Parameters:
+
+- `value` (_Any_): The value to check.
+
+Returns:
+
+- (_Boolean_): Whether `value` is a type.
+
+```
+# Is type
+[
+    isType(null),
+    isType(false),
+    isType(true),
+    isType(42),
+    isType("foo"),
+    isType([1, 2, 3]),
+    isType(1 | to(3)),
+    isType({foo: 1, bar: 2}),
+    isType(classOf),
+    isType((x) => x),
+    isType((1 @ 1)!),
+    isType(Number),
+    isType(Sequence),
+]
+>> [false, false, false, false, false, false, false, false, false, false, false, true, true]
+```
+
+### isInstance|isInstance
+
+Returns whether its argument is an instance—a value with an object-like structure belonging to a specific class. All types other than functions and the JSON types are considered instances.
+
+Parameters:
+
+- `value` (_Any_): The value to check.
+
+Returns:
+
+- (_Boolean_): Whether `value` is an instance.
+
+```
+# Is instance
+[
+    isInstance(null),
+    isInstance(false),
+    isInstance(true),
+    isInstance(42),
+    isInstance("foo"),
+    isInstance([1, 2, 3]),
+    isInstance(1 | to(3)),
+    isInstance({foo: 1, bar: 2}),
+    isInstance(classOf),
+    isInstance((x) => x),
+    isInstance((1 @ 1)!),
+    isInstance(Number),
+    isInstance(Sequence),
+]
+>> [false, false, false, false, false, false, true, false, false, false, true, true, true]
 ```
 
 ## Control Flow|control-flow
@@ -2491,7 +2555,7 @@ properties | toObject
 ```
 # Object from error
 1 @ 1 ! | toObject
->> {error: "wrongType", details: {value: 1, expectedType: "either(Sequence, Object, Instance)"}, calls: []}
+>> {"#class": "Error", error: "wrongType", details: {value: 1, expectedType: "either(Sequence, Object, Instance)"}, calls: []}
 ```
 
 ### properties|properties
