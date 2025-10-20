@@ -3475,7 +3475,7 @@ array = mutableArray();
 
 ## Errors|errors
 
-### error|error
+### newError|newError
 
 Creates an error value with the specified error type and details. This in itself doesn't _throw_ the error.
 
@@ -3490,7 +3490,7 @@ Returns:
 
 ```
 # Creation and destructuring
-{type:, details:} = error("badIdea", foo: "bar", spam: "eggs");
+{type:, details:} = newError("badIdea", foo: "bar", spam: "eggs");
 [type, details]
 >> ["badIdea", {foo: "bar", spam: "eggs"}]
 ```
