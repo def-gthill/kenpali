@@ -6,7 +6,7 @@
 # Destructuring an array with an object pattern
 {foo:, bar:} = [1, 2];
 foo
-!! wrongType {"value": [1, 2], "expectedType": "Object"}
+!! wrongType {"value": [1, 2], "expectedType": "either(Object, Instance)"}
 ```
 
 ```

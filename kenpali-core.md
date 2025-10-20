@@ -988,7 +988,7 @@ Returns:
     "Stream [...]",
     "{foo: \"bar\", \"spam!\": \"eggs\"}",
     "Function {name: \"toString\"}",
-    "Error {error: \"wrongType\", details: {value: 1, expectedType: \"either(Sequence, Object, Instance)\"}, calls: []}",
+    "Error {type: \"wrongType\", details: {value: 1, expectedType: \"either(Sequence, Object, Instance)\"}, calls: []}",
     "Class {name: \"Number\"}",
     "Protocol {name: \"Sequence\"}",
 ]
@@ -2555,7 +2555,7 @@ properties | toObject
 ```
 # Object from error
 1 @ 1 ! | toObject
->> {"#class": "Error", error: "wrongType", details: {value: 1, expectedType: "either(Sequence, Object, Instance)"}, calls: []}
+>> {"#class": "Error", type: "wrongType", details: {value: 1, expectedType: "either(Sequence, Object, Instance)"}, calls: []}
 ```
 
 ### properties|properties
@@ -3429,10 +3429,14 @@ Parameters:
 - `type` (_String_): The kind of error condition that this error represents.
 - `**details` (_Object_): Any relevant information about the cause of the error.
 
+Returns:
+
+- (_Error_): The error value, an `Instance` with the specified `type` and `details` properties.
+
 ```
-# Creation and conversion to object
-{error: errorType, details:} = error("badIdea", foo: "bar", spam: "eggs") | toObject;
-[errorType, details]
+# Creation and destructuring
+{type:, details:} = error("badIdea", foo: "bar", spam: "eggs");
+[type, details]
 >> ["badIdea", {foo: "bar", spam: "eggs"}]
 ```
 
