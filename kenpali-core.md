@@ -1679,6 +1679,61 @@ myStream = (start) => if(
 >> [1, 2, 4, 8, 16, 32, 64]
 ```
 
+#### Stream/isEmpty|stream-isEmpty
+
+Returns whether the specified stream is empty.
+
+Returns:
+
+- (_Boolean_): True if the stream is empty.
+
+```
+# Stream is empty
+[
+    emptyStream() |.isEmpty(),
+    (1 | to(3)) |.isEmpty(),
+]
+>> [true, false]
+```
+
+#### Stream/value|stream-value
+
+Returns the first element of the specified stream.
+
+This property is _absent_ if the stream is empty.
+
+Returns:
+
+- (_Any_): The first element.
+
+```
+# Stream value
+[
+    emptyStream() |.value() ! |.type,
+    (1 | to(3)) |.value(),
+]
+>> ["missingProperty", 1]
+```
+
+#### Stream/next|stream-next
+
+Returns the rest of the specified stream.
+
+This property is _absent_ if the stream is empty.
+
+Returns:
+
+- (_Stream_): The rest of the stream.
+
+```
+# Stream next
+[
+    emptyStream() |.next() ! |.type,
+    (1 | to(3)) |.next() | toArray,
+]
+>> ["missingProperty", [2, 3]]
+```
+
 ## Stream Collapsers|stream-collapsers
 
 These functions exhaust an input stream to produce a scalar output or side effect. They loop forever if given an infinite stream.
@@ -2819,19 +2874,19 @@ Returns:
 
 Returns:
 
-- (_array_): An array containing all keys in the map.
+- (_Array_): An array containing all keys in the map.
 
 #### newMap/values|newMap-values
 
 Returns:
 
-- (_array_): An array containing all values in the map.
+- (_Array_): An array containing all values in the map.
 
 #### newMap/entries|newMap-entries
 
 Returns:
 
-- (_array_): An array of `[key, value]` pairs representing the map’s contents.
+- (_Array_): An array of `[key, value]` pairs representing the map’s contents.
 
 #### newMap/has|newMap-has
 
@@ -2839,11 +2894,11 @@ Checks whether the specified key exists in the map.
 
 Parameters:
 
-- `key` (_any_): The key to check.
+- `key` (_Any_): The key to check.
 
 Returns:
 
-- (_boolean_): Whether the key is in the map.
+- (_Boolean_): Whether the key is in the map.
 
 #### newMap/at|newMap-at
 
@@ -2851,12 +2906,12 @@ Retrieves the value associated with the specified key.
 
 Parameters:
 
-- `key` (_any_): The key whose value to retrieve.
-- `default` (_function or null_, default `null`): A function that provides a default value if the key is not found, or `null` to throw an error if the key is missing.
+- `key` (_Any_): The key whose value to retrieve.
+- `default` (_Function or Null_, default `null`): A function that provides a default value if the key is not found, or `null` to throw an error if the key is missing.
 
 Returns:
 
-- (_any_): The value associated with the key, or the result of calling `default` if the key is not found.
+- (_Any_): The value associated with the key, or the result of calling `default` if the key is not found.
 
 ```
 # Map
@@ -2926,11 +2981,11 @@ A variable holds a value that can be retrieved or updated.
 
 Parameters:
 
-- `initialValue` (_any_): The initial value of the variable.
+- `initialValue` (_Any_): The initial value of the variable.
 
 Returns:
 
-- (_object_): The new variable.
+- (_Object_): The new variable.
 
 #### variable/get|variable-get
 
@@ -2938,7 +2993,7 @@ Returns the current value of the variable.
 
 Returns:
 
-- (_any_): The current value.
+- (_Any_): The current value.
 
 #### variable/set|variable-set
 
@@ -2946,11 +3001,11 @@ Updates the variable's value.
 
 Parameters:
 
-- `newValue` (_any_): The new value to assign.
+- `newValue` (_Any_): The new value to assign.
 
 Returns:
 
-- (_any_): The updated value.
+- (_Any_): The updated value.
 
 ```
 # Variable
@@ -2975,19 +3030,19 @@ Parameters:
 
 Returns:
 
-- (_object_): The new mutable array.
+- (_Object_): The new mutable array.
 
 #### mutableArray/size|mutableArray-size
 
 Returns:
 
-- (_number_): The number of elements in the array.
+- (_Number_): The number of elements in the array.
 
 #### mutableArray/elements|mutableArray-elements
 
 Returns:
 
-- (_array_): An array containing all elements in the mutable array.
+- (_Array_): An array containing all elements in the mutable array.
 
 #### mutableArray/append|mutableArray-append
 
@@ -2995,11 +3050,11 @@ Adds an element to the end of the array.
 
 Parameters:
 
-- `element` (_any_): The value to append.
+- `element` (_Any_): The value to append.
 
 Returns:
 
-- (_object_): The mutable array itself, for chaining.
+- (_Object_): The mutable array itself, for chaining.
 
 #### mutableArray/set|mutableArray-set
 
@@ -3007,12 +3062,12 @@ Replaces the element at the specified index.
 
 Parameters:
 
-- `index` (_number_): The position to update (1-based, negative values count from the end).
-- `element` (_any_): The new value.
+- `index` (_Number_): The position to update (1-based, negative values count from the end).
+- `element` (_Any_): The new value.
 
 Returns:
 
-- (_object_): The mutable array itself, for chaining.
+- (_Object_): The mutable array itself, for chaining.
 
 Throws:
 
@@ -3024,12 +3079,12 @@ Alias for `set`, but with parameters in reversed order. Useful as the final step
 
 Parameters:
 
-- `element` (_any_): The new value.
-- `index` (_number_): The position to update (1-based, negative values count from the end).
+- `element` (_Any_): The new value.
+- `index` (_Number_): The position to update (1-based, negative values count from the end).
 
 Returns:
 
-- (_object_): The mutable array itself, for chaining.
+- (_Object_): The mutable array itself, for chaining.
 
 Throws:
 
@@ -3041,12 +3096,12 @@ Retrieves the element at the specified index.
 
 Parameters:
 
-- `index` (_number_): The position to retrieve (1-based, negative values count from the end).
-- `default:` (_function or null_, default `null`): A function returning a default value if the index is out of range, or `null` to throw an error.
+- `index` (_Number_): The position to retrieve (1-based, negative values count from the end).
+- `default:` (_Function or Null_, default `null`): A function returning a default value if the index is out of range, or `null` to throw an error.
 
 Returns:
 
-- (_any_): The element at the index, or the result of `default` if out of range.
+- (_Any_): The element at the index, or the result of `default` if out of range.
 
 #### mutableArray/pop|mutableArray-pop
 
@@ -3054,11 +3109,11 @@ Removes and returns the last element.
 
 Parameters:
 
-- `default:` (_function or null_, default `null`): A function returning a default value if the array is empty, or `null` to throw an error.
+- `default:` (_Function or Null_, default `null`): A function returning a default value if the array is empty, or `null` to throw an error.
 
 Returns:
 
-- (_any_): The last element, or the result of `default` if the array is empty.
+- (_Any_): The last element, or the result of `default` if the array is empty.
 
 #### mutableArray/clear|mutableArray-clear
 
@@ -3066,7 +3121,7 @@ Removes all elements from the array.
 
 Returns:
 
-- (_object_): The mutable array itself, for chaining.
+- (_Object_): The mutable array itself, for chaining.
 
 ```
 # Mutable array
@@ -3446,7 +3501,7 @@ Kenpali is a dynamically typed language, but it does strict type checks at runti
 
 Values are checked against a _schema_. Valid schemas are:
 
-- A Kenpali type (class or protocol), one of `Null`, `Boolean`, `Number`, `String`, `Array`, `Stream`, `Object`, `Function`, `Error`, `Class`, `Protocol`, `Sequence`, `Type`, `Any`.
+- A Kenpali type (class or protocol), one of `Null`, `Boolean`, `Number`, `String`, `Array`, `Stream`, `Object`, `Function`, `Error`, `Class`, `Protocol`, `Sequence`, `Type`, `Instance`, `Any`.
 - An object of the form `{oneOf: [<values>]}`, which matches only the specified values.
 - An object of the form `{either: [<schemas>]}`, which matches a value if _at least one of_ the specified schemas matches it.
 - An object of the form `{type: <type>, ...}`. On its own, this is equivalent to a type schema, e.g. `{type: Number}` matches the same values as `Number`. But this format allows additional properties to narrow the range of accepted values:
