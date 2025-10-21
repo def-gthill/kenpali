@@ -2973,11 +2973,13 @@ map = [[["foo"], 42], [{foo: 42, bar: 97}, 97]] | newMap;
 
 ## Mutable Objects|mutable
 
-### variable|variable
+### Var|Var
 
-Creates a mutable variable.
+A `Var` holds a value that can be retrieved or updated.
 
-A variable holds a value that can be retrieved or updated.
+#### newVar|newVar
+
+Creates a mutable variable, set to the specified initial value.
 
 Parameters:
 
@@ -2985,9 +2987,9 @@ Parameters:
 
 Returns:
 
-- (_Object_): The new variable.
+- (_Var_): The new variable.
 
-#### variable/get|variable-get
+#### Var/get|Var-get
 
 Returns the current value of the variable.
 
@@ -2995,7 +2997,7 @@ Returns:
 
 - (_Any_): The current value.
 
-#### variable/set|variable-set
+#### Var/set|Var-set
 
 Updates the variable's value.
 
@@ -3008,14 +3010,25 @@ Returns:
 - (_Any_): The updated value.
 
 ```
-# Variable
-var = variable(42);
+# Variable creation, get, and set
+var = newVar(42);
 [
     var.get(),
     var.set(73),
     var.get(),
 ]
 >> [42, 73, 73]
+```
+
+```
+# Variable as instance
+var = newVar(42);
+[
+    var | isInstance,
+    classOf(var) |.name,
+    var | toString,
+]
+>> [true, "Var", "Var {value: 42}"]
 ```
 
 ### mutableArray|mutableArray

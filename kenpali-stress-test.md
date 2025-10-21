@@ -76,7 +76,7 @@ foo
 
 ```
 # Stream values are locked in by the first traversal
-answer = variable(42);
+answer = newVar(42);
 stream = 1 | to(3) | transform(| plus(answer.get()));
 before = stream | toArray;
 answer.set(73);
@@ -248,4 +248,15 @@ main()
     {function: "$main/foo"},
     {function: "$main/main/baz"},
 ]
+```
+
+## Variables
+
+```
+# Simultaneous variables
+a = newVar(42);
+b = newVar(97);
+a.set(73);
+[a.get(), b.get()]
+>> [73, 97]
 ```
