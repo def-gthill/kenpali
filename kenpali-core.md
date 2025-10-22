@@ -2766,11 +2766,13 @@ Returns:
 
 ## Sets and Maps|sets-maps
 
-### newSet|newSet
-
-Creates an immutable set.
+### Set|Set
 
 A set is like an array, but it can't have duplicate elements, and checking whether an element is in the set is fast regardless of the size of the set.
+
+#### newSet|newSet
+
+Creates an immutable set.
 
 Parameters:
 
@@ -2778,21 +2780,21 @@ Parameters:
 
 Returns:
 
-- (_Object_): The new set.
+- (_Set_): The new set.
 
-#### newSet/size|newSet-size
+#### Set/size|Set-size
 
 Returns:
 
 - (_Number_): The number of elements in the set.
 
-#### newSet/elements|newSet-elements
+#### Set/elements|Set-elements
 
 Returns:
 
 - (_Array_): An array containing all the elements in the set.
 
-#### newSet/has|newSet-has
+#### Set/has|Set-has
 
 Checks whether the specified element is in the set.
 
@@ -2848,6 +2850,17 @@ set = [["foo"], {foo: 42, bar: 97}] | newSet;
     false,
     false,
 ]
+```
+
+```
+# Set as instance
+set = ["foo", "bar", "baz"] | newSet;
+[
+    set | isInstance,
+    classOf(set) |.name,
+    set | toString,
+]
+>> [true, "Set", "Set {elements: [\"foo\", \"bar\", \"baz\"]}"]
 ```
 
 ### newMap|newMap
