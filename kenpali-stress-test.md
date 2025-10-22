@@ -85,6 +85,14 @@ after = stream | toArray;
 >> [[43, 44, 45], [43, 44, 45]]
 ```
 
+```
+# Display values in streams
+stream = [newVar(42)] | toStream;
+stream | toArray;
+stream | toString
+>> "Stream [Var {value: 42}]"
+```
+
 ## Objects
 
 ```
