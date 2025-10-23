@@ -83,13 +83,13 @@ reverse = (sequence) => (
     | toArray
 );
 group = (pairs, onGroup: = (x) => x) => (
-    result = mutableMap();
+    result = newMutableMap();
     pairs
     | forEach(([key, value]) => (
         if(
             result.has(key),
             then: $ result.at(key) |.append(value),
-            else: $ result.set(key, mutableArray([value])),
+            else: $ result.set(key, newMutableArray([value])),
         )
     ));
     result.entries()

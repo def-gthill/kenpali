@@ -2067,7 +2067,7 @@ Returns:
 
 ```
 # Applying a side effect to each element
-result = mutableArray();
+result = newMutableArray();
 ["foo", "bar", "baz"] | forEach(result.append);
 1 | to(5) | forEach(result.append);
 result.elements()
@@ -2768,7 +2768,7 @@ Returns:
 
 ### Set|Set
 
-A set is like an array, but it can't have duplicate elements, and checking whether an element is in the set is fast regardless of the size of the set.
+A `Set` is like an array, but it can't have duplicate elements, and checking whether an element is in the set is fast regardless of the size of the set.
 
 #### newSet|newSet
 
@@ -2863,45 +2863,47 @@ set = ["foo", "bar", "baz"] | newSet;
 >> [true, "Set", "Set {elements: [\"foo\", \"bar\", \"baz\"]}"]
 ```
 
-### newMap|newMap
+### Map|Map
+
+A `Map` is a collection of key-value pairs, where keys are unique. Looking up a value by key is fast regardless of the size of the map.
+
+#### newMap|newMap
 
 Creates an immutable map.
 
-A map is a collection of key-value pairs, where keys are unique. Looking up a value by key is fast regardless of the size of the map.
-
 Parameters:
 
-- `entries` (_array_, default `[]`): An array of `[key, value]` pairs. If duplicate keys exist, only the last one is kept.
+- `entries` (_Array_, default `[]`): An array of `[key, value]` pairs. If duplicate keys exist, only the last one is kept.
 
 Returns:
 
-- (_object_): The new map.
+- (_Map_): The new map.
 
-#### newMap/size|newMap-size
+#### Map/size|Map-size
 
 Returns:
 
-- (_number_): The number of key-value pairs in the map.
+- (_Number_): The number of key-value pairs in the map.
 
-#### newMap/keys|newMap-keys
+#### Map/keys|Map-keys
 
 Returns:
 
 - (_Array_): An array containing all keys in the map.
 
-#### newMap/values|newMap-values
+#### Map/values|Map-values
 
 Returns:
 
 - (_Array_): An array containing all values in the map.
 
-#### newMap/entries|newMap-entries
+#### Map/entries|Map-entries
 
 Returns:
 
 - (_Array_): An array of `[key, value]` pairs representing the map’s contents.
 
-#### newMap/has|newMap-has
+#### Map/has|Map-has
 
 Checks whether the specified key exists in the map.
 
@@ -2913,7 +2915,7 @@ Returns:
 
 - (_Boolean_): Whether the key is in the map.
 
-#### newMap/at|newMap-at
+#### Map/at|Map-at
 
 Retrieves the value associated with the specified key.
 
@@ -2984,6 +2986,17 @@ map = [[["foo"], 42], [{foo: 42, bar: 97}, 97]] | newMap;
 ]
 ```
 
+```
+# Map as instance
+map = [["foo", 42], ["bar", 97]] | newMap;
+[
+    map | isInstance,
+    classOf(map) |.name,
+    map | toString,
+]
+>> [true, "Map", "Map {entries: [[\"foo\", 42], [\"bar\", 97]]}"]
+```
+
 ## Mutable Objects|mutable
 
 ### Var|Var
@@ -3044,33 +3057,35 @@ var = newVar(42);
 >> [true, "Var", "Var {value: 42}"]
 ```
 
-### mutableArray|mutableArray
-
-Creates a mutable array.
+### MutableArray|MutableArray
 
 A mutable array allows updating arbitrary elements, adding new elements to the end, and removing elements from the end.
 
+#### newMutableArray|newMutableArray
+
+Creates a mutable array.
+
 Parameters:
 
-- `elements` (_array_, default `[]`): The initial elements of the array.
+- `elements` (_Array_, default `[]`): The initial elements of the array.
 
 Returns:
 
-- (_Object_): The new mutable array.
+- (_MutableArray_): The new mutable array.
 
-#### mutableArray/size|mutableArray-size
+#### MutableArray/size|MutableArray-size
 
 Returns:
 
 - (_Number_): The number of elements in the array.
 
-#### mutableArray/elements|mutableArray-elements
+#### MutableArray/elements|MutableArray-elements
 
 Returns:
 
 - (_Array_): An array containing all elements in the mutable array.
 
-#### mutableArray/append|mutableArray-append
+#### MutableArray/append|MutableArray-append
 
 Adds an element to the end of the array.
 
@@ -3080,9 +3095,9 @@ Parameters:
 
 Returns:
 
-- (_Object_): The mutable array itself, for chaining.
+- (_MutableArray_): The mutable array itself, for chaining.
 
-#### mutableArray/set|mutableArray-set
+#### MutableArray/set|MutableArray-set
 
 Replaces the element at the specified index.
 
@@ -3093,13 +3108,13 @@ Parameters:
 
 Returns:
 
-- (_Object_): The mutable array itself, for chaining.
+- (_MutableArray_): The mutable array itself, for chaining.
 
 Throws:
 
 - `indexOutOfBounds`: If the index is out of range.
 
-#### mutableArray/storeAt|mutableArray-storeAt
+#### MutableArray/storeAt|MutableArray-storeAt
 
 Alias for `set`, but with parameters in reversed order. Useful as the final step in a pipeline that computes the new element value.
 
@@ -3110,13 +3125,13 @@ Parameters:
 
 Returns:
 
-- (_Object_): The mutable array itself, for chaining.
+- (_MutableArray_): The mutable array itself, for chaining.
 
 Throws:
 
 - `indexOutOfBounds`: If the index is out of range.
 
-#### mutableArray/at|mutableArray-at
+#### MutableArray/at|MutableArray-at
 
 Retrieves the element at the specified index.
 
@@ -3129,7 +3144,7 @@ Returns:
 
 - (_Any_): The element at the index, or the result of `default` if out of range.
 
-#### mutableArray/pop|mutableArray-pop
+#### MutableArray/pop|MutableArray-pop
 
 Removes and returns the last element.
 
@@ -3141,17 +3156,17 @@ Returns:
 
 - (_Any_): The last element, or the result of `default` if the array is empty.
 
-#### mutableArray/clear|mutableArray-clear
+#### MutableArray/clear|MutableArray-clear
 
 Removes all elements from the array.
 
 Returns:
 
-- (_Object_): The mutable array itself, for chaining.
+- (_MutableArray_): The mutable array itself, for chaining.
 
 ```
 # Mutable array
-array = ["foo", "bar", "baz"] | mutableArray
+array = ["foo", "bar", "baz"] | newMutableArray
 |.append("spam")
 |.append("eggs")
 |.append("foo")
@@ -3181,11 +3196,24 @@ array = ["foo", "bar", "baz"] | mutableArray
 ]
 ```
 
-### mutableSet|mutableSet
+```
+# Mutable array as instance
+array = ["foo", "bar", "baz"] | newMutableArray;
+[
+    array | isInstance,
+    classOf(array) |.name,
+    array | toString,
+]
+>> [true, "MutableArray", "MutableArray {elements: [\"foo\", \"bar\", \"baz\"]}"]
+```
 
-Creates a mutable set.
+### MutableSet|MutableSet
 
 A mutable set is like a regular set, but it allows adding and removing elements dynamically.
+
+#### newMutableSet|newMutableSet
+
+Creates a mutable set.
 
 Parameters:
 
@@ -3193,21 +3221,21 @@ Parameters:
 
 Returns:
 
-- (_Object_): The new mutable set.
+- (_MutableSet_): The new mutable set.
 
-#### mutableSet/size|mutableSet-size
+#### MutableSet/size|MutableSet-size
 
 Returns:
 
 - (_Number_): The number of elements in the set.
 
-#### mutableSet/elements|mutableSet-elements
+#### MutableSet/elements|MutableSet-elements
 
 Returns:
 
 - (_Array_): An array containing all elements in the mutable set.
 
-#### mutableSet/add|mutableSet-add
+#### MutableSet/add|MutableSet-add
 
 Adds an element to the set.
 
@@ -3217,9 +3245,9 @@ Parameters:
 
 Returns:
 
-- (_Object_): The mutable set itself, for chaining.
+- (_MutableSet_): The mutable set itself, for chaining.
 
-#### mutableSet/remove|mutableSet-remove
+#### MutableSet/remove|MutableSet-remove
 
 Removes an element from the set.
 
@@ -3229,9 +3257,9 @@ Parameters:
 
 Returns:
 
-- (_Object_): The mutable set itself, for chaining.
+- (_MutableSet_): The mutable set itself, for chaining.
 
-#### mutableSet/has|mutableSet-has
+#### MutableSet/has|MutableSet-has
 
 Checks whether the specified element is in the set.
 
@@ -3243,17 +3271,17 @@ Returns:
 
 - (_Boolean_): Whether the value is in the set.
 
-#### mutableSet/clear|mutableSet-clear
+#### MutableSet/clear|MutableSet-clear
 
 Removes all elements from the set.
 
 Returns:
 
-- (_Object_): The mutable set itself, for chaining.
+- (_MutableSet_): The mutable set itself, for chaining.
 
 ```
 # Mutable set
-set = ["foo", "bar", "baz"] | mutableSet
+set = ["foo", "bar", "baz"] | newMutableSet
 |.add("spam")
 |.add("eggs")
 |.add("foo")
@@ -3281,7 +3309,7 @@ set = ["foo", "bar", "baz"] | mutableSet
 
 ```
 # Collections as mutable set keys
-set = [["foo"]] | mutableSet;
+set = [["foo"]] | newMutableSet;
 [
     set.has(["foo"]),
     set.has("foo"),
@@ -3306,11 +3334,24 @@ set = [["foo"]] | mutableSet;
 ]
 ```
 
-### mutableMap|mutableMap
+```
+# Mutable set as instance
+set = ["foo", "bar", "baz"] | newMutableSet;
+[
+    set | isInstance,
+    classOf(set) |.name,
+    set | toString,
+]
+>> [true, "MutableSet", "MutableSet {elements: [\"foo\", \"bar\", \"baz\"]}"]
+```
 
-Creates a mutable map.
+### MutableMap|MutableMap
 
 A mutable map is a collection of key-value pairs where keys are unique, and entries can be added, updated, and removed dynamically.
+
+#### newMutableMap|newMutableMap
+
+Creates a mutable map.
 
 Parameters:
 
@@ -3318,33 +3359,33 @@ Parameters:
 
 Returns:
 
-- (_Object_): The new mutable map.
+- (_MutableMap_): The new mutable map.
 
-#### mutableMap/size|mutableMap-size
+#### MutableMap/size|MutableMap-size
 
 Returns:
 
 - (_Number_): The number of entries in the map.
 
-#### mutableMap/keys|mutableMap-keys
+#### MutableMap/keys|MutableMap-keys
 
 Returns:
 
 - (_Array_): An array containing all keys in the map.
 
-#### mutableMap/values|mutableMap-values
+#### MutableMap/values|MutableMap-values
 
 Returns:
 
 - (_Array_): An array containing all values in the map.
 
-#### mutableMap/entries|mutableMap-entries
+#### MutableMap/entries|MutableMap-entries
 
 Returns:
 
 - (_Array_): An array of `[key, value]` pairs representing the map's entries.
 
-#### mutableMap/set|mutableMap-set
+#### MutableMap/set|MutableMap-set
 
 Sets the value for a given key.
 
@@ -3355,9 +3396,9 @@ Parameters:
 
 Returns:
 
-- (_Object_): The mutable map itself, for chaining.
+- (_MutableMap_): The mutable map itself, for chaining.
 
-#### mutableMap/storeAt|mutableMap-storeAt
+#### MutableMap/storeAt|MutableMap-storeAt
 
 Alias for `set`, but with parameters in reversed order. Useful as the final step in a pipeline that computes the new element value.
 
@@ -3368,9 +3409,9 @@ Parameters:
 
 Returns:
 
-- (_Object_): The mutable map itself, for chaining.
+- (_MutableMap_): The mutable map itself, for chaining.
 
-#### mutableMap/remove|mutableMap-remove
+#### MutableMap/remove|MutableMap-remove
 
 Removes a key and its associated value from the map.
 
@@ -3380,9 +3421,9 @@ Parameters:
 
 Returns:
 
-- (_Object_): The mutable map itself, for chaining.
+- (_MutableMap_): The mutable map itself, for chaining.
 
-#### mutableMap/has|mutableMap-has
+#### MutableMap/has|MutableMap-has
 
 Checks whether the map contains a specific key.
 
@@ -3394,7 +3435,7 @@ Returns:
 
 - (_Boolean_): Whether the key exists in the map.
 
-#### mutableMap/at|mutableMap-at
+#### MutableMap/at|MutableMap-at
 
 Retrieves the value associated with a given key.
 
@@ -3407,17 +3448,17 @@ Returns:
 
 - (_Any_): The value associated with the key, or the default value if the key is not found.
 
-#### mutableMap/clear|mutableMap-clear
+#### MutableMap/clear|MutableMap-clear
 
 Removes all entries from the map.
 
 Returns:
 
-- (_Object_): The mutable map itself, for chaining.
+- (_MutableMap_): The mutable map itself, for chaining.
 
 ```
 # Mutable map
-map = [["foo", 42], ["bar", 97]] | mutableMap
+map = [["foo", 42], ["bar", 97]] | newMutableMap
 |.set("eggs", 216)
 |.storeAt(729, "foo")
 |.remove("bar");
@@ -3447,7 +3488,7 @@ map = [["foo", 42], ["bar", 97]] | mutableMap
 
 ```
 # Collections as mutable map keys
-map = [[["foo"], 42]] | mutableMap;
+map = [[["foo"], 42]] | newMutableMap;
 [
     map.has(["foo"]),
     map.has("foo"),
@@ -3476,6 +3517,17 @@ map = [[["foo"], 42]] | mutableMap;
 ]
 ```
 
+```
+# Mutable map as instance
+map = [["foo", 42], ["bar", 97]] | newMutableMap;
+[
+    map | isInstance,
+    classOf(map) |.name,
+    map | toString,
+]
+>> [true, "MutableMap", "MutableMap {entries: [[\"foo\", 42], [\"bar\", 97]]}"]
+```
+
 ### also
 
 Performs an action on a value, then returns it for further processing.
@@ -3491,7 +3543,7 @@ Returns:
 
 ```
 # Doing side effects on an expression result as it flies by
-array = mutableArray();
+array = newMutableArray();
 [
     42 | also((n) => array.append(n)),
     array.elements(),
