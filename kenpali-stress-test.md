@@ -225,6 +225,15 @@ foo = (a, b = 4) => (c, d = 5) => [a, b, c, d];
 ## Sets and Maps
 
 ```
+# Instances as set members
+var1 = newVar(42);
+var2 = newVar(42);
+set = [var1] | newSet;
+[set.has(var1), set.has(var2)]
+>> [true, false]
+```
+
+```
 # Set-has as callback
 set = [1, 2, 3, 4, 42] | newSet;
 [3, 8, 4, 42, 57] | where(set.has) | toArray
