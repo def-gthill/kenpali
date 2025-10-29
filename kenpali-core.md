@@ -946,11 +946,11 @@ Returns:
 >> [false, false, false, false, true, false, false, false, false, false, false, false, false]
 ```
 
-### toString|toString
+### display|display
 
-Returns the string representation of its argument.
+Returns a string representation of its argument, suitable for reporting the result of a computation. This is generally *not* suitable for user-friendly text, which should use formatting logic specific to the type being displayed.
 
-Calling `toString` on a stream reports already evaluated elements but never forces further evaluation.
+Calling `display` on a stream reports already evaluated elements but never forces further evaluation.
 
 Parameters:
 
@@ -961,21 +961,21 @@ Returns:
 - (_String_): The string value.
 
 ```
-# To string
+# Display
 [
-    toString(null),
-    toString(false),
-    toString(true),
-    toString(42),
-    toString(-2.5),
-    toString("foo"),
-    toString([1, 2, 3]),
-    toString(1 | to(3)),
-    toString({foo: "bar", "spam!": "eggs"}),
-    toString(toString),
-    toString((1 @ 1)!),
-    toString(Number),
-    toString(Sequence),
+    display(null),
+    display(false),
+    display(true),
+    display(42),
+    display(-2.5),
+    display("foo"),
+    display([1, 2, 3]),
+    display(1 | to(3)),
+    display({foo: "bar", "spam!": "eggs"}),
+    display(display),
+    display((1 @ 1)!),
+    display(Number),
+    display(Sequence),
 ]
 >> [
     "null",
@@ -987,7 +987,7 @@ Returns:
     "[1, 2, 3]",
     "Stream [...]",
     "{foo: \"bar\", \"spam!\": \"eggs\"}",
-    "Function {name: \"toString\"}",
+    "Function {name: \"display\"}",
     "Error {type: \"wrongType\", details: {value: 1, expectedType: \"either(Sequence, Object, Instance)\"}, calls: []}",
     "Class {name: \"Number\"}",
     "Protocol {name: \"Sequence\"}",
@@ -995,17 +995,17 @@ Returns:
 ```
 
 ```
-# To string on streams
+# Display on streams
 stream = 1 | to(4);
 [
-    stream | toString,
+    stream | display,
     (
         stream | keepFirst(3) | toArray;
-        stream | toString
+        stream | display
     ),
     (
         stream | toArray;
-        stream | toString
+        stream | display
     ),
 ]
 >> [
@@ -1016,16 +1016,16 @@ stream = 1 | to(4);
 ```
 
 ```
-# To string on natural functions
+# Display on natural functions
 foo = $ (
     bar = $ 42;
     $ bar
 );
 [
-    ($ 42) | toString,
-    foo | toString,
-    foo() | toString,
-    foo()() | toString,
+    ($ 42) | display,
+    foo | display,
+    foo() | display,
+    foo()() | display,
 ]
 >> [
     "Function {name: \"$main/$anon1\"}",
@@ -1242,7 +1242,7 @@ Returns:
 # To function
 [
     toFunction(42)(97),
-    toFunction(toString)(97),
+    toFunction(display)(97),
     toFunction((x) => plus(x, 3))(97),
 ]
 >> [42, "97", 100]
@@ -1480,7 +1480,7 @@ Returns:
 
 ```
 # Switch
-withComment = (value, comment) => [value | toString, comment] | join;
+withComment = (value, comment) => [value | display, comment] | join;
 foo = | switch(
     [| isLessThan(42), | withComment(" is too small!")],
     [| isMoreThan(42), | withComment(" is too big!")],
@@ -2858,7 +2858,7 @@ set = ["foo", "bar", "baz"] | newSet;
 [
     set | isInstance,
     classOf(set) |.name,
-    set | toString,
+    set | display,
 ]
 >> [true, "Set", "Set {elements: [\"foo\", \"bar\", \"baz\"]}"]
 ```
@@ -2992,7 +2992,7 @@ map = [["foo", 42], ["bar", 97]] | newMap;
 [
     map | isInstance,
     classOf(map) |.name,
-    map | toString,
+    map | display,
 ]
 >> [true, "Map", "Map {entries: [[\"foo\", 42], [\"bar\", 97]]}"]
 ```
@@ -3052,7 +3052,7 @@ var = newVar(42);
 [
     var | isInstance,
     classOf(var) |.name,
-    var | toString,
+    var | display,
 ]
 >> [true, "Var", "Var {value: 42}"]
 ```
@@ -3202,7 +3202,7 @@ array = ["foo", "bar", "baz"] | newMutableArray;
 [
     array | isInstance,
     classOf(array) |.name,
-    array | toString,
+    array | display,
 ]
 >> [true, "MutableArray", "MutableArray {elements: [\"foo\", \"bar\", \"baz\"]}"]
 ```
@@ -3340,7 +3340,7 @@ set = ["foo", "bar", "baz"] | newMutableSet;
 [
     set | isInstance,
     classOf(set) |.name,
-    set | toString,
+    set | display,
 ]
 >> [true, "MutableSet", "MutableSet {elements: [\"foo\", \"bar\", \"baz\"]}"]
 ```
@@ -3523,7 +3523,7 @@ map = [["foo", 42], ["bar", 97]] | newMutableMap;
 [
     map | isInstance,
     classOf(map) |.name,
-    map | toString,
+    map | display,
 ]
 >> [true, "MutableMap", "MutableMap {entries: [[\"foo\", 42], [\"bar\", 97]]}"]
 ```

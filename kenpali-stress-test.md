@@ -89,7 +89,7 @@ after = stream | toArray;
 # Display values in streams
 stream = [newVar(42)] | toStream;
 stream | toArray;
-stream | toString
+stream | display
 >> "Stream [Var {value: 42}]"
 ```
 

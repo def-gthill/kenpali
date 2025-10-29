@@ -29,7 +29,7 @@ fizzbuzz = (n) => (
             ""
             | butIf(i | isDivisibleBy(3), (s) => join([s, "Fizz"]))
             | butIf(i | isDivisibleBy(5), (s) => join([s, "Buzz"]))
-            | butIf(isEmpty, $ toString(i))
+            | butIf(isEmpty, $ display(i))
         )
     )
     | toArray
