@@ -1,4 +1,4 @@
-# Kenpali Stress Test
+# Kenpali Semantic Specification
 
 ## Arrays
 
