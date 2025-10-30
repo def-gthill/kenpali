@@ -3579,15 +3579,14 @@ Kenpali is a dynamically typed language, but it does strict type checks at runti
 
 Values are checked against a _schema_. Valid schemas are:
 
-- A Kenpali type (class or protocol), one of `Null`, `Boolean`, `Number`, `String`, `Array`, `Stream`, `Object`, `Function`, `Error`, `Class`, `Protocol`, `Sequence`, `Type`, `Instance`, `Any`.
-- An object of the form `{oneOf: [<values>]}`, which matches only the specified values.
-- An object of the form `{either: [<schemas>]}`, which matches a value if _at least one of_ the specified schemas matches it.
-- An object of the form `{type: <type>, ...}`. On its own, this is equivalent to a type schema, e.g. `{type: Number}` matches the same values as `Number`. But this format allows additional properties to narrow the range of accepted values:
-    - For arrays, the `elements` property specifies the schema that all the array's elements must match, e.g. `{type: Array, elements: Number}` matches only array of numbers.
-    - For arrays, the `shape` property specifies an array of individual schemas for each element, e.g. `{type: Array, shape: [Number, String]}` matches only arrays whose first element is a number and whose second element is a string.
-    - For objects, the `values` property specifies the schemas that all the object's property values must match, e.g. `{type: Object, values: Number}` matches only objects whose properties are all numbers.
-    - For objects, the `shape` property specifies an object whose properties are schemas that the corresponding properties must match, e.g. `{type: Object, shape: {foo: Number, bar: String}}` matches only objects with a numeric `foo` property and a string `bar` property.
-    - The `where` property specifies an arbitrary function that must return `true` when called on the value, e.g. `{type: Number, where: | isLessThan(10)}` matches only numbers less than 10.
+- A Kenpali type: one of the primitive classes `Null`, `Boolean`, `Number`, `String`, `Array`, `Object`, or `Function`; or an instance type such as `Error`, `Class`, or `Map`; or a protocol such as `Sequence` or `Type`.
+- An object of the form `{form: "enum", values: [<values>]}`, which matches only the specified values.
+- An object of the form `{form: "union", options: [<schemas>]}`, which matches a value if _at least one of_ the specified schemas matches it.
+- An object of the form `{form: "condition", schema: <schema>, condition: <function>}`, which adds the specified condition to the schema. For example, `{form: "condition", schema: Number, condition: | isLessThan(10)}` matches only numbers less than 10.
+- An object of the form `{form: "array", elements: <schema>}`, which matches only arrays whose elements _all_ match the specified schema. For example, `{form: "array", elements: Number}` matches only arrays of numbers.
+- An object of the form `{form: "tuple", shape: [<schemas>]}`, which matches only arrays whose elements match the specified schemas in order. For example, `{form: "tuple", shape: [Number, String]}` matches only arrays whose first element is a number and whose second element is a string.
+- An object of the form `{form: "object", keys: <key-schema>, values: <value-schema>}`, which matches only objects whose keys and values match the specified schemas. Either `keys` or `values` may be omitted; `keys` defaults to `String`, and `values` defaults to `Any`. For example, `{form: "object", values: Number}` matches only objects whose whose values are numbers, while `{form: "object", keys: {form: "enum", values: ["foo", "bar", "baz"]}, values: Number}` matches only objects whose keys are some subset of `"foo"`, `"bar"`, and `"baz"` and whose values are numbers.
+- An object of the form `{form: "record", shape: {<property-schemas>}}`, where each property of the shape is a schema that the corresponding property must match. For example, `{form: "record", shape: {foo: Number, bar: String}}` matches only objects with a numeric `foo` property and a string `bar` property.
 
 ### validate|validate
 
@@ -3715,37 +3714,9 @@ Returns:
 ]
 ```
 
-### is|is
+### oneOfValues|oneOfValues
 
-Creates a schema that checks the type of the value, and optionally that it satisfies a predicate.
-
-Parameters:
-
-- `type` (_Type_): The expected Kenpali type.
-- `where:` (_Function or Null_, default `null`): A predicate that the value must satisfy.
-
-Returns:
-
-- (_Object_): A schema of the form `{type, where}`.
-
-```
-# Matching a type with a predicate
-sch = is(Number, where: (n) => isLessThan(n, 10));
-[
-    1 | matches(sch),
-    42 | matches(sch),
-    "foo" | matches(sch),
-]
->> [
-    true,
-    false,
-    false,
-]
-```
-
-### oneOf|oneOf
-
-Creates a schema that checks if the value is in the specified list.
+Creates a schema that checks if the value is in the specified list. This can be used to simulate an "enum" type.
 
 Parametersː
 
@@ -3753,11 +3724,11 @@ Parametersː
 
 Returns:
 
-- (_Object_): A schema of the form `{oneOf: values}`.
+- (_Object_): A schema of the form `{form: "enum", values: [<values>]}`.
 
 ```
 # Matching a list of specific values
-sch = oneOf("red", "green", "blue");
+sch = oneOfValues("red", "green", "blue");
 [
     "red" | matches(sch),
     "blue" | matches(sch),
@@ -3770,20 +3741,75 @@ sch = oneOf("red", "green", "blue");
     false,
     false,
 ]
+
+```
+
+### either|either
+
+Creates a schema that allows anything matching any of the specified schemas.
+
+Parameters:
+
+- `*schemas` (_Array of Type or Object_): The allowed schemas.
+
+Returns:
+
+- (_Object_): A schema of the form `{form: "union", options: [<schemas>]}`.
+
+```
+# Matching a union
+sch = either(String, Number);
+[
+    "foo" | matches(sch),
+    42 | matches(sch),
+    [1, 2, 3] | matches(sch),
+]
+>> [
+    true,
+    true,
+    false,
+]
+```
+
+### satisfying|satisfying
+
+Creates a `condition` schema, adding the specified predicate to the schema.
+
+Parameters:
+
+- `schema` (_Type or Object_): The schema to add the condition to.
+- `condition` (_Function_): A predicate that the value must satisfy.
+
+Returns:
+
+- (_Object_): A schema of the form `{form: "condition", schema: <schema>, condition: <function>}`.
+
+```
+# Matching a type with a predicate
+sch = Number | satisfying(| isLessThan(10));
+[
+    1 | matches(sch),
+    42 | matches(sch),
+    "foo" | matches(sch),
+]
+>> [
+    true,
+    false,
+    false,
+]
 ```
 
 ### arrayOf|arrayOf
 
-Creates a schema that checks the elements of an array against a single schema, and optionally that the array satisfies a predicate.
+Creates a schema that checks all the elements of an array against a single schema.
 
 Parameters:
 
-- `elementSchema` (_Type or Object_): The schema that all elements must match.
-- `where:` (_Function or Null_, default `null`): A predicate that the array must satisfy.
+- `elements` (_Type or Object_): The schema that all elements must match.
 
 Returns:
 
-- (_Object_): A schema of the form `{type: "array", elements: elementSchema, where}`.
+- (_Object_): A schema of the form `{form: "array", elements: <schema>}`.
 
 ```
 # Matching an array where all elements must be of a given type
@@ -3814,7 +3840,7 @@ Parameters:
 
 Returns:
 
-- (_Object_): A schema of the form `{type: "array", shape}`.
+- (_Object_): A schema of the form `{form: "tuple", shape: [<schemas>]}`.
 
 ```
 # Matching an array where each element has its own schema
@@ -3837,21 +3863,20 @@ sch = tupleLike([String, Number, arrayOf(Number)]);
 
 ### objectOf|objectOf
 
-Creates a schema that checks the property values of an object against a single schema, and optionally that the keys match a schema and/or that the entire object satisfies a predicate.
+Creates a schema that checks the property values of an object against a single schema, and optionally that the keys match a schema and.
 
 Parameters:
 
 - `keys:` (_Type or Object_, default: `String`): The schema that all keys must match.
 - `values:` (_Type or Object_): The schema that all values must match.
-- `where:` (_Function or Null_, default `null`): A predicate that the object must satisfy.
 
 Returns:
 
-- (_Object_): An object of the form `{type: "object", keys, values, where}`.
+- (_Object_): An object of the form `{form: "object", keys: <key-schema>, values: <value-schema>}`.
 
 ```
 # Matching an object where keys and values must match schemas
-sch = objectOf(keys: is(String, where: (s) => (length(s) | equals(1))), values: Number);
+sch = objectOf(keys: String | satisfying(| length | equals(1)), values: Number);
 [
     {} | matches(sch),
     {x: 42} | matches(sch),
@@ -3882,7 +3907,7 @@ Parameters:
 
 Returns:
 
-- (_Object_): A schema of the form `{type: "object", shape}`.
+- (_Object_): A schema of the form `{form: "record", shape: {<entry-schemas>}}`.
 
 ```
 # Matching an object with a specific structure
@@ -3909,9 +3934,9 @@ person = recordLike({name: String, age: Number});
 
 ### optional|optional
 
-Creates a schema that marks an array element or object property as optional.
+Creates a schema that marks a tuple element or record property as optional.
 
-The returned schema is only valid inside the `shape` property of an array or object schema.
+The returned schema is only valid inside the `shape` property of a tuple or record schema.
 
 Parameters:
 
@@ -3919,7 +3944,7 @@ Parameters:
 
 Returns:
 
-- (_Object_): A schema of the form `{optional: schema}`.
+- (_Object_): A schema of the form `{form: "optional", schema: <schema>}`.
 
 ```
 # Matching an array with an optional element
@@ -3961,33 +3986,6 @@ person = recordLike({name: String, age: optional(Number)});
     false,
     false,
     false,
-    false,
-]
-```
-
-### either|either
-
-Creates a schema that allows anything matching any of the specified schemas.
-
-Parameters:
-
-- `*schemas` (_Array of Type or Object_): The allowed schemas.
-
-Returns:
-
-- (_Object_): A schema of the form `{either: schemas}`.
-
-```
-# Matching a union
-sch = either(String, Number);
-[
-    "foo" | matches(sch),
-    42 | matches(sch),
-    [1, 2, 3] | matches(sch),
-]
->> [
-    true,
-    true,
     false,
 ]
 ```
