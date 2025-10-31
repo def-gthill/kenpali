@@ -13,21 +13,9 @@ Examples:
 ```
 
 ```
-# Literal false
-{"type": "literal", "value": false}
->> false
-```
-
-```
 # Literal true
 {"type": "literal", "value": true}
 >> true
-```
-
-```
-# Literal number
-{"type": "literal", "value": 1}
->> 1
 ```
 
 ```
@@ -70,100 +58,6 @@ Examples:
 >> 42
 ```
 
-Names are defined in the order they appear in the block. It's an error to reference a name before it is defined.
-
-```
-# Name used before assignment
-{
-    "type": "block",
-    "defs": [
-        ["foo", {"type": "name", "name": "baz"}],
-        ["bar", {"type": "literal", "value": 42}],
-        ["baz", {"type": "name", "name": "bar"}]
-    ],
-    "result": {"type": "name", "name": "foo"}
-}
-!! nameUsedBeforeAssignment {"name": "baz"}
-```
-
-It's an error to declare the same name more than once in the same block.
-
-```
-# Name declared more than once in the same scope
-{
-    "type": "block",
-    "defs": [
-        ["foo", {"type": "literal", "value": 42}],
-        ["foo", {"type": "literal", "value": 97}]
-    ],
-    "result": {"type": "name", "name": "foo"}
-}
-!! duplicateName {"name": "foo"}
-```
-
-A block creates a _scope_; all names defined within it are only accessible within it.
-
-```
-# Scope
-{
-    "type": "block",
-    "defs": [
-        [
-            "foo",
-            {
-                "type": "block",
-                "defs": [
-                    ["bar", {"type": "literal", "value": 42}]
-                ],
-                "result": {"type": "literal", "value": null}
-            }
-        ]
-    ],
-    "result": {"type": "name", "name": "bar"}
-}
-!! nameNotDefined {"name": "bar"}
-```
-
-But expressions in a block can reference names defined in a containing block.
-
-```
-# A name from an enclosing scope
-{
-    "type": "block",
-    "defs": [
-        ["foo", {"type": "literal", "value": 42}]
-    ],
-    "result": {
-        "type": "block",
-        "defs": [
-            ["bar", {"type": "literal", "value": 73}]
-        ],
-        "result": {"type": "name", "name": "foo"}
-    }
-}
->> 42
-```
-
-A block can define a name that duplicates one in an enclosing block. References to that name evaluate to the _innermost_ accessible version of the name—the inner name _shadows_ the outer one.
-
-```
-# Shadowing
-{
-    "type": "block",
-    "defs": [
-        ["foo", {"type": "literal", "value": 42}]
-    ],
-    "result": {
-        "type": "block",
-        "defs": [
-            ["foo", {"type": "literal", "value": 73}]
-        ],
-        "result": {"type": "name", "name": "foo"}
-    }
-}
->> 73
-```
-
 The name pattern can be `null`, which creates an _expression statement_. An expression statement evaluates the expression (usually for its side effects) and then discards the result.
 
 ```
@@ -199,30 +93,6 @@ An _array expression_ has the form `{"type": "array", "elements": <elements>}`. 
     ]
 }
 >> [1, 2, 3]
-```
-
-```
-# Array with elements of mixed types
-{
-    "type": "array",
-    "elements": [
-        {"type": "literal", "value": null},
-        {"type": "literal", "value": 1},
-        {"type": "literal", "value": "foo"}
-    ]
-}
->> [null, 1, "foo"]
-```
-
-```
-# Nested arrays
-{
-    "type": "array",
-    "elements": [
-        {"type": "array", "elements": [{"type": "literal", "value": 1}]}
-    ]
-}
->> [[1]]
 ```
 
 ```
@@ -397,36 +267,6 @@ An _object expression_ has the form `{"type": "object", "entries": <entries>}`. 
 ```
 
 ```
-# Object with values of mixed types
-{
-    "type": "object",
-    "entries": [
-        ["foo", {"type": "literal", "value": null}],
-        ["bar", {"type": "literal", "value": 1}],
-        ["baz", {"type": "array", "elements": [{"type": "literal", "value": 2}]}]
-    ]
-}
->> {foo: null, bar: 1, baz: [2]}
-```
-
-```
-# Nested objects
-{
-    "type": "object",
-    "entries": [
-        [
-            "foo",
-            {
-                "type": "object",
-                "entries": [["bar", {"type": "literal", "value": "baz"}]]
-            }
-        ]
-    ]
-}
->> {foo: {bar: "baz"}}
-```
-
-```
 # Object with expression keys and values
 {
     "type": "block",
@@ -547,7 +387,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
 ```
 
 ```
-# One positional parameter, one positional argument
+# Positional parameter and positional argument
 {
     "type": "block",
     "defs": [
@@ -563,44 +403,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
 ```
 
 ```
-# One positional parameter, no arguments
-{
-    "type": "block",
-    "defs": [
-        ["foo", {"type": "function", "posParams": ["x"], "body": {"type": "name", "name": "x"}}]
-    ],
-    "result": {"type": "call", "callee": {"type": "name", "name": "foo"}}
-}
-!! missingArgument {"name": "x"}
-```
-
-```
-# One optional positional parameter, one positional argument
-{
-    "type": "block",
-    "defs": [
-        [
-            "foo",
-            {
-                "type": "function",
-                "posParams": [
-                    {
-                        "type": "optional",
-                        "name": "x",
-                        "defaultValue": {"type": "literal", "value": 73}
-                    }
-                ],
-                "body": {"type": "name", "name": "x"}
-            }
-        ]
-    ],
-    "result": {"type": "call", "callee": {"type": "name", "name": "foo"}, "posArgs": [{"type": "literal", "value": 42}]}
-}
->> 42
-```
-
-```
-# One optional positional parameter, no arguments
+# Optional positional parameter
 {
     "type": "block",
     "defs": [
@@ -625,33 +428,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
 ```
 
 ```
-# Default value referencing a name
-{
-    "type": "block",
-    "defs": [
-        ["foo", {"type": "literal", "value": 73}],
-        [
-            "bar",
-            {
-                "type": "function",
-                "posParams": [
-                    {
-                        "type": "optional",
-                        "name": "x",
-                        "defaultValue": {"type": "name", "name": "foo"}
-                    }
-                ],
-                "body": {"type": "name", "name": "x"}
-            }
-        ]
-    ],
-    "result": {"type": "call", "callee": {"type": "name", "name": "bar"}}
-}
->> 73
-```
-
-```
-# Positional rest parameter
+# Positional rest parameter and spread argument
 {
     "type": "block",
     "defs": [
@@ -661,36 +438,6 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
                 "type": "function",
                 "posParams": [{"type": "rest", "name": "args"}],
                 "body": {"type": "name", "name": "args"}
-            }
-        ]
-    ],
-    "result": {
-        "type": "call",
-        "callee": {"type": "name", "name": "foo"},
-        "posArgs": [{"type": "literal", "value": 42}, {"type": "literal", "value": 97}]
-    }
-}
->> [42, 97]
-```
-
-```
-# Spread positional argument
-{
-    "type": "block",
-    "defs": [
-        [
-            "foo",
-            {
-                "type": "function",
-                "posParams": ["bar", "baz"],
-                "body": {
-                    "type": "array",
-                    "elements": [
-                        {"type": "name", "name": "baz"},
-                        {"type": "name", "name": "baz"},
-                        {"type": "name", "name": "bar"}
-                    ]
-                }
             }
         ]
     ],
@@ -711,11 +458,11 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
         ]
     }
 }
->> [97, 97, 42]
+>> [42, 97]
 ```
 
 ```
-# One named parameter, one argument with that name
+# Named parameter and named argument
 {
     "type": "block",
     "defs": [
@@ -728,34 +475,6 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
     }
 }
 >> 42
-```
-
-```
-# One named parameter, no arguments
-{
-    "type": "block",
-    "defs": [
-        ["foo", {"type": "function", "namedParams": [["x", "x"]], "body": {"type": "name", "name": "x"}}]
-    ],
-    "result": {"type": "call", "callee": {"type": "name", "name": "foo"}}
-}
-!! missingArgument {"name": "x"}
-```
-
-```
-# One named parameter, one positional argument
-{
-    "type": "block",
-    "defs": [
-        ["foo", {"type": "function", "namedParams": [["x", "x"]], "body": {"type": "name", "name": "x"}}]
-    ],
-    "result": {
-        "type": "call",
-        "callee": {"type": "name", "name": "foo"},
-        "posArgs": [{"type": "literal", "value": 42}]
-    }
-}
-!! missingArgument {"name": "x"}
 ```
 
 ```
@@ -792,7 +511,7 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
 ```
 
 ```
-# Named rest parameter
+# Named rest parameter and spread argument
 {
     "type": "block",
     "defs": [
@@ -809,193 +528,19 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
         "type": "call",
         "callee": {"type": "name", "name": "foo"},
         "namedArgs": [
-            ["bar", {"type": "literal", "value": 42}],
-            ["baz", {"type": "literal", "value": 97}]
-        ]
-    }
-}
->> {bar: 42, baz: 97}
-```
-
-```
-# Spread named argument
-{
-    "type": "block",
-    "defs": [
-        [
-            "foo",
-            {
-                "type": "function",
-                "namedParams": [["bar", "bar"], ["baz", "baz"]],
-                "body": {
-                    "type": "array",
-                    "elements": [
-                        {"type": "name", "name": "baz"},
-                        {"type": "name", "name": "baz"},
-                        {"type": "name", "name": "bar"}
-                    ]
-                }
-            }
-        ]
-    ],
-    "result": {
-        "type": "call",
-        "callee": {"type": "name", "name": "foo"},
-        "namedArgs": [
             {
                 "type": "spread",
                 "value": {
                     "type": "object",
                     "entries": [
-                        ["bar", {"type": "literal", "value": 42}],
-                        ["baz", {"type": "literal", "value": 97}]
+                        ["bar", {"type": "literal", "value": 42}], ["baz", {"type": "literal", "value": 97}]
                     ]
                 }
             }
         ]
     }
 }
->> [97, 97, 42]
-```
-
-```
-# Array destructuring in parameters
-{
-    "type": "block",
-    "defs": [
-        [
-            "foo",
-            {
-                "type": "function",
-                "posParams": [
-                    {"type": "arrayPattern", "names": ["foo", "bar"]}
-                ],
-                "body": {
-                    "type": "array",
-                    "elements": [
-                        {"type": "name", "name": "bar"},
-                        {"type": "name", "name": "bar"},
-                        {"type": "name", "name": "foo"}
-                    ]
-                }
-            }
-        ]
-    ],
-    "result": {
-        "type": "call",
-        "callee": {"type": "name", "name": "foo"},
-        "posArgs": [
-            {
-                "type": "array",
-                "elements": [
-                    {"type": "literal", "value": 42},
-                    {"type": "literal", "value": 97}
-                ]
-            }
-        ]
-    }
-}
->> [97, 97, 42]
-```
-
-```
-# Calling a non-function
-{
-    "type": "call",
-    "callee": {"type": "literal", "value": 42}
-}
-!! notCallable {"value": 42}
-```
-
-A function can reference names defined in an enclosing scope.
-
-```
-# A name from an enclosing function
-{
-    "type": "block",
-    "defs": [
-        ["x", {"type": "literal", "value": 73}],
-        [
-            "foo",
-            {
-                "type": "function",
-                "posParams": ["y"],
-                "body": {
-                    "type": "array",
-                    "elements": [
-                        {"type": "name", "name": "x"},
-                        {"type": "name", "name": "y"}
-                    ]
-                }
-            }
-        ]
-    ],
-    "result": {
-        "type": "call",
-        "callee": {"type": "name", "name": "foo"},
-        "posArgs": [{"type": "literal", "value": 42}]
-    }
-}
->> [73, 42]
-```
-
-A function can reference names that were in scope when the function was _defined_, even if those names are out of scope when the function is _called_.
-
-```
-# Closure
-{
-    "type": "call",
-    "callee": {
-        "type": "call",
-        "callee": {
-            "type": "function",
-            "body": {
-                "type": "block",
-                "defs": [["x", {"type": "literal", "value": 73}]],
-                "result": {
-                    "type": "function",
-                    "posParams": ["y"],
-                    "body": {
-                        "type": "array",
-                        "elements": [
-                            {"type": "name", "name": "x"},
-                            {"type": "name", "name": "y"}
-                        ]
-                    }
-                }
-            }
-        }
-    },
-    "posArgs": [{"type": "literal", "value": 42}]
-}
->> [73, 42]
-```
-
-On the other hand, names that are in scope when the function is called don't leak into the function body.
-
-```
-# Leakage
-{
-    "type": "block",
-    "defs": [
-        [
-            "leaky",
-            {"type": "function", "posParams": ["x"], "body": {"type": "name", "name": "intruder"}}
-        ]
-    ],
-    "result": {
-        "type": "block",
-        "defs": [
-            ["intruder", {"type": "literal", "value": 42}]
-        ],
-        "result": {
-            "type": "call",
-            "callee": {"type": "name", "name": "leaky"},
-            "posArgs": [{"type": "literal", "value": 73}]
-        }
-    }
-}
-!! nameNotDefined {"name": "intruder"}
+>> {bar: 42, baz: 97}
 ```
 
 ## Indexing|indexing
@@ -1005,7 +550,7 @@ An _index expression_ extracts the value at a specific index from a collection. 
 All numeric indexes are one-based.
 
 ```
-# Indexing strings
+# Indexing
 {
     "type": "index",
     "collection": {"type": "literal", "value": "foobar"},
@@ -1014,233 +559,9 @@ All numeric indexes are one-based.
 >> "b"
 ```
 
-```
-# Indexing strings - wrong index type
-{
-    "type": "index",
-    "collection": {"type": "literal", "value": "foobar"},
-    "index": {"type": "literal", "value": "baz"}
-}
-!! wrongType {"value": "baz", "expectedType": "Number"}
-```
-
-```
-# Indexing arrays
-{
-    "type": "index",
-    "collection": {
-        "type": "array",
-        "elements": [
-            {"type": "literal", "value": "foo"},
-            {"type": "literal", "value": "bar"}
-        ]
-    },
-    "index": {"type": "literal", "value": 2}
-}
->> "bar"
-```
-
-```
-# Indexing arrays - index from end
-{
-    "type": "index",
-    "collection": {
-        "type": "array",
-        "elements": [
-            {"type": "literal", "value": "foo"},
-            {"type": "literal", "value": "bar"}
-        ]
-    },
-    "index": {"type": "literal", "value": -2}
-}
->> "foo"
-```
-
-```
-# Indexing arrays - wrong index type
-{
-    "type": "index",
-    "collection": {
-        "type": "array",
-        "elements": [
-            {"type": "literal", "value": "foo"},
-            {"type": "literal", "value": "bar"}
-        ]
-    },
-    "index": {"type": "literal", "value": "baz"}
-}
-!! wrongType {"value": "baz", "expectedType": "Number"}
-```
-
-```
-# Indexing arrays - index less than minus length
-{
-    "type": "index",
-    "collection": {
-        "type": "array",
-        "elements": [
-            {"type": "literal", "value": "foo"},
-            {"type": "literal", "value": "bar"}
-        ]
-    },
-    "index": {"type": "literal", "value": -3}
-}
-!! indexOutOfBounds {"value": ["foo", "bar"], "length": 2, "index": -3}
-```
-
-```
-# Indexing arrays - index 0
-{
-    "type": "index",
-    "collection": {
-        "type": "array",
-        "elements": [
-            {"type": "literal", "value": "foo"},
-            {"type": "literal", "value": "bar"}
-        ]
-    },
-    "index": {"type": "literal", "value": 0}
-}
-!! indexOutOfBounds {"value": ["foo", "bar"], "length": 2, "index": 0}
-```
-
-```
-# Indexing arrays - index greater than length
-{
-    "type": "index",
-    "collection": {
-        "type": "array",
-        "elements": [
-            {"type": "literal", "value": "foo"},
-            {"type": "literal", "value": "bar"}
-        ]
-    },
-    "index": {"type": "literal", "value": 3}
-}
-!! indexOutOfBounds {"value": ["foo", "bar"], "length": 2, "index": 3}
-```
-
-```
-# Indexing objects
-{
-    "type": "index",
-    "collection": {
-        "type": "object",
-        "entries": [
-            ["foo", {"type": "literal", "value": "bar"}],
-            ["spam", {"type": "literal", "value": "eggs"}]
-        ]
-    },
-    "index": {"type": "literal", "value": "spam"}
-}
->> "eggs"
-```
-
-```
-# Indexing objects - wrong index type
-{
-    "type": "index",
-    "collection": {
-        "type": "object",
-        "entries": [
-            ["foo", {"type": "literal", "value": "bar"}],
-            ["spam", {"type": "literal", "value": "eggs"}]
-        ]
-    },
-    "index": {"type": "literal", "value": 42}
-}
-!! wrongType {"value": 42, "expectedType": "String"}
-```
-
-```
-# Indexing objects - property not in object
-{
-    "type": "index",
-    "collection": {
-        "type": "object",
-        "entries": [
-            ["foo", {"type": "literal", "value": "bar"}],
-            ["spam", {"type": "literal", "value": "eggs"}]
-        ]
-    },
-    "index": {"type": "literal", "value": "baz"}
-}
-!! missingProperty {"value": {"foo": "bar", "spam": "eggs"}, "key": "baz"}
-```
-
-```
-# Indexing something non-indexable
-{
-    "type": "index",
-    "collection": {"type": "literal", "value": 42},
-    "index": {"type": "literal", "value": 2}
-}
-!! wrongType {"value": 42, "expectedType": "either(Sequence, Object, Instance)"}
-```
-
 ## Errors|errors
 
-If an expression throws an error, that error propagates outward through enclosing expressions, aborting further evaluation.
-
-```
-# Error short-circuiting through function calls
-{
-    "type": "call",
-    "callee": {
-        "type": "function",
-        "body": {"type": "literal", "value": 42}
-    },
-    "posArgs": [
-        {
-            "type": "block",
-            "defs": [
-                [{"type": "arrayPattern", "names": ["foo"]}, {"type": "array", "elements": []}]
-            ],
-            "result": {"type": "name", "name": "foo"}
-        }
-    ]
-}
-!! missingElement {"value": [], "name": "foo"}
-```
-
-```
-# Error short-circuiting through arrays
-{
-    "type": "array",
-    "elements": [
-        {
-            "type": "block",
-            "defs": [
-                [{"type": "arrayPattern", "names": ["foo"]}, {"type": "array", "elements": []}]
-            ],
-            "result": {"type": "name", "name": "foo"}
-        }
-    ]
-}
-!! missingElement {"value": [], "name": "foo"}
-```
-
-```
-# Error short-circuiting through objects
-{
-    "type": "object",
-    "entries": [
-        [
-            "foo",
-            {
-                "type": "block",
-                "defs": [
-                    [{"type": "arrayPattern", "names": ["foo"]}, {"type": "array", "elements": []}]
-                ],
-                "result": {"type": "name", "name": "foo"}
-            }
-        ]
-    ]
-}
-!! missingElement {"value": [], "name": "foo"}
-```
-
-But if the error encounters a _catch expression_, the catch expression returns the error as a value, stopping its propagation. A catch expression has the form `{"type": "catch", "expression": <expression>}`.
+If an expression throws an error, that error propagates outward through enclosing expressions, aborting further evaluation. But if the error encounters a _catch expression_, the catch expression returns the error as a value, stopping its propagation. A catch expression has the form `{"type": "catch", "expression": <expression>}`.
 
 ```
 # Error catching

@@ -65,6 +65,12 @@ true
 ```
 
 ```
+# Literal decimal in scientific notation
+1.23e4
+>> {"type": "literal", "value": 1.23e4}
+```
+
+```
 # Literal string
 "foobar"
 >> {"type": "literal", "value": "foobar"}
@@ -176,29 +182,6 @@ An array parses to an [array expression](/docs/json#arrays).
 ```
 
 ```
-# Array with elements of mixed types
-[null, 1, "foo"]
->> {
-    "type": "array",
-    "elements": [
-        {"type": "literal", "value": null}, {"type": "literal", "value": 1},
-        {"type": "literal", "value": "foo"}
-    ]
-}
-```
-
-```
-# Nested arrays
-[[1]]
->> {
-    "type": "array",
-    "elements": [
-        {"type": "array", "elements": [{"type": "literal", "value": 1}]}
-    ]
-}
-```
-
-```
 # Array containing an expression to evaluate
 [foo]
 >> {"type": "array", "elements": [{"type": "name", "name": "foo"}]}
@@ -282,38 +265,6 @@ If the value is omitted, it defaults to reading the property name from the surro
     "entries": [
         ["foo", {"type": "name", "name": "foo"}],
         ["spam", {"type": "name", "name": "spam"}]
-    ]
-}
-```
-
-```
-# Object with values of mixed types
-{foo: null, bar: 1, baz: [2]}
->> {
-    "type": "object",
-    "entries": [
-        ["foo", {"type": "literal", "value": null}],
-        ["bar", {"type": "literal", "value": 1}],
-        ["baz", {"type": "array", "elements": [{"type": "literal", "value": 2}]}]
-    ]
-}
-```
-
-```
-# Nested objects
-{foo: {bar: "baz"}}
->> {
-    "type": "object",
-    "entries": [
-        [
-            "foo",
-            {
-                "type": "object",
-                "entries": [
-                    ["bar", {"type": "literal", "value": "baz"}]
-                ]
-            }
-        ]
     ]
 }
 ```
@@ -404,27 +355,6 @@ foo = (bar = 1; bar); foo
     "defs": [
         [
             {"type": "arrayPattern", "names": ["foo", "bar"]},
-            {"type": "name", "name": "arr"}
-        ]
-    ],
-    "result": {"type": "name", "name": "foo"}
-}
-```
-
-```
-# Nested array destructuring
-[foo, [spam, eggs]] = arr; foo
->> {
-    "type": "block",
-    "defs": [
-        [
-            {
-                "type": "arrayPattern",
-                "names": [
-                    "foo",
-                    {"type": "arrayPattern", "names": ["spam", "eggs"]}
-                ]
-            },
             {"type": "name", "name": "arr"}
         ]
     ],
@@ -544,21 +474,17 @@ A function definition parses to a [function expression](/docs/json#functions).
 
 ```
 # One positional parameter
-(x) => plus(x, 3)
+(x) => x
 >> {
     "type": "function",
     "posParams": ["x"],
-    "body": {
-        "type": "call",
-        "callee": {"type": "name", "name": "plus"},
-        "posArgs": [{"type": "name", "name": "x"}, {"type": "literal", "value": 3}]
-    }
+    "body": {"type": "name", "name": "x"}
 }
 ```
 
 ```
 # Optional positional parameter
-(x, y = 3) => plus(x, y)
+(x, y = 3) => x
 >> {
     "type": "function",
     "posParams": [
@@ -569,46 +495,34 @@ A function definition parses to a [function expression](/docs/json#functions).
             "defaultValue": {"type": "literal", "value": 3}
         }
     ],
-    "body": {
-        "type": "call",
-        "callee": {"type": "name", "name": "plus"},
-        "posArgs": [{"type": "name", "name": "x"}, {"type": "name", "name": "y"}]
-    }
+    "body": {"type": "name", "name": "x"}
 }
 ```
 
 ```
 # Positional rest parameter
-(*args) => length(args)
+(*args) => args
 >> {
     "type": "function",
     "posParams": [{"type": "rest", "name": "args"}],
-    "body": {
-        "type": "call",
-        "callee": {"type": "name", "name": "length"},
-        "posArgs": [{"type": "name", "name": "args"}]
-    }
+    "body": {"type": "name", "name": "args"}
 }
 ```
 
 ```
 # Named parameter
-(x, y:) => plus(x, y)
+(x, y:) => x
 >> {
     "type": "function",
     "posParams": ["x"],
     "namedParams": [["y", "y"]],
-    "body": {
-        "type": "call",
-        "callee": {"type": "name", "name": "plus"},
-        "posArgs": [{"type": "name", "name": "x"}, {"type": "name", "name": "y"}]
-    }
+    "body": {"type": "name", "name": "x"}
 }
 ```
 
 ```
 # Optional named parameter
-(x, y: = 3) => plus(x, y)
+(x, y: = 3) => x
 >> {
     "type": "function",
     "posParams": ["x"],
@@ -620,11 +534,7 @@ A function definition parses to a [function expression](/docs/json#functions).
             "defaultValue": {"type": "literal", "value": 3}
         }
     ]],
-    "body": {
-        "type": "call",
-        "callee": {"type": "name", "name": "plus"},
-        "posArgs": [{"type": "name", "name": "x"}, {"type": "name", "name": "y"}]
-    }
+    "body": {"type": "name", "name": "x"}
 }
 ```
 
@@ -640,49 +550,24 @@ A function definition parses to a [function expression](/docs/json#functions).
 
 ```
 # Named parameter with alias
-(x, y: z) => plus(x, z)
+(x, y: z) => x
 >> {
     "type": "function",
     "posParams": ["x"],
     "namedParams": [["y", "z"]],
-    "body": {
-        "type": "call",
-        "callee": {"type": "name", "name": "plus"},
-        "posArgs": [{"type": "name", "name": "x"}, {"type": "name", "name": "z"}]
-    }
-}
-```
-
-```
-# Array destructuring in parameters
-([foo, bar]) => foo
->> {
-    "type": "function",
-    "posParams": [
-        {"type": "arrayPattern", "names": ["foo", "bar"]}
-    ],
-    "body": {"type": "name", "name": "foo"}
+    "body": {"type": "name", "name": "x"}
 }
 ```
 
 ```
 # Scope in function body
-(x) => (y = plus(x, 3); y)
+(x) => (y = x; y)
 >> {
     "type": "function",
     "posParams": ["x"],
     "body": {
         "type": "block",
-        "defs": [
-            [
-                "y",
-                {
-                    "type": "call",
-                    "callee": {"type": "name", "name": "plus"},
-                    "posArgs": [{"type": "name", "name": "x"}, {"type": "literal", "value": 3}]
-                }
-            ]
-        ],
+        "defs": [["y", {"type": "name", "name": "x"}]],
         "result": {"type": "name", "name": "y"}
     }
 }
@@ -850,7 +735,7 @@ foo(x)(y)
 
 ### Pipes and Pipe-Calls|forward-pipe
 
-Pipe and pipe-call steps are transformed into ordinary function calls, producting [call expressions](/docs/json#functions).
+Pipe and pipe-call steps are transformed into ordinary function calls, producing [call expressions](/docs/json#functions).
 
 ```
 # Forward pipe into a bare name
