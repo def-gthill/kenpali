@@ -267,7 +267,7 @@ One of the elements of an array pattern can be a _rest pattern_, of the form `{"
 
 ## Objects|objects
 
-An _object expression_ has the form `{"type": "object", "entries": <entries>}`. The `<entries>` node is a JSON array containing name-value pairs. In each pair, the first element can be a string or an expression evaluating to a string, while the second element can be any expression.
+An _object expression_ has the form `{"type": "object", "entries": <entries>}`. The `<entries>` node is a JSON array containing name-value pairs. In each pair, the first element must be an expression evaluating to a string, while the second element can be any expression.
 
 ```
 # Empty object
@@ -280,20 +280,14 @@ An _object expression_ has the form `{"type": "object", "entries": <entries>}`. 
 {
     "type": "object",
     "entries": [
-        ["foo", {"type": "literal", "value": "bar"}],
-        ["spam", {"type": "literal", "value": "eggs"}]
-    ]
-}
->> {foo: "bar", spam: "eggs"}
-```
-
-```
-# Object with explicit literal keys
-{
-    "type": "object",
-    "entries": [
-        [{"type": "literal", "value": "foo"}, {"type": "literal", "value": "bar"}],
-        [{"type": "literal", "value": "spam"}, {"type": "literal", "value": "eggs"}]
+        [
+            {"type": "literal", "value": "foo"},
+            {"type": "literal", "value": "bar"}
+        ],
+        [
+            {"type": "literal", "value": "spam"},
+            {"type": "literal", "value": "eggs"}
+        ]
     ]
 }
 >> {foo: "bar", spam: "eggs"}
@@ -316,32 +310,47 @@ An _object expression_ has the form `{"type": "object", "entries": <entries>}`. 
     "result": {
         "type": "object",
         "entries": [
-            [{"type": "name", "name": "key"}, {"type": "name", "name": "value"}]
+            [
+                {"type": "name", "name": "key"},
+                {"type": "name", "name": "value"}
+            ]
         ]
     }
 }
 >> {foo: 42}
 ```
 
-Instead of a name-value pair, any of the object's elements can be a _spread_ instead. A spread has the form `{"type": "spread", "value": <value>}`, where `<value>` is any expression. The `<value>` expression is expected to evaluate to an object, whose entries are added to the containing object.
+Instead of an expression, a key can be `{"type": "spread"}` instead. The corresponding `<value>` expression is expected to evaluate to an object, whose entries are added to the containing object.
 
 ```
 # Object with spread
 {
     "type": "object",
     "entries": [
-        ["answer", {"type": "literal", "value": 42}],
-        {
-            "type": "spread",
-            "value": {
+        [
+            {"type": "literal", "value": "answer"},
+            {"type": "literal", "value": 42}
+        ],
+        [
+            {"type": "spread"},
+            {
                 "type": "object",
                 "entries": [
-                    ["bar", {"type": "literal", "value": 1}],
-                    ["baz", {"type": "literal", "value": 2}]
+                    [
+                        {"type": "literal", "value": "bar"},
+                        {"type": "literal", "value": 1}
+                    ],
+                    [
+                        {"type": "literal", "value": "baz"},
+                        {"type": "literal", "value": 2}
+                    ]
                 ]
             }
-        },
-        ["question", {"type": "literal", "value": 69}]
+        ],
+        [
+            {"type": "literal", "value": "question"},
+            {"type": "literal", "value": 69}
+        ]
     ]
 }
 >> {answer: 42, bar: 1, baz: 2, question: 69}
@@ -369,8 +378,14 @@ When defining [names](#names), an _object pattern_ can be used to extract proper
             {
                 "type": "object",
                 "entries": [
-                    ["bar", {"type": "literal", "value": 42}],
-                    ["foo", {"type": "literal", "value": 97}]
+                    [
+                        {"type": "literal", "value": "bar"},
+                        {"type": "literal", "value": 42}
+                    ],
+                    [
+                        {"type": "literal", "value": "foo"},
+                        {"type": "literal", "value": 97}
+                    ]
                 ]
             }
         ]
@@ -387,7 +402,7 @@ When defining [names](#names), an _object pattern_ can be used to extract proper
 >> [97, 97, 42]
 ```
 
-One of the entries of an object pattern can be a _rest pattern_, of the form `{"type": "rest", "name": <name>}`. The `<name>` is bound to an object containing whatever properties aren't mentioned explicitly in the object pattern.
+One of the entries of an object pattern can have `{"type": "rest"}` as its key. The corresponding name pattern is bound to an object containing whatever properties aren't mentioned explicitly in the object pattern.
 
 ```
 # Object destructuring with rest
@@ -402,15 +417,27 @@ One of the entries of an object pattern can be a _rest pattern_, of the form `{"
                         {"type": "literal", "value": "bar"},
                         {"type": "name", "name": "bar"}
                     ],
-                    {"type": "rest", "name": {"type": "name", "name": "others"}}
+                    [
+                        {"type": "rest"},
+                        {"type": "name", "name": "others"}
+                    ]
                 ]
             },
             {
                 "type": "object",
                 "entries": [
-                    ["baz", {"type": "literal", "value": 216}],
-                    ["bar", {"type": "literal", "value": 42}],
-                    ["foo", {"type": "literal", "value": 97}]
+                    [
+                        {"type": "literal", "value": "baz"},
+                        {"type": "literal", "value": 216}
+                    ],
+                    [
+                        {"type": "literal", "value": "bar"},
+                        {"type": "literal", "value": 42}
+                    ],
+                    [
+                        {"type": "literal", "value": "foo"},
+                        {"type": "literal", "value": 97}
+                    ]
                 ]
             }
         ]
@@ -551,35 +578,12 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
     "result": {
         "type": "call",
         "callee": {"type": "name", "name": "foo"},
-        "namedArgs": [["x", {"type": "literal", "value": 42}]]
-    }
-}
->> 42
-```
-
-```
-# Explicit literal named argument
-{
-    "type": "block",
-    "defs": [
-        [
-            {"type": "name", "name": "foo"},
-            {
-                "type": "function",
-                "namedParams": [
-                    [
-                        {"type": "literal", "value": "x"},
-                        {"type": "name", "name": "x"}
-                    ]
-                ],
-                "body": {"type": "name", "name": "x"}
-            }
+        "namedArgs": [
+            [
+                {"type": "literal", "value": "x"},
+                {"type": "literal", "value": 42}
+            ]
         ]
-    ],
-    "result": {
-        "type": "call",
-        "callee": {"type": "name", "name": "foo"},
-        "namedArgs": [[{"type": "literal", "value": "x"}, {"type": "literal", "value": 42}]]
     }
 }
 >> 42
@@ -611,7 +615,12 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
     "result": {
         "type": "call",
         "callee": {"type": "name", "name": "foo"},
-        "namedArgs": [[{"type": "name", "name": "key"}, {"type": "literal", "value": 42}]]
+        "namedArgs": [
+            [
+                {"type": "name", "name": "key"},
+                {"type": "literal", "value": 42}
+            ]
+        ]
     }
 }
 >> 42
@@ -627,7 +636,10 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
             {
                 "type": "function",
                 "namedParams": [
-                    {"type": "rest", "name": {"type": "name", "name": "namedArgs"}}
+                    [
+                        {"type": "rest"},
+                        {"type": "name", "name": "namedArgs"}
+                    ]
                 ],
                 "body": {"type": "name", "name": "namedArgs"}
             }
@@ -637,15 +649,22 @@ Functions are called using a _call expression_, which has the form `{"type": "ca
         "type": "call",
         "callee": {"type": "name", "name": "foo"},
         "namedArgs": [
-            {
-                "type": "spread",
-                "value": {
+            [
+                {"type": "spread"},
+                {
                     "type": "object",
                     "entries": [
-                        ["bar", {"type": "literal", "value": 42}], ["baz", {"type": "literal", "value": 97}]
+                        [
+                            {"type": "literal", "value": "bar"},
+                            {"type": "literal", "value": 42}
+                        ],
+                        [
+                            {"type": "literal", "value": "baz"},
+                            {"type": "literal", "value": 97}
+                        ]
                     ]
                 }
-            }
+            ]
         ]
     }
 }

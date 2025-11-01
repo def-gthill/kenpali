@@ -222,8 +222,14 @@ An object parses to an [object expression](/docs/json#objects).
 >> {
     "type": "object",
     "entries": [
-        ["foo", {"type": "literal", "value": "bar"}],
-        ["spam", {"type": "literal", "value": "eggs"}]
+        [
+            {"type": "literal", "value": "foo"},
+            {"type": "literal", "value": "bar"}
+        ],
+        [
+            {"type": "literal", "value": "spam"},
+            {"type": "literal", "value": "eggs"}
+        ]
     ]
 }
 ```
@@ -236,8 +242,14 @@ If a key is a valid Kenpali name, the quotes can be omitted.
 >> {
     "type": "object",
     "entries": [
-        ["foo", {"type": "literal", "value": "bar"}],
-        ["spam", {"type": "literal", "value": "eggs"}]
+        [
+            {"type": "literal", "value": "foo"},
+            {"type": "literal", "value": "bar"}
+        ],
+        [
+            {"type": "literal", "value": "spam"},
+            {"type": "literal", "value": "eggs"}
+        ]
     ]
 }
 ```
@@ -250,7 +262,10 @@ If the key is meant to actually reference a name from the surrounding scope, enc
 >> {
     "type": "object",
     "entries": [
-        [{"type": "name", "name": "key"}, {"type": "name", "name": "value"}]
+        [
+            {"type": "name", "name": "key"},
+            {"type": "name", "name": "value"}
+        ]
     ]
 }
 ```
@@ -263,8 +278,14 @@ If the value is omitted, it defaults to reading the property name from the surro
 >> {
     "type": "object",
     "entries": [
-        ["foo", {"type": "name", "name": "foo"}],
-        ["spam", {"type": "name", "name": "spam"}]
+        [
+            {"type": "literal", "value": "foo"},
+            {"type": "name", "name": "foo"}
+        ],
+        [
+            {"type": "literal", "value": "spam"},
+            {"type": "name", "name": "spam"}
+        ]
     ]
 }
 ```
@@ -275,9 +296,18 @@ If the value is omitted, it defaults to reading the property name from the surro
 >> {
     "type": "object",
     "entries": [
-        ["answer", {"type": "literal", "value": 42}],
-        {"type": "spread", "value": {"type": "name", "name": "foo"}},
-        ["question", {"type": "literal", "value": 69}]
+        [
+            {"type": "literal", "value": "answer"},
+            {"type": "literal", "value": 42}
+        ],
+        [
+            {"type": "spread"},
+            {"type": "name", "name": "foo"}
+        ],
+        [
+            {"type": "literal", "value": "question"},
+            {"type": "literal", "value": 69}
+        ]
     ]
 }
 ```
@@ -584,10 +614,10 @@ A function definition parses to a [function expression](/docs/json#functions).
 >> {
     "type": "function",
     "namedParams": [
-        {
-            "type": "rest",
-            "name": {"type": "name", "name": "namedArgs"}
-        }
+        [
+            {"type": "rest"},
+            {"type": "name", "name": "namedArgs"}
+        ]
     ],
     "body": {"type": "name", "name": "namedArgs"}
 }
@@ -709,7 +739,12 @@ foo(bar: 1)
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "foo"},
-    "namedArgs": [["bar", {"type": "literal", "value": 1}]]
+    "namedArgs": [
+        [
+            {"type": "literal", "value": "bar"},
+            {"type": "literal", "value": 1}
+        ]
+    ]
 }
 ```
 
@@ -719,7 +754,16 @@ foo(bar: 1, baz: 2)
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "foo"},
-    "namedArgs": [["bar", {"type": "literal", "value": 1}], ["baz", {"type": "literal", "value": 2}]]
+    "namedArgs": [
+        [
+            {"type": "literal", "value": "bar"},
+            {"type": "literal", "value": 1}
+        ],
+        [
+            {"type": "literal", "value": "baz"},
+            {"type": "literal", "value": 2}
+        ]
+    ]
 }
 ```
 
@@ -729,7 +773,12 @@ foo("bar": 1)
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "foo"},
-    "namedArgs": [["bar", {"type": "literal", "value": 1}]]
+    "namedArgs": [
+        [
+            {"type": "literal", "value": "bar"},
+            {"type": "literal", "value": 1}
+        ]
+    ]
 }
 ```
 
@@ -739,7 +788,12 @@ foo((bar): 1)
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "foo"},
-    "namedArgs": [[{"type": "name", "name": "bar"}, {"type": "literal", "value": 1}]]
+    "namedArgs": [
+        [
+            {"type": "name", "name": "bar"},
+            {"type": "literal", "value": 1}
+        ]
+    ]
 }
 ```
 
@@ -749,7 +803,16 @@ foo(bar:, baz:)
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "foo"},
-    "namedArgs": [["bar", {"type": "name", "name": "bar"}], ["baz", {"type": "name", "name": "baz"}]]
+    "namedArgs": [
+        [
+            {"type": "literal", "value": "bar"},
+            {"type": "name", "name": "bar"}
+        ],
+        [
+            {"type": "literal", "value": "baz"},
+            {"type": "name", "name": "baz"}
+        ]
+    ]
 }
 ```
 
@@ -759,7 +822,12 @@ foo(**bar)
 >> {
     "type": "call",
     "callee": {"type": "name", "name": "foo"},
-    "namedArgs": [{"type": "spread", "value": {"type": "name", "name": "bar"}}]
+    "namedArgs": [
+        [
+            {"type": "spread"},
+            {"type": "name", "name": "bar"}
+        ]
+    ]
 }
 ```
 
@@ -770,7 +838,16 @@ foo(1, 2, bar: 3, baz: 4)
     "type": "call",
     "callee": {"type": "name", "name": "foo"},
     "posArgs": [{"type": "literal", "value": 1}, {"type": "literal", "value": 2}],
-    "namedArgs": [["bar", {"type": "literal", "value": 3}], ["baz", {"type": "literal", "value": 4}]]
+    "namedArgs": [
+        [
+            {"type": "literal", "value": "bar"},
+            {"type": "literal", "value": 3}
+        ],
+        [
+            {"type": "literal", "value": "baz"},
+            {"type": "literal", "value": 4}
+        ]
+    ]
 }
 ```
 
@@ -819,7 +896,12 @@ Pipe and pipe-call steps are transformed into ordinary function calls, producing
     "type": "call",
     "callee": {"type": "name", "name": "bar"},
     "posArgs": [{"type": "literal", "value": 1}],
-    "namedArgs": [["foo", {"type": "literal", "value": 2}]]
+    "namedArgs": [
+        [
+            {"type": "literal", "value": "foo"},
+            {"type": "literal", "value": 2}
+        ]
+    ]
 }
 ```
 
