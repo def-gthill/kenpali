@@ -320,7 +320,10 @@ foo = 42; foo
 >> {
     "type": "block",
     "defs": [
-        ["foo", {"type": "literal", "value": 42}]
+        [
+            {"type": "name", "name": "foo"},
+            {"type": "literal", "value": 42}
+        ]
     ],
     "result": {"type": "name", "name": "foo"}
 }
@@ -333,11 +336,14 @@ foo = (bar = 1; bar); foo
     "type": "block",
     "defs": [
         [
-            "foo",
+            {"type": "name", "name": "foo"},
             {
                 "type": "block",
                 "defs": [
-                    ["bar", {"type": "literal", "value": 1}]
+                    [
+                        {"type": "name", "name": "bar"},
+                        {"type": "literal", "value": 1}
+                    ]
                 ],
                 "result": {"type": "name", "name": "bar"}
             }
@@ -354,7 +360,13 @@ foo = (bar = 1; bar); foo
     "type": "block",
     "defs": [
         [
-            {"type": "arrayPattern", "names": ["foo", "bar"]},
+            {
+                "type": "arrayPattern",
+                "names": [
+                    {"type": "name", "name": "foo"},
+                    {"type": "name", "name": "bar"}
+                ]
+            },
             {"type": "name", "name": "arr"}
         ]
     ],
@@ -369,7 +381,19 @@ foo = (bar = 1; bar); foo
     "type": "block",
     "defs": [
         [
-            {"type": "objectPattern", "entries": [["foo", "foo"], ["bar", "bar"]]},
+            {
+                "type": "objectPattern",
+                "entries": [
+                    [
+                        {"type": "literal", "value": "foo"},
+                        {"type": "name", "name": "foo"}
+                    ],
+                    [
+                        {"type": "literal", "value": "bar"},
+                        {"type": "name", "name": "bar"}
+                    ]
+                ]
+            },
             {"type": "name", "name": "obj"}
         ]
     ],
@@ -387,8 +411,14 @@ foo = (bar = 1; bar); foo
             {
                 "type": "objectPattern",
                 "entries": [
-                    ["foo", "spam"],
-                    ["bar", "eggs"]
+                    [
+                        {"type": "literal", "value": "foo"},
+                        {"type": "name", "name": "spam"}
+                    ],
+                    [
+                        {"type": "literal", "value": "bar"},
+                        {"type": "name", "name": "eggs"}
+                    ]
                 ]
             },
             {"type": "name", "name": "obj"}
@@ -404,7 +434,10 @@ foo; 42
 >> {
     "type": "block",
     "defs": [
-        [null, {"type": "name", "name": "foo"}]
+        [
+            {"type": "ignore"},
+            {"type": "name", "name": "foo"}
+        ]
     ],
     "result": {"type": "literal", "value": 42}
 }
@@ -477,7 +510,7 @@ A function definition parses to a [function expression](/docs/json#functions).
 (x) => x
 >> {
     "type": "function",
-    "posParams": ["x"],
+    "posParams": [{"type": "name", "name": "x"}],
     "body": {"type": "name", "name": "x"}
 }
 ```
@@ -488,10 +521,10 @@ A function definition parses to a [function expression](/docs/json#functions).
 >> {
     "type": "function",
     "posParams": [
-        "x",
+        {"type": "name", "name": "x"},
         {
             "type": "optional",
-            "name": "y",
+            "name": {"type": "name", "name": "y"},
             "defaultValue": {"type": "literal", "value": 3}
         }
     ],
@@ -504,7 +537,7 @@ A function definition parses to a [function expression](/docs/json#functions).
 (*args) => args
 >> {
     "type": "function",
-    "posParams": [{"type": "rest", "name": "args"}],
+    "posParams": [{"type": "rest", "name": {"type": "name", "name": "args"}}],
     "body": {"type": "name", "name": "args"}
 }
 ```
@@ -514,8 +547,13 @@ A function definition parses to a [function expression](/docs/json#functions).
 (x, y:) => x
 >> {
     "type": "function",
-    "posParams": ["x"],
-    "namedParams": [["y", "y"]],
+    "posParams": [{"type": "name", "name": "x"}],
+    "namedParams": [
+        [
+            {"type": "literal", "value": "y"},
+            {"type": "name", "name": "y"}
+        ]
+    ],
     "body": {"type": "name", "name": "x"}
 }
 ```
@@ -525,15 +563,17 @@ A function definition parses to a [function expression](/docs/json#functions).
 (x, y: = 3) => x
 >> {
     "type": "function",
-    "posParams": ["x"],
-    "namedParams": [[
-        "y",
-        {
-            "type": "optional",
-            "name": "y",
-            "defaultValue": {"type": "literal", "value": 3}
-        }
-    ]],
+    "posParams": [{"type": "name", "name": "x"}],
+    "namedParams": [
+        [
+            {"type": "literal", "value": "y"},
+            {
+                "type": "optional",
+                "name": {"type": "name", "name": "y"},
+                "defaultValue": {"type": "literal", "value": 3}
+            }
+        ]
+    ],
     "body": {"type": "name", "name": "x"}
 }
 ```
@@ -543,7 +583,12 @@ A function definition parses to a [function expression](/docs/json#functions).
 (**namedArgs) => namedArgs
 >> {
     "type": "function",
-    "namedParams": [{"type": "rest", "name": "namedArgs"}],
+    "namedParams": [
+        {
+            "type": "rest",
+            "name": {"type": "name", "name": "namedArgs"}
+        }
+    ],
     "body": {"type": "name", "name": "namedArgs"}
 }
 ```
@@ -553,8 +598,13 @@ A function definition parses to a [function expression](/docs/json#functions).
 (x, y: z) => x
 >> {
     "type": "function",
-    "posParams": ["x"],
-    "namedParams": [["y", "z"]],
+    "posParams": [{"type": "name", "name": "x"}],
+    "namedParams": [
+        [
+            {"type": "literal", "value": "y"},
+            {"type": "name", "name": "z"}
+        ]
+    ],
     "body": {"type": "name", "name": "x"}
 }
 ```
@@ -564,10 +614,15 @@ A function definition parses to a [function expression](/docs/json#functions).
 (x) => (y = x; y)
 >> {
     "type": "function",
-    "posParams": ["x"],
+    "posParams": [{"type": "name", "name": "x"}],
     "body": {
         "type": "block",
-        "defs": [["y", {"type": "name", "name": "x"}]],
+        "defs": [
+            [
+                {"type": "name", "name": "y"},
+                {"type": "name", "name": "x"}
+            ]
+        ],
         "result": {"type": "name", "name": "y"}
     }
 }
@@ -804,7 +859,7 @@ Pipe and pipe-call steps are transformed into ordinary function calls, producing
 (x) => x | plus(3)
 >> {
     "type": "function",
-    "posParams": ["x"],
+    "posParams": [{"type": "name", "name": "x"}],
     "body": {
         "type": "call",
         "callee": {"type": "name", "name": "plus"},
@@ -959,7 +1014,7 @@ A _point-free pipeline_ is written as a pipeline missing the initial value. It p
 | foo | bar(2)
 >> {
     "type": "function",
-    "posParams": ["pipelineArg"],
+    "posParams": [{"type": "name", "name": "pipelineArg"}],
     "body": {
         "type": "call",
         "callee": {"type": "name", "name": "bar"},
