@@ -3573,6 +3573,73 @@ Returns:
 >> ["badIdea", {foo: "bar", spam: "eggs"}]
 ```
 
+### throw|throw
+
+Throws an error.
+
+Parameters:
+
+- `error` (_Error_): The error to throw.
+
+Returns:
+
+- (_Never_): Never returns.
+
+```
+# Throwing an error
+throw(newError("badIdea", foo: "bar", spam: "eggs"))
+!! badIdea {"foo": "bar", "spam": "eggs"}
+```
+
+### try|try
+
+Calls the specified function, then invokes one of the specified handlers depending on whether the function threw an error.
+
+Parameters:
+
+- `f` (_Function_): The function to call.
+- `onError:` (_Function_): The handler to invoke if the function throws an error.
+- `onSuccess:` (_Function or Null_, default `null`): The handler to invoke if the function returns normally, or `null` to simply return the function's result.
+
+```
+# Trying a function
+explode = $ throw(newError("badIdea"));
+[
+    try($ 42, onSuccess: up, onError: |.type),
+    try(explode, onSuccess: up, onError: |.type),
+    try($ 42, onError: |.type),
+    try(explode, onError: |.type),
+]
+>> [43, "badIdea", 42, "badIdea"]
+```
+
+### catch|catch
+
+Calls the specified function, returning `{status: "success", value: <value>}` if the function returns normally, or `{status: "error", error: <error>}` if the function throws an error.
+
+This is useful if the result of a fallable operation needs to be stored somewhere for later processing.
+
+Parameters:
+
+- `f` (_Function_): The function to call.
+
+Returns:
+
+- (_Object_): An object with the status and value or error.
+
+```
+# Catching errors
+[
+    catch($ 42),
+    catch($ throw(newError("badIdea")))
+    | (({status:, error:}) => {status:, error: error.type}),
+]
+>> [
+    {status: "success", value: 42},
+    {status: "error", error: "badIdea"}
+]
+```
+
 ## Validation|validation
 
 Kenpali is a dynamically typed language, but it does strict type checks at runtime. The core module exposes several functions to interact with the type checking system.

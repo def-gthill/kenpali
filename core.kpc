@@ -34,6 +34,11 @@ most = (sequence) => (
     )
     | last
 );
+toFunction = (value) => if(
+    value | isFunction,
+    then: $ value,
+    else: $ $ value,
+);
 butIf = (value, condition, ifTrue) => if(
     toFunction(condition)(value),
     then: $ ifTrue(value),
@@ -130,4 +135,9 @@ merge = (objects) => (
     objects | transform(properties) | flatten | toObject
 );
 itself = (x) => x;
-also = (value, f) => (f(value); value);
+also = (value, action) => (action(value); value);
+catch = (f) => try(
+    f,
+    onSuccess: (value) => {status: "success", value:},
+    onError: (error) => {status: "error", error:},
+);
