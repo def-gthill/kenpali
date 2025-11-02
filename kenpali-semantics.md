@@ -680,7 +680,7 @@ If an expression throws an error, that error propagates outward through enclosin
 
 ```
 # Error thrown after catching
-1 @ 1 ! @ 1
+try($ 1 @ 1, onError: itself) @ 1
 !! wrongType {"expectedType": "String"}
 ```
 
@@ -692,7 +692,7 @@ bar = $ (
 foo = $ bar();
 main = $ (
   baz = $ foo();
-  baz() ! |.calls
+  try(baz, onError: |.calls)
 );
 main()
 >> [

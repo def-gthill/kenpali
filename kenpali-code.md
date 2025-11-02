@@ -950,38 +950,6 @@ Pipe and pipe-call steps are transformed into ordinary function calls, producing
 }
 ```
 
-### Error Catching|error-catching
-
-Error catching steps parse to [catch expressions](/docs/json#errors).
-
-```
-# Error catching
-foo !
->> {
-    "type": "catch",
-    "expression": {"type": "name", "name": "foo"}
-}
-```
-
-```
-# Error catching in pipeline
-1 | foo ! | bar
->> {
-    "type": "call",
-    "callee": {"type": "name", "name": "bar"},
-    "posArgs": [
-        {
-            "type": "catch",
-            "expression": {
-                "type": "call",
-                "callee": {"type": "name", "name": "foo"},
-                "posArgs": [{"type": "literal", "value": 1}]
-            }
-        }
-    ]
-}
-```
-
 ### Indexing|indexing
 
 Indexing steps parse to [index expressions](/docs/json#indexing).

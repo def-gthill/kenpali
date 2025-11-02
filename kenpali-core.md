@@ -782,7 +782,7 @@ Returns:
     classOf(1 | to(3)),
     classOf({foo: 1, bar: 2}),
     classOf((x) => x),
-    classOf((1 @ 1)!),
+    classOf(newError("badIdea")),
     classOf(Number),
     classOf(Sequence),
 ]
@@ -816,7 +816,7 @@ Returns:
     isNull({foo: 1, bar: 2}),
     isNull(classOf),
     isNull((x) => x),
-    isNull((1 @ 1)!),
+    isNull(newError("badIdea")),
     isNull(Number),
     isNull(Sequence),
 ]
@@ -848,7 +848,7 @@ Returns:
     isBoolean({foo: 1, bar: 2}),
     isBoolean(classOf),
     isBoolean((x) => x),
-    isBoolean((1 @ 1)!),
+    isBoolean(newError("badIdea")),
     isBoolean(Number),
     isBoolean(Sequence),
 ]
@@ -880,7 +880,7 @@ Returns:
     isNumber({foo: 1, bar: 2}),
     isNumber(classOf),
     isNumber((x) => x),
-    isNumber((1 @ 1)!),
+    isNumber(newError("badIdea")),
     isNumber(Number),
     isNumber(Sequence),
 ]
@@ -939,7 +939,7 @@ Returns:
     isString({foo: 1, bar: 2}),
     isString(classOf),
     isString((x) => x),
-    isString((1 @ 1)!),
+    isString(newError("badIdea")),
     isString(Number),
     isString(Sequence),
 ]
@@ -973,7 +973,7 @@ Returns:
     display(1 | to(3)),
     display({foo: "bar", "spam!": "eggs"}),
     display(display),
-    display((1 @ 1)!),
+    display(newError("badIdea", foo: "bar")),
     display(Number),
     display(Sequence),
 ]
@@ -988,7 +988,7 @@ Returns:
     "Stream [...]",
     "{foo: \"bar\", \"spam!\": \"eggs\"}",
     "Function {name: \"display\"}",
-    "Error {type: \"wrongType\", details: {value: 1, expectedType: \"either(Sequence, Object, Instance)\"}, calls: []}",
+    "Error {type: \"badIdea\", details: {foo: \"bar\"}, calls: []}",
     "Class {name: \"Number\"}",
     "Protocol {name: \"Sequence\"}",
 ]
@@ -1060,7 +1060,7 @@ Returns:
     isArray({foo: 1, bar: 2}),
     isArray(classOf),
     isArray((x) => x),
-    isArray((1 @ 1)!),
+    isArray(newError("badIdea")),
     isArray(Number),
     isArray(Sequence),
 ]
@@ -1104,7 +1104,7 @@ Returns:
     isStream({foo: 1, bar: 2}),
     isStream(classOf),
     isStream((x) => x),
-    isStream((1 @ 1)!),
+    isStream(newError("badIdea")),
     isStream(Number),
     isStream(Sequence),
 ]
@@ -1150,7 +1150,7 @@ Returns:
     isObject({foo: 1, bar: 2}),
     isObject(classOf),
     isObject((x) => x),
-    isObject((1 @ 1)!),
+    isObject(newError("badIdea")),
     isObject(Number),
     isObject(Sequence),
 ]
@@ -1182,7 +1182,7 @@ Returns:
     isFunction({foo: 1, bar: 2}),
     isFunction(classOf),
     isFunction((x) => x),
-    isFunction((1 @ 1)!),
+    isFunction(newError("badIdea")),
     isFunction(Number),
     isFunction(Sequence),
 ]
@@ -1216,7 +1216,7 @@ Returns:
     isError({foo: 1, bar: 2}),
     isError(classOf),
     isError((x) => x),
-    isError((1 @ 1)!),
+    isError(newError("badIdea")),
     isError(Number),
     isError(Sequence),
 ]
@@ -1273,7 +1273,7 @@ Returns:
     isClass({foo: 1, bar: 2}),
     isClass(classOf),
     isClass((x) => x),
-    isClass((1 @ 1)!),
+    isClass(newError("badIdea")),
     isClass(Number),
     isClass(Sequence),
 ]
@@ -1305,7 +1305,7 @@ Returns:
     isSequence({foo: 1, bar: 2}),
     isSequence(classOf),
     isSequence((x) => x),
-    isSequence((1 @ 1)!),
+    isSequence(newError("badIdea")),
     isSequence(Number),
     isSequence(Sequence),
 ]
@@ -1337,7 +1337,7 @@ Returns:
     isType({foo: 1, bar: 2}),
     isType(classOf),
     isType((x) => x),
-    isType((1 @ 1)!),
+    isType(newError("badIdea")),
     isType(Number),
     isType(Sequence),
 ]
@@ -1369,7 +1369,7 @@ Returns:
     isInstance({foo: 1, bar: 2}),
     isInstance(classOf),
     isInstance((x) => x),
-    isInstance((1 @ 1)!),
+    isInstance(newError("badIdea")),
     isInstance(Number),
     isInstance(Sequence),
 ]
@@ -1709,7 +1709,7 @@ Returns:
 ```
 # Stream value
 [
-    emptyStream() |.value() ! |.type,
+    try($ emptyStream() |.value(), onError: itself) |.type,
     (1 | to(3)) |.value(),
 ]
 >> ["missingProperty", 1]
@@ -1728,7 +1728,7 @@ Returns:
 ```
 # Stream next
 [
-    emptyStream() |.next() ! |.type,
+    try($ emptyStream() |.next(), onError: itself) |.type,
     (1 | to(3)) |.next() | toArray,
 ]
 >> ["missingProperty", [2, 3]]
@@ -2583,11 +2583,11 @@ Converts the specified value into an object.
 
 If the value is an array or stream, its elements are treated as key-value pairs. Any duplicate keys are assigned the value from the _last_ pair with that key in the sequence.
 
-If the value is an error, an object containing the error details is returned.
+If the value is an instance, an object containing its class name and properties is returned.
 
 Parameters:
 
-- `value` (_Array or Stream or Error_): The value to convert. If an array or stream, it must contain tuples like _[string, any]_.
+- `value` (_Array or Instance_): The value to convert. If an array or stream, it must contain tuples like _[string, any]_.
 
 Returns:
 
@@ -2608,9 +2608,9 @@ properties | toObject
 ```
 
 ```
-# Object from error
-1 @ 1 ! | toObject
->> {"#class": "Error", type: "wrongType", details: {value: 1, expectedType: "either(Sequence, Object, Instance)"}, calls: []}
+# Object from instance
+newError("badIdea", foo: "bar") | toObject
+>> {"#class": "Error", type: "badIdea", details: {foo: "bar"}, calls: []}
 ```
 
 ### properties|properties
@@ -3699,8 +3699,8 @@ Returns:
     classOf | matches(Function),
     ((x) => x) | matches(Object),
     ((x) => x) | matches(Function),
-    (1 @ 1)! |  matches(Function),
-    (1 @ 1)! | matches(Error),
+    newError("badIdea") | matches(Function),
+    newError("badIdea") | matches(Error),
     null | matches(Error),
 ]
 >> [
@@ -3733,7 +3733,7 @@ Returns:
     {foo: 1, bar: 2} | matches(Sequence),
     classOf | matches(Sequence),
     ((x) => x) | matches(Sequence),
-    (1 @ 1)! | matches(Sequence),
+    newError("badIdea") | matches(Sequence),
     Number | matches(Sequence),
     Sequence | matches(Sequence),
     "foo" | matches(Type),
@@ -3741,7 +3741,7 @@ Returns:
     {foo: 1, bar: 2} | matches(Type),
     classOf | matches(Type),
     ((x) => x) | matches(Type),
-    (1 @ 1)! | matches(Type),
+    newError("badIdea") | matches(Type),
     Number | matches(Type),
     Sequence | matches(Type),
     "foo" | matches(Any),
@@ -3749,7 +3749,7 @@ Returns:
     {foo: 1, bar: 2} | matches(Any),
     classOf | matches(Any),
     ((x) => x) | matches(Any),
-    (1 @ 1)! | matches(Any),
+    newError("badIdea") | matches(Any),
     Number | matches(Any),
     Sequence | matches(Any),
 ]

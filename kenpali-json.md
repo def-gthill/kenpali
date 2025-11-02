@@ -686,37 +686,3 @@ All numeric indexes are one-based.
 }
 >> "b"
 ```
-
-## Errors|errors
-
-If an expression throws an error, that error propagates outward through enclosing expressions, aborting further evaluation. But if the error encounters a _catch expression_, the catch expression returns the error as a value, stopping its propagation. A catch expression has the form `{"type": "catch", "expression": <expression>}`.
-
-```
-# Error catching
-{
-    "type": "call",
-    "callee": {
-        "type": "function",
-        "body": {"type": "literal", "value": 42}
-    },
-    "posArgs": [
-        {
-            "type": "catch",
-            "expression": {
-                "type": "block",
-                "defs": [
-                    [
-                        {
-                            "type": "arrayPattern",
-                            "names": [{"type": "name", "name": "foo"}]
-                        },
-                        {"type": "array", "elements": []}
-                    ]
-                ],
-                "result": {"type": "name", "name": "foo"}
-            }
-        }
-    ]
-}
->> 42
-```
