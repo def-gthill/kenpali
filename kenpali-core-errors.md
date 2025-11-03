@@ -143,3 +143,19 @@ toNumber("42a")
 [] | newMutableArray |.pop()
 !! indexOutOfBounds {"length": 0, "index": -1}
 ```
+
+## Validation
+
+```
+# Validation - invalid schema
+42 | validate({foo: "bar"})
+!! invalidSchema {"schema": {"foo": "bar"}}
+```
+
+```
+# Matches - invalid schema
+42 | matches({foo: "bar"})
+!! invalidSchema {"schema": {"foo": "bar"}}
+```
+
+
