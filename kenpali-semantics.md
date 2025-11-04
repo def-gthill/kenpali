@@ -98,6 +98,12 @@ foo = 42;
 >> 4
 ```
 
+```
+# Malformed string literal
+"foo\u{1f61b"
+!! invalidStringLiteral {"value": "\"foo\\u{1f61b\""}
+```
+
 ## Arrays
 
 Arrays can freely mix different types of elements.

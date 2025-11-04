@@ -28,6 +28,12 @@ Comments consist of the characters `//` and all following text until the end of 
 
 Any characters not matching the above token patterns cause parsing to fail.
 
+```
+# Invalid character
+25%
+!! invalidCharacter {"character": "%"}
+```
+
 ## Literals|literals
 
 `literal ::= "null" | "false" | "true" | NUMBER | STRING | RAW_STRING`
