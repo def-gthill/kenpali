@@ -283,8 +283,8 @@ Returns:
 
 ```
 # Converting a string to code points
-toCodePoints("foo\u1234")
->> [102, 111, 111, 4660]
+toCodePoints("foo\u1234\u{1f61b}")
+>> [102, 111, 111, 4660, 128539]
 ```
 
 ### fromCodePoints|fromCodePoints

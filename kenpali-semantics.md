@@ -72,6 +72,32 @@ foo = 42;
 !! nameUsedBeforeAssignment {"name": "foo"}
 ```
 
+## Strings
+
+```
+# String length counts Unicode code points
+"foo\u{1f61b}" | length
+>> 4
+```
+
+```
+# String indexing counts Unicode code points
+"foo\u{1f61b}bar" @ 5
+>> "b"
+```
+
+```
+# String indexing from the end counts Unicode code points
+"bar\u{1f61b}foo" @ -5
+>> "r"
+```
+
+```
+# String streaming iterates over Unicode code points
+"foo\u{1f61b}" | toStream | length
+>> 4
+```
+
 ## Arrays
 
 Arrays can freely mix different types of elements.
