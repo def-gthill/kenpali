@@ -758,6 +758,50 @@ Returns:
 
 ## Types and Type Conversion|types
 
+### Type Constants|type-constants
+
+A class value is defined for each of the basic types.
+
+```
+# Class constants
+[
+    Null,
+    Boolean,
+    Number,
+    String,
+    Array,
+    Stream,
+    Object,
+    Function,
+    Error,
+    Class,
+    Protocol,
+]
+| transform(|.name)
+| toArray
+>> ["Null", "Boolean", "Number", "String", "Array", "Stream", "Object", "Function", "Error", "Class", "Protocol"]
+```
+
+There are also protocol constants for the following protocols:
+
+- `Sequence` covers collections with a definite order: strings, arrays, and streams.
+- `Instance` covers all values except null, booleans, numbers, strings, arrays, objects, and functions.
+- `Type` covers values that represent Kenpali types: classes and protocols.
+- `Any` covers all values.
+
+```
+# Protocol constants
+[
+    Sequence,
+    Instance,
+    Type,
+    Any,
+]
+| transform(|.name)
+| toArray
+>> ["Sequence", "Instance", "Type", "Any"]
+```
+
 ### classOf|classOf
 
 Returns the Kenpali class of its argument.
@@ -889,7 +933,7 @@ Returns:
 
 ### toNumber|toNumber
 
-Returns the numeric representation of its argument.
+Returns the numeric value of its argument.
 
 Parameters:
 
@@ -1157,6 +1201,42 @@ Returns:
 >> [false, false, false, false, false, false, false, true, false, false, false, false, false]
 ```
 
+### toObject|toObject
+
+Converts the specified value into an object.
+
+If the value is an array or stream, its elements are treated as key-value pairs. Any duplicate keys are assigned the value from the _last_ pair with that key in the sequence.
+
+If the value is an instance, an object containing its class name and properties is returned.
+
+Parameters:
+
+- `value` (_Array or Instance_): The value to convert. If an array or stream, it must contain tuples like _[string, any]_.
+
+Returns:
+
+- (_Object_): An object constructed from `value`.
+
+```
+# Object from properties
+properties = [["foo", "bar"], ["spam", "eggs"]];
+properties | toObject
+>> {foo: "bar", spam: "eggs"}
+```
+
+```
+# Object from properties with duplicates
+properties = [["foo", "bar"], ["spam", "eggs"], ["foo", "baz"]];
+properties | toObject
+>> {foo: "baz", spam: "eggs"}
+```
+
+```
+# Object from instance
+newError("badIdea", foo: "bar") | toObject
+>> {"#class": "Error", type: "badIdea", details: {foo: "bar"}, calls: []}
+```
+
 ### isFunction|isFunction
 
 Returns whether its argument is a function.
@@ -1189,11 +1269,36 @@ Returns:
 >> [false, false, false, false, false, false, false, false, true, true, false, false, false]
 ```
 
+### toFunction|toFunction
+
+Converts the specified value to a function:
+
+- If the argument is already a function, the same function is returned.
+- Otherwise, a constant function that returns the specified value is returned.
+
+Parameters:
+
+- `value` (_Any_): The value to convert.
+
+Returns:
+
+- (_Function_): The function.
+
+```
+# To function
+[
+    toFunction(42)(97),
+    toFunction(display)(97),
+    toFunction((x) => plus(x, 3))(97),
+]
+>> [42, "97", 100]
+```
+
 ### isError|isError
 
 Returns whether its argument is an error.
 
-Note that merely calling this function doesn't _catch_ a thrown error: if `x` throws, `x | isError` propagates the error rather than returning `true`. The error must be explicitly caught first, i.e. `x ! | isError`.
+Note that merely calling this function doesn't _catch_ a thrown error: if `x` throws, `x | isError` propagates the error rather than returning `true`. The error must be explicitly caught first, i.e. `try($ x, onError: itself) | isError`.
 
 Parameters:
 
@@ -1221,31 +1326,6 @@ Returns:
     isError(Sequence),
 ]
 >> [false, false, false, false, false, false, false, false, false, false, true, false, false]
-```
-
-### toFunction|toFunction
-
-Converts the specified value to a function:
-
-- If the argument is already a function, the same function is returned.
-- Otherwise, a constant function that returns the specified value is returned.
-
-Parameters:
-
-- `value` (_Any_): The value to convert.
-
-Returns:
-
-- (_Function_): The function.
-
-```
-# To function
-[
-    toFunction(42)(97),
-    toFunction(display)(97),
-    toFunction((x) => plus(x, 3))(97),
-]
->> [42, "97", 100]
 ```
 
 ### isClass|isClass
@@ -1278,6 +1358,38 @@ Returns:
     isClass(Sequence),
 ]
 >> [false, false, false, false, false, false, false, false, false, false, false, true, false]
+```
+
+### isProtocol|isProtocol
+
+Returns whether its argument is a protocol.
+
+Parameters:
+
+- `value` (_Any_): The value to check.
+
+Returns:
+
+- (_Boolean_): Whether `value` is a protocol.
+
+```
+# Is protocol
+[
+    isProtocol(null),
+    isProtocol(false),
+    isProtocol(true),
+    isProtocol(42),
+    isProtocol("foo"),
+    isProtocol([1, 2, 3]),
+    isProtocol(1 | to(3)),
+    isProtocol({foo: 1, bar: 2}),
+    isProtocol(classOf),
+    isProtocol((x) => x),
+    isProtocol(newError("badIdea")),
+    isProtocol(Number),
+    isProtocol(Sequence),
+]
+>> [false, false, false, false, false, false, false, false, false, false, false, false, true]
 ```
 
 ### isSequence|isSequence
@@ -1498,6 +1610,114 @@ foo = | switch(
 
 These functions build up new streams from scalar inputs.
 
+### Stream|stream
+
+#### newStream|newStream
+
+Explicitly creates a stream with the specified head value and tail stream.
+
+Parameters:
+
+- `value:` (_Function_): A function that returns the first value in the stream.
+- `next:` (_Function_): A function that returns the remaining values in the stream, as a stream. This normally makes a recursive call to the containing function, allowing the stream to continue indefinitely.
+
+Returns:
+
+- (_Stream_): The new stream.
+
+```
+# Explicitly creating a stream
+myStream = (start) => newStream(
+    value: $ start,
+    next: $ myStream(start | times(2))
+);
+1 | myStream | keepFirst(5) | toArray
+>> [1, 2, 4, 8, 16]
+```
+
+#### emptyStream|emptyStream
+
+Creates a stream with no elements. Together with `newStream`, this allows explicitly creating finite streams.
+
+Returns:
+
+- (_Stream_): An empty stream.
+
+```
+# Empty stream
+emptyStream() | toArray
+>> []
+```
+
+```
+# Explicitly creating a finite stream
+myStream = (start) => if(
+    start | isLessThan(100),
+    then: $ newStream(
+        value: $ start,
+        next: $ myStream(start | times(2))
+    ),
+    else: $ emptyStream(),
+);
+1 | myStream | toArray
+>> [1, 2, 4, 8, 16, 32, 64]
+```
+
+#### Stream/isEmpty|stream-isEmpty
+
+Returns whether the specified stream is empty.
+
+Returns:
+
+- (_Boolean_): True if the stream is empty.
+
+```
+# Stream is empty
+[
+    emptyStream() |.isEmpty(),
+    (1 | to(3)) |.isEmpty(),
+]
+>> [true, false]
+```
+
+#### Stream/value|stream-value
+
+Returns the first element of the specified stream.
+
+This property is _absent_ if the stream is empty.
+
+Returns:
+
+- (_Any_): The first element.
+
+```
+# Stream value
+[
+    try($ emptyStream() |.value(), onError: itself) |.type,
+    (1 | to(3)) |.value(),
+]
+>> ["missingProperty", 1]
+```
+
+#### Stream/next|stream-next
+
+Returns the rest of the specified stream.
+
+This property is _absent_ if the stream is empty.
+
+Returns:
+
+- (_Stream_): The rest of the stream.
+
+```
+# Stream next
+[
+    try($ emptyStream() |.next(), onError: itself) |.type,
+    (1 | to(3)) |.next() | toArray,
+]
+>> ["missingProperty", [2, 3]]
+```
+
 ### build|build
 
 Generates a stream by repeatedly applying a function to a start value.
@@ -1626,112 +1846,6 @@ Returns:
     true,
     [42, 42, 42, 42, 42],
 ]
-```
-
-### newStream|newStream
-
-Explicitly creates a stream with the specified head value and tail stream.
-
-Parameters:
-
-- `value:` (_Function_): A function that returns the first value in the stream.
-- `next:` (_Function_): A function that returns the remaining values in the stream, as a stream. This normally makes a recursive call to the containing function, allowing the stream to continue indefinitely.
-
-Returns:
-
-- (_Stream_): The new stream.
-
-```
-# Explicitly creating a stream
-myStream = (start) => newStream(
-    value: $ start,
-    next: $ myStream(start | times(2))
-);
-1 | myStream | keepFirst(5) | toArray
->> [1, 2, 4, 8, 16]
-```
-
-### emptyStream|emptyStream
-
-Creates a stream with no elements. Together with `newStream`, this allows explicitly creating finite streams.
-
-Returns:
-
-- (_Stream_): An empty stream.
-
-```
-# Empty stream
-emptyStream() | toArray
->> []
-```
-
-```
-# Explicitly creating a finite stream
-myStream = (start) => if(
-    start | isLessThan(100),
-    then: $ newStream(
-        value: $ start,
-        next: $ myStream(start | times(2))
-    ),
-    else: $ emptyStream(),
-);
-1 | myStream | toArray
->> [1, 2, 4, 8, 16, 32, 64]
-```
-
-#### Stream/isEmpty|stream-isEmpty
-
-Returns whether the specified stream is empty.
-
-Returns:
-
-- (_Boolean_): True if the stream is empty.
-
-```
-# Stream is empty
-[
-    emptyStream() |.isEmpty(),
-    (1 | to(3)) |.isEmpty(),
-]
->> [true, false]
-```
-
-#### Stream/value|stream-value
-
-Returns the first element of the specified stream.
-
-This property is _absent_ if the stream is empty.
-
-Returns:
-
-- (_Any_): The first element.
-
-```
-# Stream value
-[
-    try($ emptyStream() |.value(), onError: itself) |.type,
-    (1 | to(3)) |.value(),
-]
->> ["missingProperty", 1]
-```
-
-#### Stream/next|stream-next
-
-Returns the rest of the specified stream.
-
-This property is _absent_ if the stream is empty.
-
-Returns:
-
-- (_Stream_): The rest of the stream.
-
-```
-# Stream next
-[
-    try($ emptyStream() |.next(), onError: itself) |.type,
-    (1 | to(3)) |.next() | toArray,
-]
->> ["missingProperty", [2, 3]]
 ```
 
 ## Stream Collapsers|stream-collapsers
@@ -2192,6 +2306,24 @@ Returns:
 >> [0, 2, 28, 289, 2893, 28937]
 ```
 
+### withIndex|withIndex
+
+Tags each element of the input sequence with its index.
+
+Parameters:
+
+- `sequence` (_Sequence_): The sequence to add indices to.
+
+Returns:
+
+- (_Stream_): A stream of pairs, where the first element is the index and the second element is the element from the input sequence.
+
+```
+# Adding indices
+["foo", "bar", "baz"] | withIndex | toArray
+>> [[1, "foo"], [2, "bar"], [3, "baz"]]
+```
+
 ### keepFirst|keepFirst
 
 Retains only the first `n` elements of the input.
@@ -2474,6 +2606,19 @@ Returns:
 ]
 ```
 
+```
+# Unzipping with more than two streams
+[
+    [[1, "one", "eins"], [2, "two", "zwei"], [3, "three", "drei"]]
+    | unzip(numStreams: 3)
+    | transform(| keepFirst(3) | toArray)
+    | toArray,
+]
+>> [
+    [[1, 2, 3], ["one", "two", "three"], ["eins", "zwei", "drei"]],
+]
+```
+
 ### flatten|flatten
 
 Flattens a sequence of sequences into a single stream.
@@ -2577,42 +2722,6 @@ object | keys
 >> ["foo", "spam"]
 ```
 
-### toObject|toObject
-
-Converts the specified value into an object.
-
-If the value is an array or stream, its elements are treated as key-value pairs. Any duplicate keys are assigned the value from the _last_ pair with that key in the sequence.
-
-If the value is an instance, an object containing its class name and properties is returned.
-
-Parameters:
-
-- `value` (_Array or Instance_): The value to convert. If an array or stream, it must contain tuples like _[string, any]_.
-
-Returns:
-
-- (_Object_): An object constructed from `value`.
-
-```
-# Object from properties
-properties = [["foo", "bar"], ["spam", "eggs"]];
-properties | toObject
->> {foo: "bar", spam: "eggs"}
-```
-
-```
-# Object from properties with duplicates
-properties = [["foo", "bar"], ["spam", "eggs"], ["foo", "baz"]];
-properties | toObject
->> {foo: "baz", spam: "eggs"}
-```
-
-```
-# Object from instance
-newError("badIdea", foo: "bar") | toObject
->> {"#class": "Error", type: "badIdea", details: {foo: "bar"}, calls: []}
-```
-
 ### properties|properties
 
 Returns an array of the key-value pairs in the object.
@@ -2679,6 +2788,8 @@ Parameters:
 >> ["bar", "bar", "bar", "bar", "other", "other", "other"]
 ```
 
+Finite streams can be indexed as if they were arrays.
+
 ```
 # Indexing finite streams
 [
@@ -2692,6 +2803,8 @@ Parameters:
 ]
 >> [3, 3, 4, 4, 42, 42, 42]
 ```
+
+Infinite streams only accept positive indices. They loop forever if the index is negative.
 
 ```
 # Indexing infinite streams
@@ -2740,7 +2853,7 @@ Returns:
 
 ### itself|itself
 
-Returns its argument. Useful when a function must be provided, but no transformation is needed.
+Returns its argument. This is useful when a function must be provided, but no transformation is needed, and can be clearer than just writing `(x) => x`.
 
 Parameters:
 
