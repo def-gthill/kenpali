@@ -1743,6 +1743,29 @@ powersOfTwo = 1 | build(| times(2));
 >> [true, 1, 4, 128]
 ```
 
+```
+# Build only invokes the function when needed
+1
+| build((x) => if(
+    x | isAtLeast(3),
+    then: $ throw(newError("tooBig")),
+    else: $ x | up
+))
+| keepFirst(3)
+| toArray
+>> [1, 2, 3]
+```
+
+```
+# Build only invokes the function once for each iteration
+out = newMutableArray();
+1 | build((x) => (out.append(x); x | up))
+| keepFirst(4)
+| toArray;
+out.elements()
+>> [1, 2, 3]
+```
+
 ### to|to
 
 Generates a stream of numbers covering a range.
@@ -2207,16 +2230,22 @@ Returns:
 ```
 # Is empty
 [
+    "" | isEmpty,
+    "foo" | isEmpty,
     [] | isEmpty,
     [1] | isEmpty,
     [] | toStream | isEmpty,
     [1] | toStream | isEmpty,
     1 | repeat | isEmpty,
+    newStream(value: $ throw(newError("badIdea")), next: emptyStream) | isEmpty,
 ]
 >> [
     true,
     false,
     true,
+    false,
+    true,
+    false,
     false,
     false,
 ]
@@ -2241,8 +2270,9 @@ Returns:
     ["foo", "bar", "baz"] | first,
     1 | to(5) | first,
     1 | build(| times(2)) | first,
+    1 | build($ throw(newError("badIdea"))) | first,
 ]
->> ["foo", "foo", 1, 1]
+>> ["foo", "foo", 1, 1, 1]
 ```
 
 ## Stream Rebuilders|stream-rebuilders
@@ -2271,11 +2301,16 @@ Returns:
     | transform((i) => times(i, i))
     | keepFirst(3)
     | toArray,
+    1
+    | build($ throw(newError("badIdea")))
+    | transform((i) => times(i, i))
+    | first,
 ]
 >> [
     [1, 4, 9],
     [1, 4, 9],
     [1, 4, 9],
+    1,
 ]
 ```
 
@@ -2306,6 +2341,17 @@ Returns:
 >> [0, 2, 28, 289, 2893, 28937]
 ```
 
+```
+# Running only invokes `next` when needed
+[2, 8, 9, 3, 7]
+| running(
+    start: 0,
+    next: $ throw(newError("badIdea"))
+)
+| first
+>> 0
+```
+
 ### withIndex|withIndex
 
 Tags each element of the input sequence with its index.
@@ -2322,6 +2368,12 @@ Returns:
 # Adding indices
 ["foo", "bar", "baz"] | withIndex | toArray
 >> [[1, "foo"], [2, "bar"], [3, "baz"]]
+```
+
+```
+# Adding indices only advances the input stream when needed
+1 | build($ throw(newError("badIdea"))) | withIndex | first
+>> [1, 1]
 ```
 
 ### keepFirst|keepFirst
@@ -2343,11 +2395,13 @@ Returns:
     "foobar" | keepFirst(3),
     [42, 97, 6, 12, 64] | keepFirst(3) | toArray,
     1 | build(| times(2)) | keepFirst(3) | toArray,
+    1 | build($ throw(newError("badIdea"))) | keepFirst(1) | toArray,
 ]
 >> [
     "foo",
     [42, 97, 6],
     [1, 2, 4],
+    [1],
 ]
 ```
 
@@ -2372,6 +2426,11 @@ Returns:
     [42, 97, 6, 12, 64] | dropFirst | toArray,
     [42, 97, 6, 12, 64] | dropFirst(3) | toArray,
     1 | build(| times(2)) | dropFirst(3) | keepFirst(3) | toArray,
+    [[42, 97, 6], 1 | build($ throw(newError("badIdea")))]
+    | flatten
+    | dropFirst(1)
+    | keepFirst(3)
+    | toArray,
 ]
 >> [
     "oobar",
@@ -2379,7 +2438,15 @@ Returns:
     [97, 6, 12, 64],
     [12, 64],
     [8, 16, 32],
+    [97, 6, 1],
 ]
+```
+
+```
+# Dropping doesn't ask for any of the dropped values
+fs = [$ throw(newError("badIdea")), $ throw(newError("stillBadIdea")), $ 42, $ 97];
+1 | to(4) | transform((i) => (fs @ i)()) | dropFirst(2) | toArray
+>> [42, 97]
 ```
 
 ### slice|slice
@@ -2406,6 +2473,10 @@ Returns:
     [42, 97, 6, 12, 64] | slice(from: 2, to: 10) | toArray,
     [42, 97, 6, 12, 64] | slice(from: 0, to: 4) | toArray,
     1 | build(| times(2)) | slice(from: 2, to: 4) | toArray,
+    [[42, 97, 6], 1 | build($ throw(newError("badIdea")))]
+    | flatten
+    | slice(from: 2, to: 4)
+    | toArray,
 ]
 >> [
     "oob",
@@ -2414,7 +2485,8 @@ Returns:
     [97, 6, 12],
     [97, 6, 12, 64],
     [42, 97, 6, 12],
-    [2, 4, 8]
+    [2, 4, 8],
+    [97, 6, 1],
 ]
 ```
 
@@ -2440,6 +2512,12 @@ Returns:
 >> [1, 2, 4, 8, 16, 32, 64]
 ```
 
+```
+# While doesn't ask for values beyond the stopping condition
+1 | build($ throw(newError("badIdea"))) | while(| isLessThan(0)) | toArray
+>> []
+```
+
 ### continueIf|continueIf
 
 Creates a stream of elements from the input sequence, continuing to the next element if a condition holds. The resulting stream has one extra element compared to `while`—the first element that doesn't satisfy the condition—which makes some stopping conditions easier to express.
@@ -2460,6 +2538,12 @@ Returns:
 | continueIf(| isLessThan(100))
 | toArray
 >> [1, 2, 4, 8, 16, 32, 64, 128]
+```
+
+```
+# Continue-If doesn't ask for values beyond the stopping condition
+1 | build($ throw(newError("badIdea"))) | continueIf(| isLessThan(0)) | toArray
+>> [1]
 ```
 
 ### thenRepeat|thenRepeat
@@ -2515,6 +2599,16 @@ diffs = (sequence) => (
 ]
 ```
 
+```
+# Sliding doesn't ask for values beyond its last window
+[[2, 8, 9, 3], 1 | build($ throw(newError("badIdea")))]
+| flatten
+| sliding(3)
+| keepFirst(3)
+| toArray
+>> [[2, 8, 9], [8, 9, 3], [9, 3, 1]]
+```
+
 ### where|where
 
 Filters a sequence, keeping only elements that satisfy a condition.
@@ -2545,6 +2639,16 @@ Returns:
 ]
 ```
 
+```
+# Filtering doesn't ask for values beyond the last element it needs
+[[1, 10, 2, 9, 3, 12], 1 | build($ throw(newError("badIdea")))]
+| flatten
+| where(| isLessThan(10))
+| keepFirst(5)
+| toArray
+>> [1, 2, 9, 3, 1]
+```
+
 ### zip|zip
 
 Combines multiple sequences into a stream of tuples, stopping when the shortest sequence is exhausted.
@@ -2565,12 +2669,14 @@ Returns:
     [1, 2, 3] | zip(["one", "two"]) | toArray,
     1 | build(| times(2)) | zip(["one", "two", "three"]) | toArray,
     1 | build(| times(2)) | zip(1 | build(| times(3))) | keepFirst(3) | toArray,
+    1 | build($ throw(newError("badIdea"))) | zip(["foo"]) | toArray,
 ]
 >> [
     [[1, "one"], [2, "two"], [3, "three"]],
     [[1, "one"], [2, "two"]],
     [[1, "one"], [2, "two"], [4, "three"]],
     [[1, 1], [2, 3], [4, 9]],
+    [[1, "foo"]],
 ]
 ```
 
@@ -2599,10 +2705,15 @@ Returns:
     | unzip
     | transform(| keepFirst(4) | toArray)
     | toArray,
+    [1, "one"] | build($ throw(newError("badIdea")))
+    | unzip
+    | transform(first)
+    | toArray,
 ]
 >> [
     [[1, 2, 3], ["one", "two", "three"]],
-    [[2, 4, 6, 10], [2, 3, 5, 7]]
+    [[2, 4, 6, 10], [2, 3, 5, 7]],
+    [1, "one"]
 ]
 ```
 
@@ -2634,14 +2745,24 @@ Returns:
 ```
 # Flattening nested sequences
 [
+    [] | flatten | toArray,
+    [[]] | flatten | toArray,
     [[1], [2, 3], [4, 5, [6]]] | flatten | toArray,
     [[1], [2, 3], []] | flatten | toArray,
     [1] | build((a) => [*a, a | last | up]) | flatten | keepFirst(7) | toArray,
+    [[1], 1 | build($ throw(newError("badIdea")))] | flatten | keepFirst(2) | toArray,
+    [[1], newStream(value: $ throw(newError("badIdea")), next: emptyStream)] | flatten | keepFirst(1) | toArray,
+    [1] | build($ throw(newError("badIdea"))) | flatten | first,
 ]
 >> [
+    [],
+    [],
     [1, 2, 3, 4, 5, [6]],
     [1, 2, 3],
     [1, 1, 2, 1, 2, 3, 1],
+    [1, 1],
+    [1],
+    1,
 ]
 ```
 
@@ -2664,11 +2785,13 @@ Returns:
     [] | dissect(| isAtLeast(8)) | toArray,
     [2, 8, 9, 3, 7] | dissect(| isAtLeast(8)) | toArray,
     [2, 8, 9, 3, 7] | repeat | flatten | dissect(| isAtLeast(8)) | keepFirst(5) | toArray,
+    9 | build($ throw(newError("badIdea"))) | dissect(| isAtLeast(8)) | first,
 ]
 >> [
     [],
     [[2, 8], [9], [3, 7]],
     [[2, 8], [9], [3, 7, 2, 8], [9], [3, 7, 2, 8]],
+    [9],
 ]
 ```
 
@@ -2692,12 +2815,18 @@ Returns:
     1 | to(10) | chunk(3) | toArray,
     1 | to(11) | chunk(3) | toArray,
     1 | build(| times(2)) | chunk(3) | keepFirst(3) | toArray,
+    [1 | to(9), newStream(value: $ throw(newError("badIdea")), next: emptyStream)]
+    | flatten
+    | chunk(3)
+    | keepFirst(3)
+    | toArray,
 ]
 >> [
     [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
     [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]],
     [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11]],
     [[1, 2, 4], [8, 16, 32], [64, 128, 256]],
+    [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
 ]
 ```
 
@@ -2777,7 +2906,9 @@ Parameters:
 ```
 # Indexing arrays
 [
+    ["foo", "bar", "baz"] | at(1),
     ["foo", "bar", "baz"] | at(2),
+    ["foo", "bar", "baz"] | at(3),
     ["foo", "bar", "baz"] | at(2, default: $ "other"),
     ["foo", "bar", "baz"] | at(-2),
     ["foo", "bar", "baz"] | at(-2, default: $ "other"),
@@ -2785,7 +2916,7 @@ Parameters:
     ["foo", "bar", "baz"] | at(0, default: $ "other"),
     ["foo", "bar", "baz"] | at(-4, default: $ "other"),
 ]
->> ["bar", "bar", "bar", "bar", "other", "other", "other"]
+>> ["foo", "bar", "baz", "bar", "bar", "bar", "other", "other", "other"]
 ```
 
 Finite streams can be indexed as if they were arrays.
@@ -2793,15 +2924,18 @@ Finite streams can be indexed as if they were arrays.
 ```
 # Indexing finite streams
 [
+    2 | to(5) | at(1),
     2 | to(5) | at(2),
+    2 | to(5) | at(4),
     2 | to(5) | at(2, default: $ 42),
     2 | to(5) | at(-2),
     2 | to(5) | at(-2, default: $ 42),
     2 | to(5) | at(5, default: $ 42),
     2 | to(5) | at(0, default: $ 42),
     2 | to(5) | at(-5, default: $ 42),
+    1 | build($ throw(newError("badIdea"))) | at(1),
 ]
->> [3, 3, 4, 4, 42, 42, 42]
+>> [2, 3, 5, 3, 4, 4, 42, 42, 42, 1]
 ```
 
 Infinite streams only accept positive indices. They loop forever if the index is negative.
@@ -2875,6 +3009,26 @@ Returns:
     "foo",
     [{foo: 1, bar: 2}, {bar: 3, baz: 4}],
 ]
+```
+
+### callOnce|callOnce
+
+Creates a function that evaluates its body only the first time it is called, and saves the result for subsequent calls.
+
+Parameters:
+
+- `body` (_Function_): A zero-argument function to evaluate on the first call.
+
+Returns:
+
+- (_Function_): The wrapped function.
+
+```
+# Ensuring a function is called only once
+out = newMutableArray();
+foo = callOnce($ 42 | also(| out.append));
+[foo(), foo(), foo(), out.elements()]
+>> [42, 42, 42, [42]]
 ```
 
 ## Sets and Maps|sets-maps
