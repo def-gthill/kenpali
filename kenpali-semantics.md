@@ -382,6 +382,15 @@ bar()
 ```
 
 ```
+# Mutable default value
+foo = (x = newVar(42)) => (
+    x.get() | up | (x.set); x.get()
+);
+[foo(), foo(), foo()]
+>> [43, 43, 43]
+```
+
+```
 # Multiple optional positional parameters
 foo = (a, b = 1, c = 2) => [a, b, c];
 [
