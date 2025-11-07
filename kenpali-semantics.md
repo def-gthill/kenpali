@@ -735,6 +735,17 @@ main()
 ]
 ```
 
+```
+# Stack traces through platform functions
+foo = $ 1 | to(3) | forEach($ 1 @ 1);
+try(foo, onError: |.calls)
+>> [
+    {function: "$main/foo/$anon1"},
+    {function: "forEach"},
+    {function: "$main/foo"},
+]
+```
+
 ## Variables
 
 ```
