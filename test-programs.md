@@ -8,7 +8,7 @@ negative(42)
 
 ```
 # Pipeline
-2 | plus(3) | times(4) | minus(5) | dividedBy(6)
+2 | add(3) | mul(4) | sub(5) | div(6)
 >> 2.5
 ```
 
@@ -42,13 +42,13 @@ fizzbuzz(16)
 # Collatz
 collatzStep = (n) => if(
     n | isDivisibleBy(2),
-    then: $ n | dividedBy(2),
-    else: $ n | times(3) | plus(1),
+    then: $ n | div(2),
+    else: $ n | mul(3) | add(1),
 );
 collatz = (start) => (
     start
     | build(collatzStep)
-    | continueIf(| isMoreThan(1))
+    | continueIf(| gt(1))
     | toArray
 );
 collatz(7)
@@ -62,7 +62,7 @@ collatz(7)
     numbers: (
         numbers
         | where((n) => (
-            n | equals(numbers @ index) | or(
+            n | eq(numbers @ index) | or(
                 $ n | isDivisibleBy(numbers @ index) | not
             )
         ))
@@ -71,7 +71,7 @@ collatz(7)
     index: index | up,
 })
 | while(({numbers:, index:}) => (
-    index | isAtMost(numbers | length)
+    index | le(numbers | length)
 ))
 | last
 |.numbers
@@ -94,14 +94,14 @@ merge = (list1, list2) => (
     ifs(
         [$ head1 | isNull, take2],
         [$ head2 | isNull, take1],
-        [$ head2 | isLessThan(head1), take2],
+        [$ head2 | lt(head1), take2],
         else: take1,
     )
 );
 mergesort = (sequence) => (
     array = sequence | toArray;
     if(
-        array | length | isAtMost(1),
+        array | length | le(1),
         then: $ array,
         else: $ (
             halfway = array | length | quotientBy(2);

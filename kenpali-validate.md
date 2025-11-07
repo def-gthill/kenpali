@@ -86,19 +86,19 @@ null | validate(either(String, Number))
 
 ```
 # Successful validation of a type with a predicate
-1 | validate(Number | satisfying(| isLessThan(10)))
+1 | validate(Number | satisfying(| lt(10)))
 >> true
 ```
 
 ```
 # Failed validation of a type with a predicate - wrong type
-"foo" | validate(Number | satisfying(| isLessThan(10)))
+"foo" | validate(Number | satisfying(| lt(10)))
 !! wrongType {"value": "foo", "expectedType": "Number"}
 ```
 
 ```
 # Failed validation of a type with a predicate - false predicate
-42 | validate(Number | satisfying(| isLessThan(10)))
+42 | validate(Number | satisfying(| lt(10)))
 !! badValue {"value": 42}
 ```
 
@@ -164,25 +164,25 @@ null | validate(either(String, Number))
 
 ```
 # Successful validation of a uniform object - keys and values
-{x: 42} | validate(objectOf(keys: String | satisfying(| length | equals(1)), values: Number))
+{x: 42} | validate(objectOf(keys: String | satisfying(| length | eq(1)), values: Number))
 >> true
 ```
 
 ```
 # Failed validation of a uniform object - not an object
-"foo" | validate(objectOf(keys: String | satisfying(| length | equals(1)), values: Number))
+"foo" | validate(objectOf(keys: String | satisfying(| length | eq(1)), values: Number))
 !! wrongType {"value": "foo", "expectedType": "Object"}
 ```
 
 ```
 # Failed validation of a uniform object - bad key
-{za: 42} | validate(objectOf(keys: String | satisfying(| length | equals(1)), values: Number))
+{za: 42} | validate(objectOf(keys: String | satisfying(| length | eq(1)), values: Number))
 !! badKey {"key": "za"}
 ```
 
 ```
 # Failed validation of a uniform object - bad property value
-{z: "foo"} | validate(objectOf(keys: String | satisfying(| length | equals(1)), values: Number))
+{z: "foo"} | validate(objectOf(keys: String | satisfying(| length | eq(1)), values: Number))
 !! badProperty {"value": {"z": "foo"}, "key": "z"}
 ```
 

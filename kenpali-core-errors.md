@@ -9,8 +9,8 @@ All platform functions must validate their arguments, and return appropriate err
 ## Arithmetic
 
 ```
-# Plus - wrong argument type
-plus(1, "foo")
+# Addition - wrong argument type
+add(1, "foo")
 !! wrongArgumentType {"value": "foo", "expectedType": "Number"}
 ```
 
@@ -38,25 +38,25 @@ join(["foo", 1])
 
 ```
 # Less than - incomparable types
-{} | isLessThan(42)
+{} | lt(42)
 !! wrongArgumentType {"value": {}, "expectedType": "either(Number, String, Boolean, Array)"}
 ```
 
 ```
 # Less than - incompatible types
-3 | isLessThan("4")
+3 | lt("4")
 !! wrongArgumentType {"value": "4", "expectedType": "Number"}
 ```
 
 ```
 # Less than - incomparable types in array
-[1, 2, {}] | isLessThan([1, 2, 3])
+[1, 2, {}] | lt([1, 2, 3])
 !! wrongArgumentType {"value": {}, "expectedType": "either(Number, String, Boolean, Array)"}
 ```
 
 ```
 # Less than - incompatible types in array
-[1, 2, 3] | isLessThan([1, 2, "4"])
+[1, 2, 3] | lt([1, 2, "4"])
 !! wrongArgumentType {"value": "4", "expectedType": "Number"}
 ```
 

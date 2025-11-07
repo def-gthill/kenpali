@@ -4,7 +4,7 @@ The Core functions must be available to any Kenpali program. Reference implement
 
 ## Arithmetic|arithmetic
 
-### plus|plus
+### add|add
 
 Returns the sum of its arguments
 
@@ -18,8 +18,8 @@ Returns:
 
 
 ```
-# Plus
-[plus(), plus(1), plus(1, 2), plus(1, 2, 3)]
+# Addition
+[add(), add(1), add(1, 2), add(1, 2, 3)]
 >> [0, 1, 3, 6]
 ```
 
@@ -41,7 +41,7 @@ sum([1, 2, 3, 4, 5])
 >> 15
 ```
 
-### minus|minus
+### sub|sub
 
 Returns its first argument minus its second argument.
 
@@ -55,8 +55,8 @@ Returns:
 - (_Number_): The difference.
 
 ```
-# Minus
-[5 | minus(2), 2 | minus(5)]
+# Subtraction
+[5 | sub(2), 2 | sub(5)]
 >> [3, -3]
 ```
 
@@ -135,7 +135,7 @@ Returns:
 >> [2, -4, 0.5]
 ```
 
-### times|times
+### mul|mul
 
 Returns the product of its arguments.
 
@@ -148,12 +148,12 @@ Returns:
 - (_Number_): The product.
 
 ```
-# Times
-[times(), times(2), times(2, 3), times(2, 3, 4)]
+# Multiplication
+[mul(), mul(2), mul(2, 3), mul(2, 3, 4)]
 >> [1, 2, 6, 24]
 ```
 
-### dividedBy|dividedBy
+### div|div
 
 Returns its first argument divided by its second argument.
 
@@ -167,8 +167,8 @@ Returns:
 - (_Number_): The quotient.
 
 ```
-# Divided by
-[12 | dividedBy(3), 12 | dividedBy(8)]
+# Division
+[12 | div(3), 12 | div(8)]
 >> [4, 1.5]
 ```
 
@@ -407,8 +407,8 @@ Any two values can be tested for equality. To be considered equal, the values mu
 - If both are booleans, they must both be true or both be false.
 - If both are numbers, they must have the same numerical value.
 - If both are strings, they must have the same sequence of Unicode code points.
-- If both are arrays, they must have the same length, and corresponding elements must be equal according to the `equals` function.
-- If both are objects, they must have the same property names, and corresponding property values must be equal according to the `equals` function. The order in which the properties are written does not affect equality.
+- If both are arrays, they must have the same length, and corresponding elements must be equal according to the `eq` function.
+- If both are objects, they must have the same property names, and corresponding property values must be equal according to the `eq` function. The order in which the properties are written does not affect equality.
 - Otherwise, they must be aliases referring to the same data in memory.
 
 Ordering comparisons work on booleans, numbers, strings, and arrays, as follows:
@@ -418,7 +418,7 @@ Ordering comparisons work on booleans, numbers, strings, and arrays, as follows:
 - Strings are compared lexicographically by their Unicode code points.
 - Arrays are compared lexicographically by their elements.
 
-### equals|equals
+### eq|eq
 
 Returns whether its arguments have equal values, according to the [Comparison Rules](#comparison-rules).
 
@@ -432,26 +432,26 @@ Returns:
 - (_Boolean_): Whether the values are equal.
 
 ```
-# Equals
+# Equality
 [
-    [equals(null, null)],
-    [equals(true, true), equals(false, true), equals(false, false)],
-    [equals(42, 42), equals(42, 43)],
-    [equals("foo", "foo"), equals("foo", "bar")],
+    [eq(null, null)],
+    [eq(true, true), eq(false, true), eq(false, false)],
+    [eq(42, 42), eq(42, 43)],
+    [eq("foo", "foo"), eq("foo", "bar")],
     [
-        equals(["foo", "bar"], ["foo", "bar"]),
-        equals(["foo", "bar"], ["foo", "baz"]),
+        eq(["foo", "bar"], ["foo", "bar"]),
+        eq(["foo", "bar"], ["foo", "baz"]),
     ],
     [
-        equals([[1, 2], [3, 4]], [[1, 2], [3, 4]]),
-        equals([[1, 2], [3, 4]], [[1, 2], [3, 5]]),
+        eq([[1, 2], [3, 4]], [[1, 2], [3, 4]]),
+        eq([[1, 2], [3, 4]], [[1, 2], [3, 5]]),
     ],
     [
-        equals(
+        eq(
             {foo: "bar", spam: "eggs"},
             {spam: "eggs", foo: "bar"},
         ),
-        equals(
+        eq(
             {foo: "bar", spam: "eggs"},
             {spam: "eggs", foo: "baz"},
         ),
@@ -468,7 +468,7 @@ Returns:
 ]
 ```
 
-### isLessThan|isLessThan
+### lt|lt
 
 Returns whether its first argument is less than its second argument, according to the [Comparison Rules](#comparison-rules).
 
@@ -485,33 +485,33 @@ Returns:
 # Less than
 [
     [
-        false | isLessThan(true),
-        true | isLessThan(true),
-        true | isLessThan(false),
+        false | lt(true),
+        true | lt(true),
+        true | lt(false),
     ],
     [
-        42 | isLessThan(43),
-        43 | isLessThan(43),
-        43 | isLessThan(42),
+        42 | lt(43),
+        43 | lt(43),
+        43 | lt(42),
     ],
     [
-        "bar" | isLessThan("baz"),
-        "baz" | isLessThan("baz"),
-        "baz" | isLessThan("bar"),
+        "bar" | lt("baz"),
+        "baz" | lt("baz"),
+        "baz" | lt("bar"),
     ],
     [
-        ["foo", "bar"] | isLessThan(["foo", "baz"]),
-        ["foo", "bar"] | isLessThan(["foo!", "aar"]),
-        ["foo", "bar"] | isLessThan(["foo", "bar"]),
-        ["foo", "baz"] | isLessThan(["foo", "bar"]),
-        ["foo!", "aar"] | isLessThan(["foo", "bar"]),
+        ["foo", "bar"] | lt(["foo", "baz"]),
+        ["foo", "bar"] | lt(["foo!", "aar"]),
+        ["foo", "bar"] | lt(["foo", "bar"]),
+        ["foo", "baz"] | lt(["foo", "bar"]),
+        ["foo!", "aar"] | lt(["foo", "bar"]),
     ],
     [
-        [[1, 2], [3, 4]] | isLessThan([[1, 2], [3, 10]]),
-        [[1, 2], [3, 4]] | isLessThan([[1, 3], [3, 3]]),
-        [[1, 2], [3, 4]] | isLessThan([[1, 2], [3, 4]]),
-        [[1, 2], [3, 10]] | isLessThan([[1, 2], [3, 4]]),
-        [[1, 3], [3, 3]] | isLessThan([[1, 2], [3, 4]]),
+        [[1, 2], [3, 4]] | lt([[1, 2], [3, 10]]),
+        [[1, 2], [3, 4]] | lt([[1, 3], [3, 3]]),
+        [[1, 2], [3, 4]] | lt([[1, 2], [3, 4]]),
+        [[1, 2], [3, 10]] | lt([[1, 2], [3, 4]]),
+        [[1, 3], [3, 3]] | lt([[1, 2], [3, 4]]),
     ]
 ]
 >> [
@@ -523,7 +523,7 @@ Returns:
 ]
 ```
 
-### isAtMost|isAtMost
+### le|le
 
 Returns whether its first argument is less than or equal to its second argument, according to the [Comparison Rules](#comparison-rules).
 
@@ -537,16 +537,16 @@ Returns:
 - (_Boolean_): Whether `a` is less than or equal to `b`.
 
 ```
-# At most (less than or equal)
+# Less than or equal
 [
-    42 | isAtMost(43),
-    43 | isAtMost(43),
-    43 | isAtMost(42),
+    42 | le(43),
+    43 | le(43),
+    43 | le(42),
 ]
 >> [true, true, false]
 ```
 
-### isMoreThan|isMoreThan
+### gt|gt
 
 Returns whether its first argument is greater than its second argument, according to the [Comparison Rules](#comparison-rules).
 
@@ -560,16 +560,16 @@ Returns:
 - (_Boolean_): Whether `a` is greater than `b`.
 
 ```
-# More than (greater than)
+# Greater than
 [
-    42 | isMoreThan(43),
-    43 | isMoreThan(43),
-    43 | isMoreThan(42),
+    42 | gt(43),
+    43 | gt(43),
+    43 | gt(42),
 ]
 >> [false, false, true]
 ```
 
-### isAtLeast|isAtLeast
+### ge|ge
 
 Returns whether its first argument is greater than or equal to its second argument, according to the [Comparison Rules](#comparison-rules).
 
@@ -583,11 +583,11 @@ Returns:
 - (_Boolean_): Whether `a` is greater than or equal to `b`.
 
 ```
-# At least (greater than or equal)
+# Greater than or equal
 [
-    42 | isAtLeast(43),
-    43 | isAtLeast(43),
-    43 | isAtLeast(42),
+    42 | ge(43),
+    43 | ge(43),
+    43 | ge(42),
 ]
 >> [false, true, true]
 ```
@@ -649,7 +649,7 @@ Returns:
 >> 42
 ```
 
-### most|most
+### greatest|greatest
 
 Returns the greatest element in the specified sequence, i.e. the element that is greater than or equal to all other elements, according to the [Comparison Rules](#comparison-rules).
 
@@ -662,8 +662,8 @@ Returns:
 - (_Number, String, Boolean, or Array_): The greatest element.
 
 ```
-# Most
-[97, 42, 216] | most
+# Greatest
+[97, 42, 216] | greatest
 >> 216
 ```
 
@@ -1159,7 +1159,7 @@ Returns:
 
 Returns a stream that iterates over the elements of the specified sequence.
 
-If the argument is already a stream, the same stream is returned, rather than a wrapper, i.e. `x | toStream | equals(x)` is true if `x` is a stream.
+If the argument is already a stream, the same stream is returned, rather than a wrapper, i.e. `x | toStream | eq(x)` is true if `x` is a stream.
 
 Parameters:
 
@@ -1289,7 +1289,7 @@ Returns:
 [
     toFunction(42)(97),
     toFunction(display)(97),
-    toFunction((x) => plus(x, 3))(97),
+    toFunction(| add(3))(97),
 ]
 >> [42, "97", 100]
 ```
@@ -1541,8 +1541,8 @@ Returns:
 ```
 # But if
 [
-    42 | butIf(| isMoreThan(10), | minus(5)),
-    7 | butIf(| isMoreThan(10), | minus(5)),
+    42 | butIf(| gt(10), | sub(5)),
+    7 | butIf(| gt(10), | sub(5)),
 ]
 >> [37, 7]
 ```
@@ -1564,8 +1564,8 @@ Returns:
 ```
 # Multi-way if
 foo = (a, b) => ifs(
-    [$ a | isLessThan(b), $ "Too small!"],
-    [$ a | isMoreThan(b), $ "Too big!"],
+    [$ a | lt(b), $ "Too small!"],
+    [$ a | gt(b), $ "Too big!"],
     else: $ "Just right!",
 );
 [
@@ -1594,8 +1594,8 @@ Returns:
 # Switch
 withComment = (value, comment) => [value | display, comment] | join;
 foo = | switch(
-    [| isLessThan(42), | withComment(" is too small!")],
-    [| isMoreThan(42), | withComment(" is too big!")],
+    [| lt(42), | withComment(" is too small!")],
+    [| gt(42), | withComment(" is too big!")],
     else: | withComment(" is just right!"),
 );
 [
@@ -1629,7 +1629,7 @@ Returns:
 # Explicitly creating a stream
 myStream = (start) => newStream(
     value: $ start,
-    next: $ myStream(start | times(2))
+    next: $ myStream(start | mul(2))
 );
 1 | myStream | keepFirst(5) | toArray
 >> [1, 2, 4, 8, 16]
@@ -1652,10 +1652,10 @@ emptyStream() | toArray
 ```
 # Explicitly creating a finite stream
 myStream = (start) => if(
-    start | isLessThan(100),
+    start | lt(100),
     then: $ newStream(
         value: $ start,
-        next: $ myStream(start | times(2))
+        next: $ myStream(start | mul(2))
     ),
     else: $ emptyStream(),
 );
@@ -1733,7 +1733,7 @@ Returns:
 
 ```
 # Build
-powersOfTwo = 1 | build(| times(2));
+powersOfTwo = 1 | build(| mul(2));
 [
     powersOfTwo | isStream,
     powersOfTwo @ 1,
@@ -1747,7 +1747,7 @@ powersOfTwo = 1 | build(| times(2));
 # Build only invokes the function when needed
 1
 | build((x) => if(
-    x | isAtLeast(3),
+    x | ge(3),
     then: $ throw(newError("tooBig")),
     else: $ x | up
 ))
@@ -2002,8 +2002,8 @@ Returns:
 ```
 # Counting
 [
-    [1, 10, 2, 9, 3, 12] | count((i) => (i | isLessThan(10))),
-    [1, 10, 2, 9, 3, 12] | toStream | count((i) => (i | isLessThan(10))),
+    [1, 10, 2, 9, 3, 12] | count(| lt(10)),
+    [1, 10, 2, 9, 3, 12] | toStream | count(| lt(10)),
 ]
 >> [4, 4]
 ```
@@ -2024,10 +2024,10 @@ Returns:
 ```
 # True for all elements
 [
-    [1, 2, 3] | forAll((n) => (n | isLessThan(10))),
-    [1, 42, 3] | forAll((n) => (n | isLessThan(10))),
-    [1, 2, 3] | toStream | forAll((n) => (n | isLessThan(10))),
-    [1, 42, 3] | toStream | forAll((n) => (n | isLessThan(10))),
+    [1, 2, 3] | forAll(| lt(10)),
+    [1, 42, 3] | forAll(| lt(10)),
+    [1, 2, 3] | toStream | forAll(| lt(10)),
+    [1, 42, 3] | toStream | forAll(| lt(10)),
 ]
 >> [true, false, true, false]
 ```
@@ -2048,10 +2048,10 @@ Returns:
 ```
 # True for some elements
 [
-    [41, 2, 43] | forSome((n) => (n | isLessThan(10))),
-    [41, 42, 43] | forSome((n) => (n | isLessThan(10))),
-    [41, 2, 43] | toStream | forSome((n) => (n | isLessThan(10))),
-    [41, 42, 43] | toStream | forSome((n) => (n | isLessThan(10))),
+    [41, 2, 43] | forSome(| lt(10)),
+    [41, 42, 43] | forSome(| lt(10)),
+    [41, 2, 43] | toStream | forSome(| lt(10)),
+    [41, 42, 43] | toStream | forSome(| lt(10)),
 ]
 >> [true, false, true, false]
 ```
@@ -2269,7 +2269,7 @@ Returns:
     ["foo"] | first,
     ["foo", "bar", "baz"] | first,
     1 | to(5) | first,
-    1 | build(| times(2)) | first,
+    1 | build(| mul(2)) | first,
     1 | build($ throw(newError("badIdea"))) | first,
 ]
 >> ["foo", "foo", 1, 1, 1]
@@ -2295,15 +2295,15 @@ Returns:
 ```
 # Transforming
 [
-    [1, 2, 3] | transform((i) => times(i, i)) | toArray,
-    1 | to(3) | transform((i) => times(i, i)) | toArray,
+    [1, 2, 3] | transform((i) => mul(i, i)) | toArray,
+    1 | to(3) | transform((i) => mul(i, i)) | toArray,
     1 | build(| up)
-    | transform((i) => times(i, i))
+    | transform((i) => mul(i, i))
     | keepFirst(3)
     | toArray,
     1
     | build($ throw(newError("badIdea")))
-    | transform((i) => times(i, i))
+    | transform((i) => mul(i, i))
     | first,
 ]
 >> [
@@ -2334,7 +2334,7 @@ Returns:
 | running(
     start: 0,
     next: (number, state: total) => (
-        total | times(10) | plus(number)
+        total | mul(10) | add(number)
     ),
 )
 | toArray
@@ -2394,7 +2394,7 @@ Returns:
 [
     "foobar" | keepFirst(3),
     [42, 97, 6, 12, 64] | keepFirst(3) | toArray,
-    1 | build(| times(2)) | keepFirst(3) | toArray,
+    1 | build(| mul(2)) | keepFirst(3) | toArray,
     1 | build($ throw(newError("badIdea"))) | keepFirst(1) | toArray,
 ]
 >> [
@@ -2425,7 +2425,7 @@ Returns:
     "foobar" | dropFirst(2),
     [42, 97, 6, 12, 64] | dropFirst | toArray,
     [42, 97, 6, 12, 64] | dropFirst(3) | toArray,
-    1 | build(| times(2)) | dropFirst(3) | keepFirst(3) | toArray,
+    1 | build(| mul(2)) | dropFirst(3) | keepFirst(3) | toArray,
     [[42, 97, 6], 1 | build($ throw(newError("badIdea")))]
     | flatten
     | dropFirst(1)
@@ -2472,7 +2472,7 @@ Returns:
     [42, 97, 6, 12, 64] | slice(from: 2, to: 4) | toArray,
     [42, 97, 6, 12, 64] | slice(from: 2, to: 10) | toArray,
     [42, 97, 6, 12, 64] | slice(from: 0, to: 4) | toArray,
-    1 | build(| times(2)) | slice(from: 2, to: 4) | toArray,
+    1 | build(| mul(2)) | slice(from: 2, to: 4) | toArray,
     [[42, 97, 6], 1 | build($ throw(newError("badIdea")))]
     | flatten
     | slice(from: 2, to: 4)
@@ -2506,15 +2506,15 @@ Returns:
 ```
 # While
 1
-| build(| times(2))
-| while(| isLessThan(100))
+| build(| mul(2))
+| while(| lt(100))
 | toArray
 >> [1, 2, 4, 8, 16, 32, 64]
 ```
 
 ```
 # While doesn't ask for values beyond the stopping condition
-1 | build($ throw(newError("badIdea"))) | while(| isLessThan(0)) | toArray
+1 | build($ throw(newError("badIdea"))) | while(| lt(0)) | toArray
 >> []
 ```
 
@@ -2534,15 +2534,15 @@ Returns:
 ```
 # Continue-If
 1
-| build(| times(2))
-| continueIf(| isLessThan(100))
+| build(| mul(2))
+| continueIf(| lt(100))
 | toArray
 >> [1, 2, 4, 8, 16, 32, 64, 128]
 ```
 
 ```
 # Continue-If doesn't ask for values beyond the stopping condition
-1 | build($ throw(newError("badIdea"))) | continueIf(| isLessThan(0)) | toArray
+1 | build($ throw(newError("badIdea"))) | continueIf(| lt(0)) | toArray
 >> [1]
 ```
 
@@ -2587,7 +2587,7 @@ Returns:
 diffs = (sequence) => (
     sequence
     | sliding(2)
-    | transform(([a, b]) => b | minus(a))
+    | transform(([a, b]) => b | sub(a))
 );
 [
     [2, 8, 9, 3, 7] | diffs | toArray,
@@ -2625,11 +2625,11 @@ Returns:
 ```
 # Filtering
 [
-    [1, 10, 2, 9, 3, 12] | where(| isLessThan(10)) | toArray,
+    [1, 10, 2, 9, 3, 12] | where(| lt(10)) | toArray,
     [1, 10, 2, 9, 3, 12]
     | repeat
     | flatten
-    | where(| isLessThan(10))
+    | where(| lt(10))
     | keepFirst(5)
     | toArray,
 ]
@@ -2643,7 +2643,7 @@ Returns:
 # Filtering doesn't ask for values beyond the last element it needs
 [[1, 10, 2, 9, 3, 12], 1 | build($ throw(newError("badIdea")))]
 | flatten
-| where(| isLessThan(10))
+| where(| lt(10))
 | keepFirst(5)
 | toArray
 >> [1, 2, 9, 3, 1]
@@ -2667,8 +2667,8 @@ Returns:
 [
     [1, 2, 3] | zip(["one", "two", "three"]) | toArray,
     [1, 2, 3] | zip(["one", "two"]) | toArray,
-    1 | build(| times(2)) | zip(["one", "two", "three"]) | toArray,
-    1 | build(| times(2)) | zip(1 | build(| times(3))) | keepFirst(3) | toArray,
+    1 | build(| mul(2)) | zip(["one", "two", "three"]) | toArray,
+    1 | build(| mul(2)) | zip(1 | build(| mul(3))) | keepFirst(3) | toArray,
     1 | build($ throw(newError("badIdea"))) | zip(["foo"]) | toArray,
 ]
 >> [
@@ -2701,7 +2701,7 @@ Returns:
     | transform(| toArray)
     | toArray,
     [2, 2]
-    | build(([a, b]) => [b | times(2), a | up])
+    | build(([a, b]) => [b | mul(2), a | up])
     | unzip
     | transform(| keepFirst(4) | toArray)
     | toArray,
@@ -2782,10 +2782,10 @@ Returns:
 ```
 # Dissecting
 [
-    [] | dissect(| isAtLeast(8)) | toArray,
-    [2, 8, 9, 3, 7] | dissect(| isAtLeast(8)) | toArray,
-    [2, 8, 9, 3, 7] | repeat | flatten | dissect(| isAtLeast(8)) | keepFirst(5) | toArray,
-    9 | build($ throw(newError("badIdea"))) | dissect(| isAtLeast(8)) | first,
+    [] | dissect(| ge(8)) | toArray,
+    [2, 8, 9, 3, 7] | dissect(| ge(8)) | toArray,
+    [2, 8, 9, 3, 7] | repeat | flatten | dissect(| ge(8)) | keepFirst(5) | toArray,
+    9 | build($ throw(newError("badIdea"))) | dissect(| ge(8)) | first,
 ]
 >> [
     [],
@@ -2814,7 +2814,7 @@ Returns:
     1 | to(9) | chunk(3) | toArray,
     1 | to(10) | chunk(3) | toArray,
     1 | to(11) | chunk(3) | toArray,
-    1 | build(| times(2)) | chunk(3) | keepFirst(3) | toArray,
+    1 | build(| mul(2)) | chunk(3) | keepFirst(3) | toArray,
     [1 | to(9), newStream(value: $ throw(newError("badIdea")), next: emptyStream)]
     | flatten
     | chunk(3)
@@ -2943,9 +2943,9 @@ Infinite streams only accept positive indices. They loop forever if the index is
 ```
 # Indexing infinite streams
 [
-    2 | build(| times(2)) | at(2),
-    2 | build(| times(2)) | at(2, default: $ 42),
-    2 | build(| times(2)) | at(0, default: $ 42),
+    2 | build(| mul(2)) | at(2),
+    2 | build(| mul(2)) | at(2, default: $ 42),
+    2 | build(| mul(2)) | at(0, default: $ 42),
 ]
 >> [4, 4, 42]
 ```
@@ -2981,7 +2981,7 @@ Returns:
 
 ```
 # Debug
-1 | build(| times(2) | debug) @ 10 // Open the console to see the debug output!
+1 | build(| mul(2) | debug) @ 10 // Open the console to see the debug output!
 >> 512
 ```
 
@@ -3916,7 +3916,7 @@ Values are checked against a _schema_. Valid schemas are:
 - A Kenpali type: one of the primitive classes `Null`, `Boolean`, `Number`, `String`, `Array`, `Object`, or `Function`; or an instance type such as `Error`, `Class`, or `Map`; or a protocol such as `Sequence` or `Type`.
 - An object of the form `{form: "enum", values: [<values>]}`, which matches only the specified values.
 - An object of the form `{form: "union", options: [<schemas>]}`, which matches a value if _at least one of_ the specified schemas matches it.
-- An object of the form `{form: "condition", schema: <schema>, condition: <function>}`, which adds the specified condition to the schema. For example, `{form: "condition", schema: Number, condition: | isLessThan(10)}` matches only numbers less than 10.
+- An object of the form `{form: "condition", schema: <schema>, condition: <function>}`, which adds the specified condition to the schema. For example, `{form: "condition", schema: Number, condition: | lt(10)}` matches only numbers less than 10.
 - An object of the form `{form: "array", elements: <schema>}`, which matches only arrays whose elements _all_ match the specified schema. For example, `{form: "array", elements: Number}` matches only arrays of numbers.
 - An object of the form `{form: "tuple", shape: [<schemas>]}`, which matches only arrays whose elements match the specified schemas in order. For example, `{form: "tuple", shape: [Number, String]}` matches only arrays whose first element is a number and whose second element is a string.
 - An object of the form `{form: "object", keys: <key-schema>, values: <value-schema>}`, which matches only objects whose keys and values match the specified schemas. Either `keys` or `values` may be omitted; `keys` defaults to `String`, and `values` defaults to `Any`. For example, `{form: "object", values: Number}` matches only objects whose whose values are numbers, while `{form: "object", keys: {form: "enum", values: ["foo", "bar", "baz"]}, values: Number}` matches only objects whose keys are some subset of `"foo"`, `"bar"`, and `"baz"` and whose values are numbers.
@@ -4120,7 +4120,7 @@ Returns:
 
 ```
 # Matching a type with a predicate
-sch = Number | satisfying(| isLessThan(10));
+sch = Number | satisfying(| lt(10));
 [
     1 | matches(sch),
     42 | matches(sch),
@@ -4210,7 +4210,7 @@ Returns:
 
 ```
 # Matching an object where keys and values must match schemas
-sch = objectOf(keys: String | satisfying(| length | equals(1)), values: Number);
+sch = objectOf(keys: String | satisfying(| length | eq(1)), values: Number);
 [
     {} | matches(sch),
     {x: 42} | matches(sch),

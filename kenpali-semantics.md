@@ -232,7 +232,7 @@ bar
 # Indexing with a positive index
 [
     2 | to(5) @ 2,
-    2 | build(| times(2)) @ 2,
+    2 | build(| mul(2)) @ 2,
 ]
 >> [3, 4]
 ```
@@ -245,21 +245,21 @@ bar
 
 ```
 # Destructuring a stream
-[foo, bar, baz] = 1 | build(| times(2));
+[foo, bar, baz] = 1 | build(| mul(2));
 [bar, baz, foo]
 >> [2, 4, 1]
 ```
 
 ```
 # Destructuring a stream with rest
-[foo, *rest] = 1 | build(| times(2));
+[foo, *rest] = 1 | build(| mul(2));
 [foo, rest | keepFirst(3) | toArray]
 >> [1, [2, 4, 8]]
 ```
 
 ```
 # Destructuring a stream with a middle rest
-[foo, *rest, bar] = 1 | build(| times(2)) | while(| isLessThan(100));
+[foo, *rest, bar] = 1 | build(| mul(2)) | while(| lt(100));
 [foo, rest, bar]
 >> [1, [2, 4, 8, 16, 32], 64]
 ```
@@ -273,7 +273,7 @@ bar
 ```
 # Stream values are locked in by the first traversal
 answer = newVar(42);
-stream = 1 | to(3) | transform(| plus(answer.get()));
+stream = 1 | to(3) | transform(| add(answer.get()));
 before = stream | toArray;
 answer.set(73);
 after = stream | toArray;
@@ -384,7 +384,8 @@ bar()
 ```
 # Mutable default value
 foo = (x = newVar(42)) => (
-    x.get() | up | (x.set); x.get()
+    x.get() | up | (x.set);
+    x.get()
 );
 [foo(), foo(), foo()]
 >> [43, 43, 43]

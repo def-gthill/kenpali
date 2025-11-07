@@ -952,13 +952,13 @@ Pipe and pipe-call steps are transformed into ordinary function calls, producing
 
 ```
 # Pipe in an arrow
-(x) => x | plus(3)
+(x) => x | add(3)
 >> {
     "type": "function",
     "posParams": [{"type": "name", "name": "x"}],
     "body": {
         "type": "call",
-        "callee": {"type": "name", "name": "plus"},
+        "callee": {"type": "name", "name": "add"},
         "posArgs": [{"type": "name", "name": "x"}, {"type": "literal", "value": 3}]
     }
 }
