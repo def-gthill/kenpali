@@ -1674,8 +1674,8 @@ Returns:
 ```
 # Stream is empty
 [
-    emptyStream() |.isEmpty(),
-    (1 | to(3)) |.isEmpty(),
+    emptyStream().isEmpty(),
+    1 | to(3) |.isEmpty(),
 ]
 >> [true, false]
 ```
@@ -1693,8 +1693,8 @@ Returns:
 ```
 # Stream value
 [
-    try($ emptyStream() |.value(), onError: itself) |.type,
-    (1 | to(3)) |.value(),
+    try($ emptyStream().value(), onError: itself).type,
+    1 | to(3) |.value(),
 ]
 >> ["missingProperty", 1]
 ```
@@ -1712,8 +1712,8 @@ Returns:
 ```
 # Stream next
 [
-    try($ emptyStream() |.next(), onError: itself) |.type,
-    (1 | to(3)) |.next() | toArray,
+    try($ emptyStream().next(), onError: itself).type,
+    1 | to(3) |.next() | toArray,
 ]
 >> ["missingProperty", [2, 3]]
 ```
@@ -3124,7 +3124,7 @@ set = [["foo"], {foo: 42, bar: 97}] | newSet;
 set = ["foo", "bar", "baz"] | newSet;
 [
     set | isInstance,
-    classOf(set) |.name,
+    classOf(set).name,
     set | display,
 ]
 >> [true, "Set", "Set {elements: [\"foo\", \"bar\", \"baz\"]}"]
@@ -3258,7 +3258,7 @@ map = [[["foo"], 42], [{foo: 42, bar: 97}, 97]] | newMap;
 map = [["foo", 42], ["bar", 97]] | newMap;
 [
     map | isInstance,
-    classOf(map) |.name,
+    classOf(map).name,
     map | display,
 ]
 >> [true, "Map", "Map {entries: [[\"foo\", 42], [\"bar\", 97]]}"]
@@ -3318,7 +3318,7 @@ var = newVar(42);
 var = newVar(42);
 [
     var | isInstance,
-    classOf(var) |.name,
+    classOf(var).name,
     var | display,
 ]
 >> [true, "Var", "Var {value: 42}"]
@@ -3468,7 +3468,7 @@ array = ["foo", "bar", "baz"] | newMutableArray
 array = ["foo", "bar", "baz"] | newMutableArray;
 [
     array | isInstance,
-    classOf(array) |.name,
+    classOf(array).name,
     array | display,
 ]
 >> [true, "MutableArray", "MutableArray {elements: [\"foo\", \"bar\", \"baz\"]}"]
@@ -3606,7 +3606,7 @@ set = [["foo"]] | newMutableSet;
 set = ["foo", "bar", "baz"] | newMutableSet;
 [
     set | isInstance,
-    classOf(set) |.name,
+    classOf(set).name,
     set | display,
 ]
 >> [true, "MutableSet", "MutableSet {elements: [\"foo\", \"bar\", \"baz\"]}"]
@@ -3789,7 +3789,7 @@ map = [[["foo"], 42]] | newMutableMap;
 map = [["foo", 42], ["bar", 97]] | newMutableMap;
 [
     map | isInstance,
-    classOf(map) |.name,
+    classOf(map).name,
     map | display,
 ]
 >> [true, "MutableMap", "MutableMap {entries: [[\"foo\", 42], [\"bar\", 97]]}"]

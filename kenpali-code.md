@@ -1043,6 +1043,117 @@ x | y |.z
 ```
 
 ```
+# Property access on a function result
+x(y).z
+>> {
+    "type": "index",
+    "collection": {
+        "type": "call",
+        "callee": {"type": "name", "name": "x"},
+        "posArgs": [{"type": "name", "name": "y"}]
+    },
+    "index": {"type": "literal", "value": "z"}
+}
+```
+
+```
+# Loose-binding property access on a function result
+x(y) |.z
+>> {
+    "type": "index",
+    "collection": {
+        "type": "call",
+        "callee": {"type": "name", "name": "x"},
+        "posArgs": [{"type": "name", "name": "y"}]
+    },
+    "index": {"type": "literal", "value": "z"}
+}
+```
+
+```
+# Loose-binding method call
+x |.y(z)
+>> {
+    "type": "call",
+    "callee": {
+        "type": "index",
+        "collection": {"type": "name", "name": "x"},
+        "index": {"type": "literal", "value": "y"}
+    },
+    "posArgs": [{"type": "name", "name": "z"}]
+}
+```
+
+```
+# Pipe into property of a function result
+a | x(y).z
+>> {
+    "type": "call",
+    "callee": {
+        "type": "index",
+        "collection": {
+            "type": "call",
+            "callee": {"type": "name", "name": "x"},
+            "posArgs": [{"type": "name", "name": "y"}]
+        },
+        "index": {"type": "literal", "value": "z"}
+    },
+    "posArgs": [{"type": "name", "name": "a"}]
+}
+```
+
+```
+# Indexing with a method call result
+x @ y.z()
+>> {
+    "type": "index",
+    "collection": {"type": "name", "name": "x"},
+    "index": {
+        "type": "call",
+        "callee": {
+            "type": "index",
+            "collection": {"type": "name", "name": "y"},
+            "index": {"type": "literal", "value": "z"}
+        }
+    }
+}
+```
+
+```
+# Piping into a method call
+a | x.y(z)
+>> {
+    "type": "call",
+    "callee": {
+        "type": "index",
+        "collection": {"type": "name", "name": "x"},
+        "index": {"type": "literal", "value": "y"}
+    },
+    "posArgs": [
+        {"type": "name", "name": "a"},
+        {"type": "name", "name": "z"}
+    ]
+}
+```
+
+```
+# Piping into a chained call
+a | x(y)(z)
+>> {
+    "type": "call",
+    "callee": {
+        "type": "call",
+        "callee": {"type": "name", "name": "x"},
+        "posArgs": [{"type": "name", "name": "y"}]
+    },
+    "posArgs": [
+        {"type": "name", "name": "a"},
+        {"type": "name", "name": "z"}
+    ]
+}
+```
+
+```
 # Indexing with an explicit string
 x @ "y"
 >> {
@@ -1066,6 +1177,32 @@ $ foo
 >> {
     "type": "function",
     "body": {"type": "name", "name": "foo"}
+}
+```
+
+```
+# Constant function shorthand with a pipe
+$ foo | bar
+>> {
+    "type": "function",
+    "body": {
+        "type": "call",
+        "callee": {"type": "name", "name": "bar"},
+        "posArgs": [{"type": "name", "name": "foo"}]
+    }
+}
+```
+
+```
+# Constant function shorthand with pipe-dot
+$ foo |.bar
+>> {
+    "type": "function",
+    "body": {
+        "type": "index",
+        "collection": {"type": "name", "name": "foo"},
+        "index": {"type": "literal", "value": "bar"}
+    }
 }
 ```
 

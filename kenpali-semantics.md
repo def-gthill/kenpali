@@ -664,22 +664,6 @@ string = "\"\\\/\b\f\n\r\t\u1234";
 !! wrongType {"value": 42, "expectedType": "either(Sequence, Object, Instance)"}
 ```
 
-## Forward Pipe
-
-```
-# Correct argument injection with multiple calls
-foo = (a, b = 4) => (c, d = 5) => [a, b, c, d];
-1 | foo(2)(3)
->> [1, 2, 3, 5]
-```
-
-```
-# Blocking argument injection with multiple calls
-foo = (a, b = 4) => (c, d = 5) => [a, b, c, d];
-1 | (foo(2))(3)
->> [2, 4, 1, 3]
-```
-
 ## Sets and Maps
 
 ```
