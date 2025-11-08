@@ -1,10 +1,10 @@
-sum = (numbers) => plus(*toArray(numbers));
-absolute = (n) => n | butIf(n | isLessThan(0), $ negative(n));
-isDivisibleBy = (a, b) => a | remainderBy(b) | equals(0);
+sum = (numbers) => add(*toArray(numbers));
+absolute = (n) => n | butIf(n | lt(0), $ negative(n));
+isDivisibleBy = (a, b) => a | remainderBy(b) | eq(0);
 joinLines = (strings) => (strings | join(on: "\n"));
 splitLines = (string) => (string | split(on: "\n"));
 isBetween = (n, lower, upper) => (
-    n | isAtLeast(lower) | and($ n | isAtMost(upper))
+    n | ge(lower) | and($ n | le(upper))
 );
 least = (sequence) => (
     sequence
@@ -12,7 +12,7 @@ least = (sequence) => (
         start: null,
         next: (element, state: leastSoFar) => if(
             leastSoFar | isNull | or(
-                $ element | isLessThan(leastSoFar)
+                $ element | lt(leastSoFar)
             ),
             then: $ element,
             else: $ leastSoFar,
@@ -20,16 +20,16 @@ least = (sequence) => (
     )
     | last
 );
-most = (sequence) => (
+greatest = (sequence) => (
     sequence
     | running(
         start: null,
-        next: (element, state: mostSoFar) => if(
-            mostSoFar | isNull | or(
-                $ element | isMoreThan(mostSoFar)
+        next: (element, state: greatestSoFar) => if(
+            greatestSoFar | isNull | or(
+                $ element | gt(greatestSoFar)
             ),
             then: $ element,
-            else: $ mostSoFar,
+            else: $ greatestSoFar,
         )
     )
     | last
@@ -45,25 +45,35 @@ butIf = (value, condition, ifTrue) => if(
     else: $ value,
 );
 ifs = (*conditions, else:) => null | switch(*conditions, else:);
+build = (start, next) => (
+    streamFrom = (getState) => (
+        getStateOnce = callOnce(getState);
+        newStream(
+            value: getStateOnce,
+            next: $ streamFrom($ next(getStateOnce())),
+        )
+    );
+    streamFrom($ start)
+);
 to = (start, end, by: = 1) => (
     isNoFurtherThan = if(
-        by | isMoreThan(0),
-        then: $ isAtMost,
-        else: $ isAtLeast,
+        by | gt(0),
+        then: $ le,
+        else: $ ge,
     );
     start
-    | build(| plus(by))
+    | build(| add(by))
     | while(| isNoFurtherThan(end))
 );
-toSize = (start, size) => (start | to(start | plus(size | down)));
+toSize = (start, size) => (start | to(start | add(size | down)));
 repeat = (value) => value | build((x) => x);
 last = (sequence) => sequence @ -1;
 keepLast = (sequence, n) => (
-    result = sequence | dropFirst(length(sequence) | minus(n));
+    result = sequence | dropFirst(length(sequence) | sub(n));
     result | butIf(result | isString | not, $ result | toArray)
 );
 dropLast = (sequence, n = 1) => (
-    result = sequence | keepFirst(length(sequence) | minus(n));
+    result = sequence | keepFirst(length(sequence) | sub(n));
     if(
         result | isString,
         then: $ result,
@@ -74,12 +84,12 @@ count = (sequence, condition) => sequence | where(condition) | toArray | length;
 forAll = (sequence, condition) => (
     sequence
     | count((element) => (element | condition | not))
-    | equals(0)
+    | eq(0)
 );
 forSome = (sequence, condition) => (
     sequence
     | count(condition)
-    | isMoreThan(0)
+    | gt(0)
 );
 reverse = (sequence) => (
     array = sequence | toArray;
@@ -93,7 +103,7 @@ group = (pairs, onGroup: = (x) => x) => (
     | forEach(([key, value]) => (
         if(
             result.has(key),
-            then: $ result.at(key) |.append(value),
+            then: $ result.at(key).append(value),
             else: $ result.set(key, newMutableArray([value])),
         )
     ));
@@ -108,10 +118,85 @@ groupBy = (sequence, by, onGroup: = (x) => x) => (
     | transform((element) => [by(element), element])
     | group(onGroup: onGroup)
 );
-isEmpty = (sequence) => sequence | keepFirst(1) | length | equals(0);
+isEmpty = (sequence) => if(
+    sequence | isStream,
+    then: $ sequence.isEmpty(),
+    else: $ sequence | keepFirst(1) | length | eq(0),
+);
 first = (sequence) => sequence @ 1;
+transform = (sequence, f) => (
+    start = sequence | toStream;
+    streamFrom = (current) => if(
+        current.isEmpty(),
+        then: emptyStream,
+        else: $ newStream(
+            value: $ f(current.value()),
+            next: $ streamFrom(current.next()),
+        )
+    );
+    streamFrom(start)
+);
+running = (in, start:, next:) => (
+    inStream = in | toStream;
+    streamFrom = (current, getState) => (
+        getStateOnce = callOnce(getState);
+        newStream(
+            value: getStateOnce,
+            next: $ if(
+                current.isEmpty(),
+                then: emptyStream,
+                else: $ streamFrom(
+                    current.next(),
+                    $ next(current.value(), state: getStateOnce())
+                ),
+            )
+        )
+    );
+    streamFrom(inStream, $ start)
+);
+withIndex = (sequence) => (
+    1 | build(up) | zip(sequence)
+);
 slice = (sequence, from:, to:) => (
     sequence | keepFirst(to) | dropFirst(from | down)
+);
+while = (sequence, condition) => (
+    start = sequence | toStream;
+    streamFrom = (current) => if(
+        current.isEmpty(),
+        then: emptyStream,
+        else: $ (
+            value = current.value();
+            if(
+                condition(value),
+                then: $ newStream(
+                    value: $ value,
+                    next: $ streamFrom(current.next()),
+                ),
+                else: emptyStream,
+            )
+        )
+    );
+    streamFrom(start)
+);
+continueIf = (sequence, condition) => (
+    start = sequence | toStream;
+    streamFrom = (current) => if(
+        current.isEmpty(),
+        then: emptyStream,
+        else: $ (
+            value = current.value();
+            newStream(
+                value: $ value,
+                next: $ if(
+                    condition(value),
+                    then: $ streamFrom(current.next()),
+                    else: emptyStream,
+                ),
+            )
+        )
+    );
+    streamFrom(start)
 );
 thenRepeat = (sequence, values) => [sequence, repeat(values)] | flatten;
 sliding = (sequence, size) => (
@@ -122,10 +207,90 @@ sliding = (sequence, size) => (
     )
     | dropFirst(size)
 );
+where = (sequence, condition) => (
+    sequence
+    | transform((value) => if(
+        condition(value),
+        then: $ [value],
+        else: $ [],
+    ))
+    | flatten
+);
+zip = (*sequences) => (
+    streams = sequences | transform(toStream);
+    streamFrom = (currents) => if(
+        currents | forSome(|.isEmpty()),
+        then: emptyStream,
+        else: $ newStream(
+            value: $ currents | transform(|.value()) | toArray,
+            next: $ streamFrom(currents | transform(|.next())),
+        )
+    );
+    streamFrom(streams)
+);
+unzip = (sequence, numStreams: = 2) => (
+    stream = sequence | toStream;
+    streamFrom = (current, i) => if(
+        current.isEmpty(),
+        then: emptyStream,
+        else: $ newStream(
+            value: $ current.value() @ i,
+            next: $ streamFrom(current.next(), i),
+        )
+    );
+    1 | to(numStreams) | transform((i) => streamFrom(stream, i)) | toArray
+);
+flatten = (sequence) => (
+    outer = toStream(sequence);
+    streamFrom = (startOuter, startInner) => (
+        [outer, inner] = [startOuter, startInner]
+        | build(([outer, inner]) => (
+            [outer.next(), outer.value() | toStream]
+        ))
+        | continueIf(([outer, inner]) => (
+            outer.isEmpty() | not | and(
+                $ inner.isEmpty()
+            )
+        ))
+        | last;
+        if(
+            inner.isEmpty(),
+            then: emptyStream,
+            else: $ newStream(
+                value: inner.value,
+                next: $ streamFrom(outer, inner.next()),
+            )
+        )
+    );
+    streamFrom(outer, emptyStream())
+);
+dissect = (sequence, condition) => (
+    start = sequence | toStream;
+    streamFrom = (start) => if(
+        start.isEmpty(),
+        then: emptyStream,
+        else: $ (
+            states = [start.value(), start.next()]
+            | build(([element, rest]) => (
+                [rest.value(), rest.next()]
+            ))
+            | continueIf(([element, rest]) => (
+                rest.isEmpty() | not | and(
+                    $ element | condition | not
+                )
+            ));
+            newStream(
+                value: $ states | transform(([element]) => element) | toArray,
+                next: $ streamFrom(states | last @ 2)
+            )
+        )
+    );
+    streamFrom(start)
+);
 chunk = (sequence, size) => (
     sequence
     | zip(1 | to(size) | repeat | flatten)
-    | dissect(([element, i]) => i | equals(size))
+    | dissect(([element, i]) => i | eq(size))
     | transform(| transform(([element]) => element) | toArray)
 );
 properties = (object) => (
