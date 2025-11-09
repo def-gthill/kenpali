@@ -1230,3 +1230,21 @@ A _point-free pipeline_ is written as a pipeline missing the initial value. It p
     }
 }
 ```
+
+```
+# Point-free pipeline starting with .
+.foo(bar)
+>> {
+    "type": "function",
+    "posParams": [{"type": "name", "name": "pipelineArg"}],
+    "body": {
+        "type": "call",
+        "callee": {
+            "type": "index",
+            "collection": {"type": "name", "name": "pipelineArg"},
+            "index": {"type": "literal", "value": "foo"}
+        },
+        "posArgs": [{"type": "name", "name": "bar"}]
+    }
+}
+```
