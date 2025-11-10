@@ -20,7 +20,7 @@ The keywords `null`, `false`, and `true` are treated as literal tokens even thou
 
 The following character sequences are tokens:
 
-`( ) [ ] { } , ; : => = |. | @ . ! $ ** *`
+`( ) [ ] { } , ; : => = |. | @ . $ ** * _`
 
 All spaces, tabs, carriage returns, and linefeeds are considered whitespace and discarded.
 
@@ -99,6 +99,8 @@ Kenpali supports "raw string" syntax, delimited using backticks instead of quote
 ```
 
 ## Comments|comments
+
+A comment can appear on its own line or at the end of a line.
 
 ```
 # A comment on its own line
@@ -183,8 +185,20 @@ An array parses to an [array expression](/docs/json#arrays).
 ```
 
 ```
+# Array containing an expression to evaluate
+[foo]
+>> {"type": "array", "elements": [{"type": "name", "name": "foo"}]}
+```
+
+An array can optionally have a comma after the last element, though this is normally only done if the array spans multiple lines.
+
+```
 # Trailing comma
-[1, 2, 3,]
+[
+    1,
+    2,
+    3,
+]
 >> {
     "type": "array",
     "elements": [
@@ -195,11 +209,7 @@ An array parses to an [array expression](/docs/json#arrays).
 }
 ```
 
-```
-# Array containing an expression to evaluate
-[foo]
->> {"type": "array", "elements": [{"type": "name", "name": "foo"}]}
-```
+Any of the array's elements can be _spreads_ instead of normal expressions, indicated by a `*` prefix. These are parsed into spread nodes in the JSON representation.
 
 ```
 # Arrays with spread
@@ -218,7 +228,11 @@ An array parses to an [array expression](/docs/json#arrays).
 
 `object ::= "{" [object_element ("," object_element)* [","]] "}"`
 
-`object_element ::= assignable ":" assignable | name ":" | object_spread`
+`object_element ::= object_entry | object_key_name | object_spread`
+
+`object_entry ::= assignable ":" assignable`
+
+`object_key_name ::= name ":"`
 
 `object_spread ::= "**" assignable`
 
@@ -304,6 +318,8 @@ If the value is omitted, it defaults to reading the property name from the surro
 }
 ```
 
+Any of the object's entries can be a _spread_ instead of a normal entry, indicated by a `**` prefix. These are parsed into entries with a `{"type": "spread"}` key in the JSON representation.
+
 ```
 # Objects with spread
 {answer: 42, **foo, question: 69}
@@ -344,34 +360,52 @@ Any expression can be enclosed in parentheses to force it to be parsed first, ov
 
 `statement ::= [name_pattern "="] assignable ";"`
 
-`name_pattern ::= name | array_pattern | object_pattern`
+`name_pattern ::= name | ignore | array_pattern | object_pattern`
+
+`ignore ::= "_"`
 
 `array_pattern ::= "[" [array_pattern_element ("," array_pattern_element)* [","]] "]"`
 
-`array_pattern_element ::= name_pattern ["=" assignable] | "*" name_pattern`
+`array_pattern_element ::= name_pattern ["=" assignable] | array_rest`
+
+`array_rest ::= "*" name_pattern`
 
 `object_pattern ::= "{" [object_pattern_element ("," object_pattern_element)* [","]] "}"`
 
-`object_pattern_element ::= object_pattern_simple ["=" assignable] | "**" name_pattern`
+`object_pattern_element ::= object_pattern_simple ["=" assignable] | object_rest`
 
-`object_pattern_simple ::= assignable ":" name_pattern | name ":"`
+`object_pattern_simple ::= object_pattern_entry | object_pattern_key_name`
+
+`object_pattern_entry ::= assignable ":" name_pattern`
+
+`object_pattern_key_name ::= name ":"`
+
+`object_rest ::= "**" name_pattern`
 
 A scope parses to a [block expression](/docs/json#names)
 
+In its simplest form, a scope is a list of assignments followed by an expression to evaluate, separated by semicolons.
+
 ```
 # Simple declaration
-foo = 42; foo
+foo = 42; bar = foo; bar
 >> {
     "type": "block",
     "defs": [
         [
             {"type": "name", "name": "foo"},
             {"type": "literal", "value": 42}
+        ],
+        [
+            {"type": "name", "name": "bar"},
+            {"type": "name", "name": "foo"}
         ]
     ],
-    "result": {"type": "name", "name": "foo"}
+    "result": {"type": "name", "name": "bar"}
 }
 ```
+
+The semicolon operator has the lowest precedence, so blocks typically need to be enclosed in parentheses when nested in other expressions.
 
 ```
 # Nested scopes
@@ -397,6 +431,10 @@ foo = (bar = 1; bar); foo
 }
 ```
 
+The left-hand side of an assignment can be a pattern instead of a single name.
+
+An array pattern has a similar syntax to an array, and parses to an array pattern node in the JSON representation.
+
 ```
 # Array destructuring declaration
 [foo, bar] = arr; foo
@@ -417,6 +455,8 @@ foo = (bar = 1; bar); foo
     "result": {"type": "name", "name": "foo"}
 }
 ```
+
+In an array pattern, elements can be ignored by using an underscore instead of a name. The underscore is parsed as an ignore node in the JSON representation. Since the underscore is special syntax, rather than a valid name with a conventional meaning, it can be used repeatedly in the same scope.
 
 ```
 # Array destructuring with ignores
@@ -440,32 +480,7 @@ foo = (bar = 1; bar); foo
 }
 ```
 
-```
-# Object destructuring declaration
-{foo:, bar:} = obj; foo
->> {
-    "type": "block",
-    "defs": [
-        [
-            {
-                "type": "objectPattern",
-                "entries": [
-                    [
-                        {"type": "literal", "value": "foo"},
-                        {"type": "name", "name": "foo"}
-                    ],
-                    [
-                        {"type": "literal", "value": "bar"},
-                        {"type": "name", "name": "bar"}
-                    ]
-                ]
-            },
-            {"type": "name", "name": "obj"}
-        ]
-    ],
-    "result": {"type": "name", "name": "foo"}
-}
-```
+An object pattern has a similar syntax to an object, and parses to an object pattern node in the JSON representation. The names to the left of the colon are the keys to look up in the object, with the name pattern to bind them to appearing on the right.
 
 ```
 # Object destructuring with aliases
@@ -494,6 +509,37 @@ foo = (bar = 1; bar); foo
 }
 ```
 
+If the name pattern to the right of the colon is omitted, the value is assigned to the same name in the current scope: `{foo:}` is equivalent to `{foo: foo}`.
+
+```
+# Object destructuring declaration
+{foo:, bar:} = obj; foo
+>> {
+    "type": "block",
+    "defs": [
+        [
+            {
+                "type": "objectPattern",
+                "entries": [
+                    [
+                        {"type": "literal", "value": "foo"},
+                        {"type": "name", "name": "foo"}
+                    ],
+                    [
+                        {"type": "literal", "value": "bar"},
+                        {"type": "name", "name": "bar"}
+                    ]
+                ]
+            },
+            {"type": "name", "name": "obj"}
+        ]
+    ],
+    "result": {"type": "name", "name": "foo"}
+}
+```
+
+An expression can be used directly as a statement. This is equivalent to assigning to `_`; the resulting JSON has an ignore node as the assignment target, so the expression is evaluated and its result is discarded.
+
 ```
 # Expression statements
 foo; 42
@@ -509,11 +555,15 @@ foo; 42
 }
 ```
 
+On the other hand, an assignment isn't a valid expression, so it can't be used as the final expression in a scope.
+
 ```
 # Assignment as the scope result
 foo = 42
 !! missingStatementSeparator {"line": 1, "column": 9}
 ```
+
+Similarly, an assignment can't itself be assigned to another name.
 
 ```
 # Chained assignment
@@ -521,206 +571,21 @@ foo = bar = 42; foo
 !! missingStatementSeparator {"line": 1, "column": 11}
 ```
 
-## Property Access|property-access
+## Tight Pipelines|tight-pipelines
 
-`tight_pipeline ::= atomic ("." name)*`
+`tight_pipeline_call ::= atomic tight_pipeline`
 
 `atomic ::= group | array | object | literal | name`
 
-A single property can be extracted from an object by putting the property name after a dot. This parses to an [index expression](/docs/json#indexing).
-
-```
-# Tight-binding property access
-foo.bar
->> {
-    "type": "index",
-    "collection": {"type": "name", "name": "foo"},
-    "index": {"type": "literal", "value": "bar"}
-}
-```
-
-Property access can be chained, and associates left to right.
-
-```
-# Chained tight-binding property access
-foo.bar.baz
->> {
-    "type": "index",
-    "collection": {
-        "type": "index",
-        "collection": {"type": "name", "name": "foo"},
-        "index": {"type": "literal", "value": "bar"}
-    },
-    "index": {"type": "literal", "value": "baz"}
-}
-```
-
-## Function Definitions|function-definitions
-
-`arrow_function ::= parameter_list "=>" assignable`
-
-`parameter_list ::= "(" [parameter ("," parameter)* [","]] ")"`
-
-`parameter ::= array_pattern_element | object_pattern_element`
-
-A function definition parses to a [function expression](/docs/json#functions).
-
-```
-# No parameters
-() => 42
->> {"type": "function", "body": {"type": "literal", "value": 42}}
-```
-
-```
-# One positional parameter
-(x) => x
->> {
-    "type": "function",
-    "posParams": [{"type": "name", "name": "x"}],
-    "body": {"type": "name", "name": "x"}
-}
-```
-
-```
-# Optional positional parameter
-(x, y = 3) => x
->> {
-    "type": "function",
-    "posParams": [
-        {"type": "name", "name": "x"},
-        {
-            "type": "optional",
-            "name": {"type": "name", "name": "y"},
-            "defaultValue": {"type": "literal", "value": 3}
-        }
-    ],
-    "body": {"type": "name", "name": "x"}
-}
-```
-
-```
-# Positional rest parameter
-(*args) => args
->> {
-    "type": "function",
-    "posParams": [{"type": "rest", "name": {"type": "name", "name": "args"}}],
-    "body": {"type": "name", "name": "args"}
-}
-```
-
-```
-# Named parameter
-(x, y:) => x
->> {
-    "type": "function",
-    "posParams": [{"type": "name", "name": "x"}],
-    "namedParams": [
-        [
-            {"type": "literal", "value": "y"},
-            {"type": "name", "name": "y"}
-        ]
-    ],
-    "body": {"type": "name", "name": "x"}
-}
-```
-
-```
-# Optional named parameter
-(x, y: = 3) => x
->> {
-    "type": "function",
-    "posParams": [{"type": "name", "name": "x"}],
-    "namedParams": [
-        [
-            {"type": "literal", "value": "y"},
-            {
-                "type": "optional",
-                "name": {"type": "name", "name": "y"},
-                "defaultValue": {"type": "literal", "value": 3}
-            }
-        ]
-    ],
-    "body": {"type": "name", "name": "x"}
-}
-```
-
-```
-# Named rest parameter
-(**namedArgs) => namedArgs
->> {
-    "type": "function",
-    "namedParams": [
-        [
-            {"type": "rest"},
-            {"type": "name", "name": "namedArgs"}
-        ]
-    ],
-    "body": {"type": "name", "name": "namedArgs"}
-}
-```
-
-```
-# Named parameter with alias
-(x, y: z) => x
->> {
-    "type": "function",
-    "posParams": [{"type": "name", "name": "x"}],
-    "namedParams": [
-        [
-            {"type": "literal", "value": "y"},
-            {"type": "name", "name": "z"}
-        ]
-    ],
-    "body": {"type": "name", "name": "x"}
-}
-```
-
-```
-# Scope in function body
-(x) => (y = x; y)
->> {
-    "type": "function",
-    "posParams": [{"type": "name", "name": "x"}],
-    "body": {
-        "type": "block",
-        "defs": [
-            [
-                {"type": "name", "name": "y"},
-                {"type": "name", "name": "x"}
-            ]
-        ],
-        "result": {"type": "name", "name": "y"}
-    }
-}
-```
-
-## Pipelines|pipelines
-
-Most of Kenpali's operators are pipeline operators. All pipeline operators have the same precedence, and associate left to right.
-
-`assignable ::= arrow_function | pipeline | point_free_pipeline | constant_function`
-
-`pipeline ::= tight_pipeline pipeline_step*`
-
-`pipeline_step ::= call | pipe | pipe_call | pipe_dot | at | "!"`
-
-`call ::= argument_list`
-
-`pipe ::= "|" tight_pipeline`
-
-`pipe_call ::= "|" tight_pipeline argument_list`
-
-`pipe_dot ::= "|." name`
-
-`at ::= "@" tight_pipeline`
+`tight_pipeline ::= (argument_list | property_access)*`
 
 `argument_list ::= "(" [argument ("," argument)* [","]] ")"`
 
-`argument ::= positional_argument | named_argument | array_spread | object_spread`
+`argument ::= object_element | array_element`
 
-`positional_argument ::= assignable`
+`property_access ::= "." name`
 
-`named_argument ::= name ":" [assignable]`
+Kenpali Code syntax relies heavily on _pipelines_—sequences of operations where the output from each operation is the input to the next. There are two kinds of pipelines, called _tight_ and _loose_ to reflect their different precedence levels. This section describes tight pipelines, which consist of function calls and property accesses.
 
 ### Function Calls|function-calls
 
@@ -746,6 +611,8 @@ foo(1, 2)
 }
 ```
 
+Function arguments can contain any syntax that works in an [array](#arrays), including spreads.
+
 ```
 # Spread positional arguments
 foo(*bar)
@@ -768,6 +635,8 @@ foo(1, *bar)
     ]
 }
 ```
+
+Named arguments are passed using object-like syntax, and the same shorthand syntax available in [objects](#objects) is also available when passing named arguments.
 
 ```
 # One named argument
@@ -887,6 +756,8 @@ foo(1, 2, bar: 3, baz: 4)
 }
 ```
 
+A tight pipeline can contain several function calls in a row, with the result of each call itself being called with the next arguments.
+
 ```
 # Calling the result of a function call
 foo(x)(y)
@@ -901,9 +772,224 @@ foo(x)(y)
 }
 ```
 
-### Pipes and Pipe-Calls|forward-pipe
+### Property Access|property-access
 
-Pipe and pipe-call steps are transformed into ordinary function calls, producing [call expressions](/docs/json#functions).
+A single property can be extracted from an object by putting the property name after a dot. This parses to an [index expression](/docs/json#indexing).
+
+```
+# Tight-binding property access
+foo.bar
+>> {
+    "type": "index",
+    "collection": {"type": "name", "name": "foo"},
+    "index": {"type": "literal", "value": "bar"}
+}
+```
+
+Property access can be chained, and associates left to right.
+
+```
+# Chained tight-binding property access
+foo.bar.baz
+>> {
+    "type": "index",
+    "collection": {
+        "type": "index",
+        "collection": {"type": "name", "name": "foo"},
+        "index": {"type": "literal", "value": "bar"}
+    },
+    "index": {"type": "literal", "value": "baz"}
+}
+```
+
+A tight pipeline can have any combination of function calls and property accesses.
+
+```
+# Complicated tight pipeline
+foo.bar(baz)(qux).quux
+>> {
+    "type": "index",
+    "collection": {
+        "type": "call",
+        "callee": {
+            "type": "call",
+            "callee": {
+                "type": "index",
+                "collection": {"type": "name", "name": "foo"},
+                "index": {"type": "literal", "value": "bar"}
+            },
+            "posArgs": [{"type": "name", "name": "baz"}]
+        },
+        "posArgs": [{"type": "name", "name": "qux"}]
+    },
+    "index": {"type": "literal", "value": "quux"}
+}
+```
+
+## Function Definitions|function-definitions
+
+`arrow_function ::= parameter_list "=>" assignable`
+
+`parameter_list ::= "(" [parameter ("," parameter)* [","]] ")"`
+
+`parameter ::= array_pattern_element | object_pattern_element`
+
+A function definition parses to a [function expression](/docs/json#functions).
+
+```
+# No parameters
+() => 42
+>> {"type": "function", "body": {"type": "literal", "value": 42}}
+```
+
+```
+# One positional parameter
+(x) => x
+>> {
+    "type": "function",
+    "posParams": [{"type": "name", "name": "x"}],
+    "body": {"type": "name", "name": "x"}
+}
+```
+
+Positional parameters support all the same syntax available in [array patterns](#scopes), including optional and rest elements.
+
+```
+# Optional positional parameter
+(x, y = 3) => x
+>> {
+    "type": "function",
+    "posParams": [
+        {"type": "name", "name": "x"},
+        {
+            "type": "optional",
+            "name": {"type": "name", "name": "y"},
+            "defaultValue": {"type": "literal", "value": 3}
+        }
+    ],
+    "body": {"type": "name", "name": "x"}
+}
+```
+
+```
+# Positional rest parameter
+(*args) => args
+>> {
+    "type": "function",
+    "posParams": [{"type": "rest", "name": {"type": "name", "name": "args"}}],
+    "body": {"type": "name", "name": "args"}
+}
+```
+
+Named parameters support all the same syntax available in [object patterns](#scopes), including optional elements, rest elements, and recursively binding to a name pattern.
+
+```
+# Named parameter
+(x, y:) => x
+>> {
+    "type": "function",
+    "posParams": [{"type": "name", "name": "x"}],
+    "namedParams": [
+        [
+            {"type": "literal", "value": "y"},
+            {"type": "name", "name": "y"}
+        ]
+    ],
+    "body": {"type": "name", "name": "x"}
+}
+```
+
+```
+# Optional named parameter
+(x, y: = 3) => x
+>> {
+    "type": "function",
+    "posParams": [{"type": "name", "name": "x"}],
+    "namedParams": [
+        [
+            {"type": "literal", "value": "y"},
+            {
+                "type": "optional",
+                "name": {"type": "name", "name": "y"},
+                "defaultValue": {"type": "literal", "value": 3}
+            }
+        ]
+    ],
+    "body": {"type": "name", "name": "x"}
+}
+```
+
+```
+# Named rest parameter
+(**namedArgs) => namedArgs
+>> {
+    "type": "function",
+    "namedParams": [
+        [
+            {"type": "rest"},
+            {"type": "name", "name": "namedArgs"}
+        ]
+    ],
+    "body": {"type": "name", "name": "namedArgs"}
+}
+```
+
+```
+# Named parameter with alias
+(x, y: z) => x
+>> {
+    "type": "function",
+    "posParams": [{"type": "name", "name": "x"}],
+    "namedParams": [
+        [
+            {"type": "literal", "value": "y"},
+            {"type": "name", "name": "z"}
+        ]
+    ],
+    "body": {"type": "name", "name": "x"}
+}
+```
+
+The body of a function is often a [scope](#scopes), which must be enclosed in parentheses because the semicolon has a lower precedence than the arrow.
+
+```
+# Scope in function body
+(x) => (y = x; y)
+>> {
+    "type": "function",
+    "posParams": [{"type": "name", "name": "x"}],
+    "body": {
+        "type": "block",
+        "defs": [
+            [
+                {"type": "name", "name": "y"},
+                {"type": "name", "name": "x"}
+            ]
+        ],
+        "result": {"type": "name", "name": "y"}
+    }
+}
+```
+
+## Loose Pipelines|loose-pipelines
+
+`assignable ::= arrow_function | pipeline | point_free_pipeline | constant_function`
+
+`pipeline ::= tight_pipeline pipeline_step*`
+
+`pipeline_step ::= pipe | pipe_dot | at`
+
+`pipe ::= "|" tight_pipeline`
+
+`pipe_dot ::= "|." name`
+
+`at ::= "@" tight_pipeline`
+
+Loose pipelines have a lower precedence than tight pipelines, and consist of pipes, loose property accesses, and indexing steps.
+
+### Pipes|forward-pipe
+
+Pipe steps are transformed into ordinary function calls, producing [call expressions](/docs/json#functions).
 
 ```
 # Forward pipe into a bare name
@@ -915,6 +1001,8 @@ Pipe and pipe-call steps are transformed into ordinary function calls, producing
 }
 ```
 
+If the target of the pipe is a tight pipeline ending in a function call, the input is injected as the first positional argument to that call.
+
 ```
 # Forward pipe injecting a first argument
 1 | bar(2)
@@ -924,6 +1012,8 @@ Pipe and pipe-call steps are transformed into ordinary function calls, producing
     "posArgs": [{"type": "literal", "value": 1}, {"type": "literal", "value": 2}]
 }
 ```
+
+Any named arguments in the call are retained alongside the injected positional argument.
 
 ```
 # Forward pipe injecting alongside a named argument
@@ -940,6 +1030,8 @@ Pipe and pipe-call steps are transformed into ordinary function calls, producing
     ]
 }
 ```
+
+Pipes can be chained together, with the output of each pipe becoming the input to the next.
 
 ```
 # Chaining forward pipes
@@ -958,6 +1050,8 @@ Pipe and pipe-call steps are transformed into ordinary function calls, producing
 }
 ```
 
+Argument injection can be blocked by enclosing the target in parentheses.
+
 ```
 # Blocking first-argument injection
 1 | (bar(2))
@@ -972,6 +1066,8 @@ Pipe and pipe-call steps are transformed into ordinary function calls, producing
 }
 ```
 
+The body of a function can be a loose pipeline without any parentheses—pipeline operators have higher precedence than the arrow.
+
 ```
 # Pipe in an arrow
 (x) => x | add(3)
@@ -983,6 +1079,98 @@ Pipe and pipe-call steps are transformed into ordinary function calls, producing
         "callee": {"type": "name", "name": "add"},
         "posArgs": [{"type": "name", "name": "x"}, {"type": "literal", "value": 3}]
     }
+}
+```
+
+### Loose property access|loose-property-access
+
+The loose property access operator `|.` does the same thing as the tight property access operator `.`, but its precedence is that of a loose pipeline. If tight property access is used alongside loose pipeline operators, the tight property access happens first.
+
+```
+# Correct precedence of tight-binding property access
+x | y.z
+>> {
+    "type": "call",
+    "callee": {
+        "type": "index",
+        "collection": {"type": "name", "name": "y"},
+        "index": {"type": "literal", "value": "z"}
+    },
+    "posArgs": [{"type": "name", "name": "x"}]
+}
+```
+
+Using loose property access makes the operations happen from left to right instead.
+
+```
+# Loose-binding property access
+x | y |.z
+>> {
+    "type": "index",
+    "collection": {
+        "type": "call",
+        "callee": {"type": "name", "name": "y"},
+        "posArgs": [{"type": "name", "name": "x"}]
+    },
+    "index": {"type": "literal", "value": "z"}
+}
+```
+
+Further tight pipeline steps can be chained onto the end of a loose property access; the whole sequence of operations happens from left to right.
+
+```
+# Tight pipeline hanging off a loose property access
+x | y |.foo(bar)(baz).qux
+>> {
+    "type": "index",
+    "collection": {
+        "type": "call",
+        "callee": {
+            "type": "call",
+            "callee": {
+                "type": "index",
+                "collection": {
+                    "type": "call",
+                    "callee": {"type": "name", "name": "y"},
+                    "posArgs": [{"type": "name", "name": "x"}]
+                },
+                "index": {"type": "literal", "value": "foo"}
+            },
+            "posArgs": [{"type": "name", "name": "bar"}]
+        },
+        "posArgs": [{"type": "name", "name": "baz"}]
+    },
+    "index": {"type": "literal", "value": "qux"}
+}
+```
+
+Compare this to the case where the loose pipeline uses only pipes.
+
+```
+# Piping into a complex tight pipeline
+x | y | foo(bar)(baz).qux
+>> {
+    "type": "call",
+    "callee": {
+        "type": "index",
+        "collection": {
+            "type": "call",
+            "callee": {
+                "type": "call",
+                "callee": {"type": "name", "name": "foo"},
+                "posArgs": [{"type": "name", "name": "bar"}]
+            },
+            "posArgs": [{"type": "name", "name": "baz"}]
+        },
+        "index": {"type": "literal", "value": "qux"}
+    },
+    "posArgs": [
+        {
+            "type": "call",
+            "callee": {"type": "name", "name": "y"},
+            "posArgs": [{"type": "name", "name": "x"}]
+        }
+    ]
 }
 ```
 
@@ -1005,6 +1193,8 @@ Indexing steps parse to [index expressions](/docs/json#indexing).
     "index": {"type": "literal", "value": 2}
 }
 ```
+
+Indexing steps can be used alongside pipes, with the operations happening from left to right.
 
 ```
 # Correct precedence of @
@@ -1036,93 +1226,7 @@ Indexing steps parse to [index expressions](/docs/json#indexing).
 }
 ```
 
-```
-# Correct precedence of tight-binding property access
-x | y.z
->> {
-    "type": "call",
-    "callee": {
-        "type": "index",
-        "collection": {"type": "name", "name": "y"},
-        "index": {"type": "literal", "value": "z"}
-    },
-    "posArgs": [{"type": "name", "name": "x"}]
-}
-```
-
-```
-# Loose-binding property access
-x | y |.z
->> {
-    "type": "index",
-    "collection": {
-        "type": "call",
-        "callee": {"type": "name", "name": "y"},
-        "posArgs": [{"type": "name", "name": "x"}]
-    },
-    "index": {"type": "literal", "value": "z"}
-}
-```
-
-```
-# Property access on a function result
-x(y).z
->> {
-    "type": "index",
-    "collection": {
-        "type": "call",
-        "callee": {"type": "name", "name": "x"},
-        "posArgs": [{"type": "name", "name": "y"}]
-    },
-    "index": {"type": "literal", "value": "z"}
-}
-```
-
-```
-# Loose-binding property access on a function result
-x(y) |.z
->> {
-    "type": "index",
-    "collection": {
-        "type": "call",
-        "callee": {"type": "name", "name": "x"},
-        "posArgs": [{"type": "name", "name": "y"}]
-    },
-    "index": {"type": "literal", "value": "z"}
-}
-```
-
-```
-# Loose-binding method call
-x |.y(z)
->> {
-    "type": "call",
-    "callee": {
-        "type": "index",
-        "collection": {"type": "name", "name": "x"},
-        "index": {"type": "literal", "value": "y"}
-    },
-    "posArgs": [{"type": "name", "name": "z"}]
-}
-```
-
-```
-# Pipe into property of a function result
-a | x(y).z
->> {
-    "type": "call",
-    "callee": {
-        "type": "index",
-        "collection": {
-            "type": "call",
-            "callee": {"type": "name", "name": "x"},
-            "posArgs": [{"type": "name", "name": "y"}]
-        },
-        "index": {"type": "literal", "value": "z"}
-    },
-    "posArgs": [{"type": "name", "name": "a"}]
-}
-```
+Like other loose pipeline operators, indexing has a lower precedence than tight pipeline operators.
 
 ```
 # Indexing with a method call result
@@ -1138,50 +1242,6 @@ x @ y.z()
             "index": {"type": "literal", "value": "z"}
         }
     }
-}
-```
-
-```
-# Piping into a method call
-a | x.y(z)
->> {
-    "type": "call",
-    "callee": {
-        "type": "index",
-        "collection": {"type": "name", "name": "x"},
-        "index": {"type": "literal", "value": "y"}
-    },
-    "posArgs": [
-        {"type": "name", "name": "a"},
-        {"type": "name", "name": "z"}
-    ]
-}
-```
-
-```
-# Piping into a chained call
-a | x(y)(z)
->> {
-    "type": "call",
-    "callee": {
-        "type": "call",
-        "callee": {"type": "name", "name": "x"},
-        "posArgs": [{"type": "name", "name": "y"}]
-    },
-    "posArgs": [
-        {"type": "name", "name": "a"},
-        {"type": "name", "name": "z"}
-    ]
-}
-```
-
-```
-# Indexing with an explicit string
-x @ "y"
->> {
-    "type": "index",
-    "collection": {"type": "name", "name": "x"},
-    "index": {"type": "literal", "value": "y"}
 }
 ```
 
@@ -1201,6 +1261,8 @@ $ foo
     "body": {"type": "name", "name": "foo"}
 }
 ```
+
+As with ordinary functions, the body of a constant function can be a loose pipeline without the need for parentheses.
 
 ```
 # Constant function shorthand with a pipe
@@ -1228,7 +1290,7 @@ $ foo |.bar
 }
 ```
 
-A _point-free pipeline_ is written as a pipeline missing the initial value. It parses to a function with one positional parameter, which becomes the missing initial value.
+A _point-free pipeline_ is written as a loose pipeline missing the initial value. It parses to a function with one positional parameter, which becomes the missing initial value.
 
 `point_free_pipeline ::= pipeline_step*`
 
@@ -1246,6 +1308,55 @@ A _point-free pipeline_ is written as a pipeline missing the initial value. It p
                 "type": "call",
                 "callee": {"type": "name", "name": "foo"},
                 "posArgs": [{"type": "name", "name": "pipelineArg"}]
+            },
+            {"type": "literal", "value": 2}
+        ]
+    }
+}
+```
+
+Point-free pipelines can start with any loose pipeline operator.
+
+```
+# Point-free pipeline starting with |.
+|.foo(bar)(baz).qux
+>> {
+    "type": "function",
+    "posParams": [{"type": "name", "name": "pipelineArg"}],
+    "body": {
+        "type": "index",
+        "collection": {
+            "type": "call",
+            "callee": {
+                "type": "call",
+                "callee": {
+                    "type": "index",
+                    "collection": {"type": "name", "name": "pipelineArg"},
+                    "index": {"type": "literal", "value": "foo"}
+                },
+                "posArgs": [{"type": "name", "name": "bar"}]
+            },
+            "posArgs": [{"type": "name", "name": "baz"}]
+        },
+        "index": {"type": "literal", "value": "qux"}
+    }
+}
+```
+
+```
+# Point-free pipeline starting with @
+@ foo | bar(2)
+>> {
+    "type": "function",
+    "posParams": [{"type": "name", "name": "pipelineArg"}],
+    "body": {
+        "type": "call",
+        "callee": {"type": "name", "name": "bar"},
+        "posArgs": [
+            {
+                "type": "index",
+                "collection": {"type": "name", "name": "pipelineArg"},
+                "index": {"type": "name", "name": "foo"}
             },
             {"type": "literal", "value": 2}
         ]
