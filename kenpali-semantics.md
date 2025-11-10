@@ -145,6 +145,13 @@ Missing elements in an array pattern cause a runtime error.
 !! missingElement {"value": [1, 2], "name": "baz"}
 ```
 
+```
+# Array pattern with ignores
+[_, _, foo] = [1, 2, 3];
+foo
+>> 3
+```
+
 Array destructuring can be nested.
 
 ```
@@ -312,6 +319,20 @@ foo(42, b: 97)
 ```
 
 ```
+# Excess positional argument
+foo = (a, b:) => [a, b];
+foo(42, 97, b: 216)
+>> [42, 216]
+```
+
+```
+# Excess named argument
+foo = (a, b:) => [a, b];
+foo(42, b: 97, c: 216)
+>> [42, 97]
+```
+
+```
 # Missing positional argument
 foo = (a, b:) => [a, b];
 foo(b: 97)
@@ -323,6 +344,13 @@ foo(b: 97)
 foo = (a, b:) => [a, b];
 foo(42)
 !! missingArgument {"name": "b"}
+```
+
+```
+# Ignoring an argument
+foo = (_, b) => b;
+foo(42, 97)
+>> 97
 ```
 
 Positional and named parameters are strictly separated; trying to pass a positional argument to a named parameter or vice versa causes a runtime error.

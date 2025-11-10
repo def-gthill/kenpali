@@ -419,6 +419,28 @@ foo = (bar = 1; bar); foo
 ```
 
 ```
+# Array destructuring with ignores
+[_, _, foo] = arr; foo
+>> {
+    "type": "block",
+    "defs": [
+        [
+            {
+                "type": "arrayPattern",
+                "names": [
+                    {"type": "ignore"},
+                    {"type": "ignore"},
+                    {"type": "name", "name": "foo"}
+                ]
+            },
+            {"type": "name", "name": "arr"}
+        ]
+    ],
+    "result": {"type": "name", "name": "foo"}
+}
+```
+
+```
 # Object destructuring declaration
 {foo:, bar:} = obj; foo
 >> {
