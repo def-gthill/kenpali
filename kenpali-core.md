@@ -1612,6 +1612,10 @@ These functions build up new streams from scalar inputs.
 
 ### Stream|stream
 
+A _stream_ is a lazily computed sequence of values. It is inspired by similar concepts in other languages (often called _generators_ or _iterators_), but the key difference is that streams _remember_ the values they have already computed, so they can be iterated over multiple times. Of course, this should be implemented in such a way that values that are _no longer reachable_ are freed—for example, by storing them in a linked list.
+
+In general, streams must not compute anything more than is absolutely necessary to produce the values that have been requested.
+
 #### newStream|newStream
 
 Explicitly creates a stream with the specified head value and tail stream.
