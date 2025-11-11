@@ -20,7 +20,7 @@ The keywords `null`, `false`, and `true` are treated as literal tokens even thou
 
 The following character sequences are tokens:
 
-`( ) [ ] { } , ; : => = |. | @ . $ ** * _`
+`( ) [ ] { } , ; : => = |. | @ . $ ** * _ /`
 
 All spaces, tabs, carriage returns, and linefeeds are considered whitespace and discarded.
 
@@ -232,7 +232,7 @@ Any of the array's elements can be _spreads_ instead of normal expressions, indi
 
 `object_entry ::= assignable ":" assignable`
 
-`object_key_name ::= name ":"`
+`object_key_name ::= NAME ":"`
 
 `object_spread ::= "**" assignable`
 
@@ -356,11 +356,13 @@ Any expression can be enclosed in parentheses to force it to be parsed first, ov
 
 ## Scopes|scopes
 
+`expression ::= scope`
+
 `scope ::= statement* assignable`
 
 `statement ::= [name_pattern "="] assignable ";"`
 
-`name_pattern ::= name | ignore | array_pattern | object_pattern`
+`name_pattern ::= NAME | ignore | array_pattern | object_pattern`
 
 `ignore ::= "_"`
 
@@ -378,7 +380,7 @@ Any expression can be enclosed in parentheses to force it to be parsed first, ov
 
 `object_pattern_entry ::= assignable ":" name_pattern`
 
-`object_pattern_key_name ::= name ":"`
+`object_pattern_key_name ::= NAME ":"`
 
 `object_rest ::= "**" name_pattern`
 
@@ -573,17 +575,19 @@ foo = bar = 42; foo
 
 ## Tight Pipelines|tight-pipelines
 
-`tight_pipeline_call ::= atomic tight_pipeline`
+`tight_pipeline_call ::= atomic [tight_pipeline]`
 
 `atomic ::= group | array | object | literal | name`
 
-`tight_pipeline ::= (argument_list | property_access)*`
+`tight_pipeline ::= tight_pipeline_step*`
+
+`tight_pipeline_step ::= argument_list | property_access`
 
 `argument_list ::= "(" [argument ("," argument)* [","]] ")"`
 
 `argument ::= object_element | array_element`
 
-`property_access ::= "." name`
+`property_access ::= "." NAME`
 
 Kenpali Code syntax relies heavily on _pipelines_—sequences of operations where the output from each operation is the input to the next. There are two kinds of pipelines, called _tight_ and _loose_ to reflect their different precedence levels. This section describes tight pipelines, which consist of function calls and property accesses.
 
@@ -973,17 +977,19 @@ The body of a function is often a [scope](#scopes), which must be enclosed in pa
 
 ## Loose Pipelines|loose-pipelines
 
-`assignable ::= arrow_function | pipeline | point_free_pipeline | constant_function`
+`assignable ::= arrow_function | loose_pipeline_call | loose_pipeline | constant_function`
 
-`pipeline ::= tight_pipeline pipeline_step*`
+`loose_pipeline_call ::= tight_pipeline_call [loose_pipeline]`
 
-`pipeline_step ::= pipe | pipe_dot | at`
+`loose_pipeline ::= loose_pipeline_step*`
 
-`pipe ::= "|" tight_pipeline`
+`loose_pipeline_step ::= pipe | pipe_dot | at`
 
-`pipe_dot ::= "|." name`
+`pipe ::= "|" tight_pipeline_call`
 
-`at ::= "@" tight_pipeline`
+`pipe_dot ::= "|." name (tight_pipeline_step)*`
+
+`at ::= "@" tight_pipeline_call`
 
 Loose pipelines have a lower precedence than tight pipelines, and consist of pipes, loose property accesses, and indexing steps.
 
@@ -1245,7 +1251,7 @@ x @ y.z()
 }
 ```
 
-## Function Definition Shorthand
+## Function Definition Shorthand|function-shorthand
 
 Kenpali has two kinds of shorthand syntax for compactly defining common function types.
 
@@ -1292,7 +1298,7 @@ $ foo |.bar
 
 A _point-free pipeline_ is written as a loose pipeline missing the initial value. It parses to a function with one positional parameter, which becomes the missing initial value.
 
-`point_free_pipeline ::= pipeline_step*`
+`point_free_pipeline ::= loose_pipeline`
 
 ```
 # Point-free pipeline starting with |

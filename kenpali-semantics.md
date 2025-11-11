@@ -1,6 +1,6 @@
 # Kenpali Semantic Specification
 
-## Names
+## Names|names
 
 It's an error to declare the same name more than once in the same block.
 
@@ -72,7 +72,7 @@ foo = 42;
 !! nameUsedBeforeAssignment {"name": "foo"}
 ```
 
-## Strings
+## Strings|strings
 
 ```
 # String length counts Unicode code points
@@ -104,7 +104,7 @@ foo = 42;
 !! invalidStringLiteral {"value": "\"foo\\u{1f61b\""}
 ```
 
-## Arrays
+## Arrays|arrays
 
 Arrays can freely mix different types of elements.
 
@@ -175,7 +175,7 @@ Array destructuring can be nested.
 >> [57, 42, 216, 73]
 ```
 
-## Objects
+## Objects|objects
 
 Objects can freely mix different types of values.
 
@@ -226,7 +226,7 @@ bar
 >> 42
 ```
 
-## Streams
+## Streams|streams
 
 ```
 # Merely invoking build doesn't call the callback
@@ -296,7 +296,7 @@ stream | display
 >> "Stream [Var {value: 42}]"
 ```
 
-## Defining and Calling Functions
+## Defining and Calling Functions|functions
 
 ```
 # Calling something that isn't a function
@@ -613,7 +613,7 @@ leaky = $ intruder;
 !! nameNotDefined {"name": "intruder"}
 ```
 
-## Indexing
+## Indexing|indexing
 
 ```
 # Indexing strings - wrong index type
@@ -692,7 +692,7 @@ string = "\"\\\/\b\f\n\r\t\u1234";
 !! wrongType {"value": 42, "expectedType": "either(Sequence, Object, Instance)"}
 ```
 
-## Sets and Maps
+## Sets and Maps|collections
 
 ```
 # Instances as set members
@@ -710,7 +710,7 @@ set = [1, 2, 3, 4, 42] | newSet;
 >> [3, 4, 42]
 ```
 
-## Errors
+## Errors|errors
 
 If an expression throws an error, that error propagates outward through enclosing expressions, aborting further evaluation.
 
@@ -768,7 +768,7 @@ try(foo, onError: |.calls)
 ]
 ```
 
-## Variables
+## Variables|variables
 
 ```
 # Simultaneous variables
