@@ -118,7 +118,7 @@ toNumber("42a")
 !! notNumeric {"value": "42a"}
 ```
 
-## Mutable Objects
+## Mutable Values
 
 ```
 # Mutable array - reading a bad index
@@ -142,6 +142,12 @@ toNumber("42a")
 # Mutable array - pop on an empty array
 [] | newMutableArray |.pop()
 !! indexOutOfBounds {"length": 0, "index": -1}
+```
+
+```
+# Mutable map - reading a bad key
+[["foo", 42], ["bar", 97]] | newMutableMap |.at("spam")
+!! missingKey {"key": "\"spam\""}
 ```
 
 ## Validation
