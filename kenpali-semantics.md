@@ -289,6 +289,12 @@ after = stream | toArray;
 ```
 
 ```
+# Streams don't overflow the stack
+repeat(42) @ 9999
+>> 42
+```
+
+```
 # Display values in streams
 stream = [newVar(42)] | toStream;
 stream | toArray;

@@ -1766,6 +1766,12 @@ out.elements()
 >> [1, 2, 3]
 ```
 
+```
+# Build doesn't overflow the stack
+1 | build(up) @ 9999
+>> 9999
+```
+
 ### to|to
 
 Generates a stream of numbers covering a range.
@@ -2350,6 +2356,12 @@ Returns:
 )
 | first
 >> 0
+```
+
+```
+# Running doesn't overflow the stack
+repeat(1) | running(start: 1, next: (number, state:) => state | add(number)) @ 9999
+>> 9999
 ```
 
 ### withIndex|withIndex

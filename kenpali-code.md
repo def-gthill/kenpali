@@ -1088,6 +1088,29 @@ The body of a function can be a loose pipeline without any parentheses—pipelin
 }
 ```
 
+This precedence also means that a function inside a loose pipeline must be enclosed in parentheses.
+
+```
+# Function in a loose pipeline
+1 | ((x) => y | foo(x))
+>> {
+    "type": "call",
+    "callee": {
+        "type": "function",
+        "posParams": [{"type": "name", "name": "x"}],
+        "body": {
+            "type": "call",
+            "callee": {"type": "name", "name": "foo"},
+            "posArgs": [
+                {"type": "name", "name": "y"},
+                {"type": "name", "name": "x"}
+            ]
+        }
+    },
+    "posArgs": [{"type": "literal", "value": 1}]
+}
+```
+
 ### Loose property access|loose-property-access
 
 The loose property access operator `|.` does the same thing as the tight property access operator `.`, but its precedence is that of a loose pipeline. If tight property access is used alongside loose pipeline operators, the tight property access happens first.
