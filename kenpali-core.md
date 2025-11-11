@@ -3807,7 +3807,7 @@ map = [["foo", 42], ["bar", 97]] | newMutableMap;
 >> [true, "MutableMap", "MutableMap {entries: [[\"foo\", 42], [\"bar\", 97]]}"]
 ```
 
-### also
+### also|also
 
 Performs an action on a value, then returns it for further processing.
 
