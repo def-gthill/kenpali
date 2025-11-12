@@ -1614,7 +1614,7 @@ These functions build up new streams from scalar inputs.
 
 A _stream_ is a lazily computed sequence of values. It is inspired by similar concepts in other languages (often called _generators_ or _iterators_), but the key difference is that streams _remember_ the values they have already computed, so they can be iterated over multiple times. Of course, this should be implemented in such a way that values that are _no longer reachable_ are freed—for example, by storing them in a linked list.
 
-In general, streams must not compute anything more than is absolutely necessary to produce the values that have been requested.
+In general, streams must not compute anything more than is absolutely necessary to produce the values that have been requested. They must also take care to avoid stack overflow—iterating over a stream must interleave _calls_ and _returns_ in a way that avoids building up a large call stack.
 
 #### newStream|newStream
 
@@ -1747,6 +1747,15 @@ powersOfTwo = 1 | build(| mul(2));
 >> [true, 1, 4, 128]
 ```
 
+As a well-behaved stream, the result of `build` doesn't invoke `next` any more than is necessary to produce the values that have been requested.
+
+```
+# Build doesn't call the callback if no values are requested
+1 | build($ 1 @ 1);
+42
+>> 42
+```
+
 ```
 # Build only invokes the function when needed
 1
@@ -1769,6 +1778,8 @@ out = newMutableArray();
 out.elements()
 >> [1, 2, 3]
 ```
+
+As a well-behaved stream, the result of `build` can be iterated over thousands of times without overflowing the stack.
 
 ```
 # Build doesn't overflow the stack

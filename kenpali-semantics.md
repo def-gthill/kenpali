@@ -1,5 +1,7 @@
 # Kenpali Semantic Specification
 
+The [Kenpali Code Specification](/docs/code) describes the syntax of Kenpali code, while the [Kenpali JSON Specification](/docs/json) describes basic evaluation rules. This document gets much deeper into the behaviour of Kenpali programs, specifying exactly how a correct Kenpali implementation must handle various interactions and corner cases.
+
 ## Names|names
 
 It's an error to declare the same name more than once in the same block.
@@ -74,11 +76,15 @@ foo = 42;
 
 ## Strings|strings
 
+Strings in Kenpali must be treated as sequences of Unicode code points, regardless of how they are actually stored. For example, the length of a string is the number of code points it contains, not the number of bytes or some other unit (like UTF-16 code units).
+
 ```
 # String length counts Unicode code points
 "foo\u{1f61b}" | length
 >> 4
 ```
+
+Similarly, string indexing extracts the code point at the given position.
 
 ```
 # String indexing counts Unicode code points
@@ -92,11 +98,42 @@ foo = 42;
 >> "r"
 ```
 
+This requirement usually makes string length and indexing _linear-time_ operations, so they should generally be avoided on arbitrary input strings. For example, the following function works, but is very slow if the string is long.
+
+```
+# Inefficient string iteration
+foo = (string) => (
+    1 | to(string | length)
+    | transform((i) => string @ i | toCodePoints)
+    | toArray
+);
+foo("foo\u{1f61b}")
+>> [[102], [111], [111], [128539]]
+```
+
+To iterate over the characters, use `toStream` instead.
+
 ```
 # String streaming iterates over Unicode code points
-"foo\u{1f61b}" | toStream | length
->> 4
+foo = (string) => string | toStream | transform(| toCodePoints) | toArray;
+foo("foo\u{1f61b}")
+>> [[102], [111], [111], [128539]]
 ```
+
+String literals can use any of the escape sequences that are valid in JSON.
+
+```
+# Indexing strings with escapes
+string = "\"\\\/\b\f\n\r\t\u1234";
+[
+    string @ 1,
+    string @ 5,
+    string @ 9,
+]
+>> ["\"", "\f", "\u1234"]
+```
+
+If a string literal contains invalid escape sequences, a runtime error occurs.
 
 ```
 # Malformed string literal
@@ -114,11 +151,15 @@ Arrays can freely mix different types of elements.
 >> [null, 1, "foo"]
 ```
 
+Arrays can be nested to arbitrary depth.
+
 ```
 # Nested arrays
 [1, [2, [3, 4]]]
 >> [1, [2, [3, 4]]]
 ```
+
+It's an error to destructure an array with an object pattern.
 
 ```
 # Destructuring an array with an object pattern
@@ -145,6 +186,8 @@ Missing elements in an array pattern cause a runtime error.
 !! missingElement {"value": [1, 2], "name": "baz"}
 ```
 
+The `_` pattern can be used to explicitly ignore elements.
+
 ```
 # Array pattern with ignores
 [_, _, foo] = [1, 2, 3];
@@ -161,12 +204,16 @@ Array destructuring can be nested.
 >> [1, 2, 3]
 ```
 
+Nested patterns can have default values.
+
 ```
 # Nested array destructure with a default
 [foo, [bar, baz] = [42, 73]] = [216];
 [bar, foo, baz]
 >> [42, 216, 73]
 ```
+
+A rest pattern can itself be destructured.
 
 ```
 # Nested destructure of array rest
@@ -185,11 +232,15 @@ Objects can freely mix different types of values.
 >> {foo: null, bar: 1, baz: [2]}
 ```
 
+Objects can be nested to arbitrary depth.
+
 ```
 # Nested objects
 {foo: {bar: "baz"}}
 >> {foo: {bar: "baz"}}
 ```
+
+It's an error to destructure an object with an array pattern.
 
 ```
 # Destructuring an object with an array pattern
@@ -198,6 +249,8 @@ foo
 !! wrongType {"value": {"foo": 42, "bar": 97}, "expectedType": "either(Array, Stream)"}
 ```
 
+Object destructuring can be nested.
+
 ```
 # Nested object destructuring
 {foo: {bar: baz}} = {foo: {bar: 42}};
@@ -205,12 +258,16 @@ baz
 >> 42
 ```
 
+Nested patterns can have default values.
+
 ```
 # Nested object destructure with a default
 {foo:, bar: [baz, quux] = [42, 73]} = {foo: 216};
 [foo, quux, baz]
 >> [216, 73, 42]
 ```
+
+The keys in an object pattern can be arbitrary expressions evaluated at runtime. But if the expression happens to be a single name, it must be enclosed in parentheses to avoid being treated as a property name.
 
 ```
 # Object destructure with a dynamic key
@@ -220,6 +277,8 @@ bar
 >> 42
 ```
 
+Property access can be done directly on an object expression.
+
 ```
 # Immediate property access on an object
 {foo: 42, bar: 97}.foo
@@ -228,12 +287,7 @@ bar
 
 ## Streams|streams
 
-```
-# Merely invoking build doesn't call the callback
-1 | build($ 1 @ 1);
-42
->> 42
-```
+Streams can be indexed like arrays.
 
 ```
 # Indexing with a positive index
@@ -244,11 +298,15 @@ bar
 >> [3, 4]
 ```
 
+Streams can be indexed with negative numbers _if finite_.
+
 ```
 # Indexing with a negative index
 1 | to(5) @ -2
 >> 4
 ```
+
+Streams can be destructured like arrays.
 
 ```
 # Destructuring a stream
@@ -257,12 +315,16 @@ bar
 >> [2, 4, 1]
 ```
 
+Streams can be destructured with rest patterns, and _if the rest pattern is the last element_, the name it binds contains a stream of the remaining values.
+
 ```
 # Destructuring a stream with rest
 [foo, *rest] = 1 | build(| mul(2));
 [foo, rest | keepFirst(3) | toArray]
 >> [1, [2, 4, 8]]
 ```
+
+Streams can be destructured with a middle rest pattern _if finite_, with the name it binds containing an _array_ of the remaining values.
 
 ```
 # Destructuring a stream with a middle rest
@@ -271,11 +333,15 @@ bar
 >> [1, [2, 4, 8, 16, 32], 64]
 ```
 
+Streams can be spread like arrays.
+
 ```
 # Spreading a stream
 ["foo", *(1 | to(3)), "bar"]
 >> ["foo", 1, 2, 3, "bar"]
 ```
+
+If a stream references mutable instances, each iteration sees the values of those instances _when that iteration is first demanded_ by a consumer of the stream. These values are then locked in for subsequent traversals, even if the instances are subsequently mutated.
 
 ```
 # Stream values are locked in by the first traversal
@@ -288,11 +354,15 @@ after = stream | toArray;
 >> [[43, 44, 45], [43, 44, 45]]
 ```
 
+The stream mechanism must be implemented so that it can iterate over an arbitrarily large number of values without causing a stack overflow.
+
 ```
 # Streams don't overflow the stack
 repeat(42) @ 9999
 >> 42
 ```
+
+If a stream contains an instance with a custom `display` implementation, it uses that implementation for its own `display`.
 
 ```
 # Display values in streams
@@ -304,11 +374,15 @@ stream | display
 
 ## Defining and Calling Functions|functions
 
+Only functions can be called. Calling any other value causes a runtime error.
+
 ```
 # Calling something that isn't a function
 42()
 !! notCallable {"value": 42}
 ```
+
+A zero-parameter function can be defined and called with no arguments.
 
 ```
 # No parameters, no arguments
@@ -317,12 +391,16 @@ foo()
 >> 42
 ```
 
+A function can have positional and named parameters, with corresponding arguments passed in the same way.
+
 ```
 # Positional and named parameters and arguments
 foo = (a, b:) => [a, b];
 foo(42, b: 97)
 >> [42, 97]
 ```
+
+Excess positional arguments are ignored.
 
 ```
 # Excess positional argument
@@ -331,12 +409,16 @@ foo(42, 97, b: 216)
 >> [42, 216]
 ```
 
+Excess named arguments are ignored.
+
 ```
 # Excess named argument
 foo = (a, b:) => [a, b];
 foo(42, b: 97, c: 216)
 >> [42, 97]
 ```
+
+Missing positional arguments cause a runtime error.
 
 ```
 # Missing positional argument
@@ -345,12 +427,16 @@ foo(b: 97)
 !! missingArgument {"name": "a"}
 ```
 
+Missing named arguments cause a runtime error.
+
 ```
 # Missing named argument
 foo = (a, b:) => [a, b];
 foo(42)
 !! missingArgument {"name": "b"}
 ```
+
+Arguments can be explicitly ignored using `_`, rather than having to be given a name that is never used.
 
 ```
 # Ignoring an argument
@@ -393,12 +479,16 @@ foo(42, c: 73, 97, d: 216)
 >> [42, 97, 73, 216]
 ```
 
+If a positional parameter has a default value, but a corresponding argument is supplied, the default value is ignored.
+
 ```
 # Optional positional parameter, argument supplied
 foo = (a, b = 1) => [a, b];
 foo(42, 73)
 >> [42, 73]
 ```
+
+If a positional parameter has a default value, but no corresponding argument is supplied, the default value is used.
 
 ```
 # Optional positional parameter, no argument supplied
@@ -407,6 +497,8 @@ foo(42)
 >> [42, 1]
 ```
 
+Default values can reference names defined in an enclosing scope.
+
 ```
 # Default value referencing a name
 foo = 73;
@@ -414,6 +506,8 @@ bar = (x = foo) => x;
 bar()
 >> 73
 ```
+
+If the default value is a mutable instance, each invocation of the function sees a new instance—the default expression is evaluated anew each time.
 
 ```
 # Mutable default value
@@ -424,6 +518,8 @@ foo = (x = newVar(42)) => (
 [foo(), foo(), foo()]
 >> [43, 43, 43]
 ```
+
+If a function has multiple optional positional parameters, the default values fill in any missing arguments.
 
 ```
 # Multiple optional positional parameters
@@ -471,6 +567,8 @@ foo(*x, *y)
 >> [216, 97, 73, 42]
 ```
 
+A _named rest parameter_ collects all remaining named arguments into an object.
+
 ```
 # Named rest parameter
 foo = (**args) => args;
@@ -478,12 +576,16 @@ foo(bar: 42, baz: 97)
 >> {bar: 42, baz: 97}
 ```
 
+Ordinary named parameters can go before and after a named rest parameter.
+
 ```
 # Named rest parameter and ordinary parameters
 foo = (a:, **args, b:) => [a, args, b];
 foo(a: 42, foo: 73, bar: 97, b: 216)
 >> [42, {foo: 73, bar: 97}, 216]
 ```
+
+Objects can be spread to fill named parameters.
 
 ```
 # Spread named arguments
@@ -508,6 +610,8 @@ Defining multiple rest parameters of the same type is ambiguous and causes a run
 !! overlappingRestPatterns {"names": ["a", "b"]}
 ```
 
+A rest parameter can go between ordinary parameters with default values, with additional parameters filling in the optional parameters first _and then_ the rest parameter.
+
 ```
 # Multiple optional positional parameters with a rest parameter in the middle
 foo = (a, b = 1, *c, d = 2) => [a, b, c, d];
@@ -527,6 +631,8 @@ foo = (a, b = 1, *c, d = 2) => [a, b, c, d];
 ]
 ```
 
+Destructuring patterns can be used in parameter lists.
+
 ```
 # Destructuring in parameters
 foo = ([a, b]) => [b, a];
@@ -534,12 +640,16 @@ foo([42, 97])
 >> [97, 42]
 ```
 
+Destructuring patterns in parameter lists can have default values.
+
 ```
 # Destructuring parameter with a default value
 foo = ({bar:, baz:} = {bar: 42, baz: 97}) => [bar, baz];
 foo()
 >> [42, 97]
 ```
+
+Destructuring patterns in parameter lists can have rest elements.
 
 ```
 # Rest in object destructure in parameter
@@ -579,7 +689,7 @@ baz
 !! nameUsedBeforeAssignment {"name": "bar"}
 ```
 
-A function can reference names that were in scope when the function was _defined_, even if those names are out of scope when the function is _called_.
+A function can reference names that were in scope when the function was _defined_, even if those names are out of scope when the function is _called_. In other words, functions must capture names that were in scope when they were defined.
 
 ```
 # Closure
@@ -621,22 +731,15 @@ leaky = $ intruder;
 
 ## Indexing|indexing
 
+Strings must be indexed with numbers.
+
 ```
 # Indexing strings - wrong index type
 "foobar" @ "baz"
 !! wrongType {"value": "baz", "expectedType": "Number"}
 ```
 
-```
-# Indexing strings with escapes
-string = "\"\\\/\b\f\n\r\t\u1234";
-[
-    string @ 1,
-    string @ 5,
-    string @ 9,
-]
->> ["\"", "\f", "\u1234"]
-```
+Arrays can be indexed with positive numbers, counting from the beginning of the array.
 
 ```
 # Indexing arrays
@@ -644,17 +747,23 @@ string = "\"\\\/\b\f\n\r\t\u1234";
 >> "bar"
 ```
 
+Arrays can be indexed with negative numbers, counting from the end of the array.
+
 ```
 # Indexing arrays - index from end
 ["foo", "bar"] @ -2
 >> "foo"
 ```
 
+Arrays must be indexed with numbers.
+
 ```
 # Indexing arrays - wrong index type
 ["foo", "bar"] @ "baz"
 !! wrongType {"value": "baz", "expectedType": "Number"}
 ```
+
+Indexing an array with an out-of-bounds index causes a runtime error.
 
 ```
 # Indexing arrays - index less than minus length
@@ -674,11 +783,15 @@ string = "\"\\\/\b\f\n\r\t\u1234";
 !! indexOutOfBounds {"value": ["foo", "bar"], "length": 2, "index": 3}
 ```
 
+Objects can be indexed with strings to retrieve the value of a property.
+
 ```
 # Indexing objects
 {foo: "bar", spam: "eggs"} @ "spam"
 >> "eggs"
 ```
+
+Objects can only be indexed with strings.
 
 ```
 # Indexing objects - wrong index type
@@ -686,11 +799,15 @@ string = "\"\\\/\b\f\n\r\t\u1234";
 !! wrongType {"value": 42, "expectedType": "String"}
 ```
 
+If the property is not in the object, a runtime error occurs.
+
 ```
 # Indexing objects - property not in object
 {foo: "bar", spam: "eggs"} @ "baz"
 !! missingProperty {"value": {"foo": "bar", "spam": "eggs"}, "key": "baz"}
 ```
+
+Indexing non-indexable values causes a runtime error.
 
 ```
 # Indexing something non-indexable
@@ -700,6 +817,8 @@ string = "\"\\\/\b\f\n\r\t\u1234";
 
 ## Sets and Maps|collections
 
+Instances can be used as set members, but they are compared by identity, not by value.
+
 ```
 # Instances as set members
 var1 = newVar(42);
@@ -708,6 +827,8 @@ set = [var1] | newSet;
 [set.has(var1), set.has(var2)]
 >> [true, false]
 ```
+
+A set's `has` method can be passed as a callback.
 
 ```
 # Set-has as callback
@@ -738,11 +859,31 @@ If an expression throws an error, that error propagates outward through enclosin
 !! missingElement {"value": [], "name": "foo"}
 ```
 
+After an error is caught, new errors can be thrown by code outside the `try` function.
+
 ```
 # Error thrown after catching
 try($ 1 @ 1, onError: itself) @ 1
 !! wrongType {"expectedType": "String"}
 ```
+
+After an error is caught, new errors can be thrown by the `onError` handler.
+
+```
+# Error thrown by onError handler
+try($ 1 @ 1, onError: $ 1 @ 1)
+!! wrongType {}
+```
+
+After an error is caught, new errors can be thrown by the `onSuccess` handler.
+
+```
+# Error thrown by onSuccess handler
+try($ 42, onError: itself, onSuccess: $ 1 @ 1)
+!! wrongType {}
+```
+
+Errors capture the names of the functions that are unwound as they propagate.
 
 ```
 # Stack traces
@@ -763,6 +904,8 @@ main()
 ]
 ```
 
+Errors that propagate through platform functions capture their names.
+
 ```
 # Stack traces through platform functions
 foo = $ 1 | to(3) | forEach($ 1 @ 1);
@@ -775,6 +918,8 @@ try(foo, onError: |.calls)
 ```
 
 ## Variables|variables
+
+Instances created separately don't share state.
 
 ```
 # Simultaneous variables
