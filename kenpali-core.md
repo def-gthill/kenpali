@@ -4060,9 +4060,17 @@ Returns:
     ((x) => x) | matches(Function),
     newError("badIdea") | matches(Function),
     newError("badIdea") | matches(Error),
-    null | matches(Error),
+    newVar(42) | matches(Error),
+    newVar(42) | matches(Var),
+    newSet() | matches(Var),
+    newSet() | matches(Set),
+    null | matches(Set),
 ]
 >> [
+    true,
+    false,
+    true,
+    false,
     true,
     false,
     true,
