@@ -222,6 +222,14 @@ A rest pattern can itself be destructured.
 >> [57, 42, 216, 73]
 ```
 
+It's an error to spread a non-sequence.
+
+```
+# Spreading a non-sequence
+[*42]
+!! wrongType {"value": 42, "expectedType": "Sequence"}
+```
+
 ## Objects|objects
 
 Objects can freely mix different types of values.
@@ -238,6 +246,14 @@ Objects can be nested to arbitrary depth.
 # Nested objects
 {foo: {bar: "baz"}}
 >> {foo: {bar: "baz"}}
+```
+
+Object keys must be strings.
+
+```
+# Object keys must be strings
+{42: "foo"}
+!! wrongType {"value": 42, "expectedType": "String"}
 ```
 
 It's an error to destructure an object with an array pattern.
@@ -283,6 +299,14 @@ Property access can be done directly on an object expression.
 # Immediate property access on an object
 {foo: 42, bar: 97}.foo
 >> 42
+```
+
+It's an error to object-spread a non-object.
+
+```
+# Object-spreading a non-object
+{**42}
+!! wrongType {"value": 42, "expectedType": "Object"}
 ```
 
 ## Streams|streams
