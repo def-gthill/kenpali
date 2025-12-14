@@ -73,15 +73,11 @@ repeat = (value) => value | build((x) => x);
 last = (sequence) => sequence @ -1;
 keepLast = (sequence, n) => (
     result = sequence | dropFirst(length(sequence) | sub(n));
-    result | butIf(result | isString | not, $ result | toArray)
+    result | butIf(| isString | not, | toArray)
 );
 dropLast = (sequence, n = 1) => (
     result = sequence | keepFirst(length(sequence) | sub(n));
-    if(
-        result | isString,
-        then: $ result,
-        else: $ result | toArray,
-    )
+    result | butIf(| isString | not, | toArray)
 );
 count = (sequence, condition) => sequence | where(condition) | toArray | length;
 forAll = (sequence, condition) => (
@@ -164,7 +160,21 @@ withIndex = (sequence) => (
     1 | build(up) | zip(sequence)
 );
 slice = (sequence, from:, to:) => (
-    sequence | keepFirst(to) | dropFirst(from | down)
+    keeper = if(
+        to | ge(0),
+        then: $ | keepFirst(to),
+        else: $ | dropLast(to | negative | down),
+    );
+    dropper = if(
+        from | ge(0),
+        then: $ | dropFirst(from | down),
+        else: $ if(
+            to | ge(0),
+            then: $ | keepLast(from | negative | sub(sequence | length) | add(to)),
+            else: $ | keepLast(from | negative | add(to) | up)
+        )
+    );
+    sequence | keeper | dropper
 );
 while = (sequence, condition) => (
     start = sequence | toStream;
