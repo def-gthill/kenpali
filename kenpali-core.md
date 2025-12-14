@@ -1951,6 +1951,8 @@ Returns:
 
 Retains only the last `n` elements of the input.
 
+If `n` is less than one, the resulting sequence is empty.
+
 Parameters:
 
 - `sequence` (_Sequence_): The sequence to take values from.
@@ -1964,12 +1966,20 @@ Returns:
 # Keeping trailing elements
 [
     "foobar" | keepLast(3),
+    "foobar" | keepLast(0),
+    "foobar" | keepLast(-1),
     [42, 97, 6, 12, 64] | keepLast(3),
+    [42, 97, 6, 12, 64] | keepLast(0),
+    [42, 97, 6, 12, 64] | keepLast(-1),
     1 | to(5) | keepLast(3),
 ]
 >> [
     "bar",
+    "",
+    "",
     [6, 12, 64],
+    [],
+    [],
     [3, 4, 5],
 ]
 ```
@@ -1977,6 +1987,8 @@ Returns:
 ### dropLast|dropLast
 
 Drops the last `n` elements of the input.
+
+If `n` is less than one, the sequence is returned unchanged.
 
 Parameters:
 
@@ -1989,19 +2001,28 @@ Returns:
 
 ```
 # Dropping trailing elements
+arr = [42, 97, 6, 12, 64];
 [
     "foobar" | dropLast,
     "foobar" | dropLast(2),
-    [42, 97, 6, 12, 64] | dropLast,
-    [42, 97, 6, 12, 64] | dropLast(3),
+    "foobar" | dropLast(0),
+    "foobar" | dropLast(-1),
+    arr | dropLast,
+    arr | dropLast(3),
+    arr | dropLast(0),
+    arr | dropLast(-1),
     1 | to(5) | dropLast,
     1 | to(5) | dropLast(3),
 ]
 >> [
     "fooba",
     "foob",
+    "foobar",
+    "foobar",
     [42, 97, 6, 12],
     [42, 97],
+    [42, 97, 6, 12, 64],
+    [42, 97, 6, 12, 64],
     [1, 2, 3, 4],
     [1, 2],
 ]
@@ -2407,6 +2428,8 @@ Returns:
 
 Retains only the first `n` elements of the input.
 
+If `n` is less than one, the resulting sequence is empty.
+
 Parameters:
 
 - `sequence` (_Sequence_): The sequence to take values from.
@@ -2420,13 +2443,21 @@ Returns:
 # Keeping leading elements
 [
     "foobar" | keepFirst(3),
+    "foobar" | keepFirst(0),
+    "foobar" | keepFirst(-1),
     [42, 97, 6, 12, 64] | keepFirst(3) | toArray,
+    [42, 97, 6, 12, 64] | keepFirst(0) | toArray,
+    [42, 97, 6, 12, 64] | keepFirst(-1) | toArray,
     1 | build(| mul(2)) | keepFirst(3) | toArray,
     1 | build($ throw(newError("badIdea"))) | keepFirst(1) | toArray,
 ]
 >> [
     "foo",
+    "",
+    "",
     [42, 97, 6],
+    [],
+    [],
     [1, 2, 4],
     [1],
 ]
@@ -2435,6 +2466,8 @@ Returns:
 ### dropFirst|dropFirst
 
 Skips the first `n` elements of the input.
+
+If `n` is less than one, the sequence is returned unchanged.
 
 Parameters:
 
@@ -2447,11 +2480,16 @@ Returns:
 
 ```
 # Dropping leading elements
+arr = [42, 97, 6, 12, 64];
 [
     "foobar" | dropFirst,
     "foobar" | dropFirst(2),
-    [42, 97, 6, 12, 64] | dropFirst | toArray,
-    [42, 97, 6, 12, 64] | dropFirst(3) | toArray,
+    "foobar" | dropFirst(0),
+    "foobar" | dropFirst(-1),
+    arr | dropFirst | toArray,
+    arr | dropFirst(3) | toArray,
+    arr | dropFirst(0) | toArray,
+    arr | dropFirst(-1) | toArray,
     1 | build(| mul(2)) | dropFirst(3) | keepFirst(3) | toArray,
     [[42, 97, 6], 1 | build($ throw(newError("badIdea")))]
     | flatten
@@ -2462,8 +2500,12 @@ Returns:
 >> [
     "oobar",
     "obar",
+    "foobar",
+    "foobar",
     [97, 6, 12, 64],
     [12, 64],
+    [42, 97, 6, 12, 64],
+    [42, 97, 6, 12, 64],
     [8, 16, 32],
     [97, 6, 1],
 ]
@@ -2480,6 +2522,12 @@ fs = [$ throw(newError("badIdea")), $ throw(newError("stillBadIdea")), $ 42, $ 9
 
 Extracts a sub-sequence of the specified sequence.
 
+Negative indices count from the end of the sequence, as with [`at`](#at).
+
+Indices are allowed to be out of bounds, in which case the slice goes as far as it can: a slice from zero starts at the beginning of the sequence, and a slice to a number greater than the length goes to the end of the sequence.
+
+If `from` comes after `to`, the slice is empty.
+
 Parameters:
 
 - `sequence` (_Sequence_): The sequence to take values from.
@@ -2492,13 +2540,22 @@ Returns:
 
 ```
 # Slicing
+arr = [42, 97, 6, 12, 64, 73];
 [
     "foobar" | slice(from: 2, to: 4),
     "foobar" | slice(from: 2, to: 10),
     "foobar" | slice(from: 0, to: 4),
-    [42, 97, 6, 12, 64] | slice(from: 2, to: 4) | toArray,
-    [42, 97, 6, 12, 64] | slice(from: 2, to: 10) | toArray,
-    [42, 97, 6, 12, 64] | slice(from: 0, to: 4) | toArray,
+    "foobar" | slice(from: 2, to: -2),
+    "foobar" | slice(from: -4, to: 4),
+    "foobar" | slice(from: -4, to: -2),
+    "foobar" | slice(from: 4, to: 2),
+    arr | slice(from: 2, to: 4) | toArray,
+    arr | slice(from: 2, to: 10) | toArray,
+    arr | slice(from: 0, to: 4) | toArray,
+    arr | slice(from: 2, to: -2) | toArray,
+    arr | slice(from: -4, to: 4) | toArray,
+    arr | slice(from: -4, to: -2) | toArray,
+    arr | slice(from: 4, to: 2) | toArray,
     1 | build(| mul(2)) | slice(from: 2, to: 4) | toArray,
     [[42, 97, 6], 1 | build($ throw(newError("badIdea")))]
     | flatten
@@ -2509,9 +2566,17 @@ Returns:
     "oob",
     "oobar",
     "foob",
+    "ooba",
+    "ob",
+    "oba",
+    "",
     [97, 6, 12],
-    [97, 6, 12, 64],
+    [97, 6, 12, 64, 73],
     [42, 97, 6, 12],
+    [97, 6, 12, 64],
+    [6, 12],
+    [6, 12, 64],
+    [],
     [2, 4, 8],
     [97, 6, 1],
 ]
