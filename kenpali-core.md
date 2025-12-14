@@ -3135,11 +3135,25 @@ Creates an immutable set.
 
 Parameters:
 
-- `elements` (_Array_, default `[]`): The set's elements. Duplicate elements are silently discarded.
+- `elements` (_Sequence_, default `[]`): The set's elements. Duplicate elements are silently discarded.
 
 Returns:
 
 - (_Set_): The new set.
+
+```
+# Set creation
+[
+    "foobar" | newSet |.elements() | sort,
+    [42, 97, 42, 73] | newSet |.elements() | sort,
+    1 | build(| mul(2)) | keepFirst(3) | newSet |.elements() | sort,
+]
+>> [
+    ["a", "b", "f", "o", "r"],
+    [42, 73, 97],
+    [1, 2, 4],
+]
+```
 
 #### Set/size|Set-size
 
@@ -3166,7 +3180,7 @@ Returns:
 - (_Boolean_): Whether the value is in the set.
 
 ```
-# Set
+# Set methods
 set = ["foo", "bar", "baz"] | newSet;
 [
     set.size(),
@@ -3232,11 +3246,28 @@ Creates an immutable map.
 
 Parameters:
 
-- `entries` (_Array_, default `[]`): An array of `[key, value]` pairs. If duplicate keys exist, only the last one is kept.
+- `entries` (_Sequence_, default `[]`): A sequence of `[key, value]` pairs. If duplicate keys exist, only the last one is kept.
 
 Returns:
 
 - (_Map_): The new map.
+
+```
+# Map creation
+[
+    [["foo", 42], ["bar", 97]] | newMap |.entries() | sort,
+    [1, "f"]
+    | build(([n, s]) => [n | mul(2), [s, "o"] | join])
+    | keepFirst(3)
+    | newMap
+    |.entries()
+    | sort,
+]
+>> [
+    [["bar", 97], ["foo", 42]],
+    [[1, "f"], [2, "fo"], [4, "foo"]],
+]
+```
 
 #### Map/size|Map-size
 
@@ -3426,11 +3457,25 @@ Creates a mutable array.
 
 Parameters:
 
-- `elements` (_Array_, default `[]`): The initial elements of the array.
+- `elements` (_Sequence_, default `[]`): The initial elements of the array.
 
 Returns:
 
 - (_MutableArray_): The new mutable array.
+
+```
+# Mutable array creation
+[
+    "foobar" | newMutableArray |.elements(),
+    [42, 97, 42, 73] | newMutableArray |.elements(),
+    1 | build(| mul(2)) | keepFirst(3) | newMutableArray |.elements(),
+]
+>> [
+    ["f", "o", "o", "b", "a", "r"],
+    [42, 97, 42, 73],
+    [1, 2, 4],
+]
+```
 
 #### MutableArray/size|MutableArray-size
 
@@ -3576,11 +3621,25 @@ Creates a mutable set.
 
 Parameters:
 
-- `elements` (_Array_, default `[]`): The initial elements of the set. Duplicate elements are silently discarded.
+- `elements` (_Sequence_, default `[]`): The initial elements of the set. Duplicate elements are silently discarded.
 
 Returns:
 
 - (_MutableSet_): The new mutable set.
+
+```
+# Mutable set creation
+[
+    "foobar" | newMutableSet |.elements() | sort,
+    [42, 97, 42, 73] | newMutableSet |.elements() | sort,
+    1 | build(| mul(2)) | keepFirst(3) | newMutableSet |.elements() | sort,
+]
+>> [
+    ["a", "b", "f", "o", "r"],
+    [42, 73, 97],
+    [1, 2, 4],
+]
+```
 
 #### MutableSet/size|MutableSet-size
 
@@ -3714,11 +3773,28 @@ Creates a mutable map.
 
 Parameters:
 
-- `entries` (_Array_, default `[]`): An array of `[key, value]` pairs to initialize the map.
+- `entries` (_Sequence_, default `[]`): A sequence of `[key, value]` pairs to initialize the map.
 
 Returns:
 
 - (_MutableMap_): The new mutable map.
+
+```
+# Mutable map creation
+[
+    [["foo", 42], ["bar", 97]] | newMutableMap |.entries() | sort,
+    [1, "f"]
+    | build(([n, s]) => [n | mul(2), [s, "o"] | join])
+    | keepFirst(3)
+    | newMutableMap
+    |.entries()
+    | sort,
+]
+>> [
+    [["bar", 97], ["foo", 42]],
+    [[1, "f"], [2, "fo"], [4, "foo"]],
+]
+```
 
 #### MutableMap/size|MutableMap-size
 
