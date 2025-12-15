@@ -899,6 +899,7 @@ A class value is defined for each of the basic types.
 There are also protocol constants for the following protocols:
 
 - `Sequence` covers collections with a definite order: strings, arrays, and streams.
+- `Display` covers instances that customize how the `display` function treats them.
 - `Instance` covers all values except null, booleans, numbers, strings, arrays, objects, and functions.
 - `Type` covers values that represent Kenpali types: classes and protocols.
 - `Any` covers all values.
@@ -907,13 +908,14 @@ There are also protocol constants for the following protocols:
 # Protocol constants
 [
     Sequence,
+    Display,
     Instance,
     Type,
     Any,
 ]
 | transform(|.name)
 | toArray
->> ["Sequence", "Instance", "Type", "Any"]
+>> ["Sequence", "Display", "Instance", "Type", "Any"]
 ```
 
 ### classOf|classOf
