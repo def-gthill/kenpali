@@ -3755,6 +3755,19 @@ array = ["foo", "bar", "baz"] | newMutableArray;
 >> [true, "MutableArray", "MutableArray {elements: [\"foo\", \"bar\", \"baz\"]}"]
 ```
 
+```
+# Mutable array as sequence
+array = ["foo", "bar", "baz"] | newMutableArray;
+[
+    array | isSequence,
+    array | toArray,
+    array | toStream | toArray,
+    array @ 2,
+    array | at(4, default: $ "boo"),
+]
+>> [true, ["foo", "bar", "baz"], ["foo", "bar", "baz"], "bar", "boo"]
+```
+
 ### MutableSet|MutableSet
 
 A mutable set is like a regular set, but it allows adding and removing elements dynamically.
@@ -4261,7 +4274,7 @@ Returns:
 - (_Boolean_): Whether the value matches the schema.
 
 ```
-# Matching classOf results
+# Matching against classes
 [
     null | matches(Null),
     false | matches(Null),
@@ -4313,7 +4326,7 @@ Returns:
 ```
 
 ```
-# Matching the protocols `Sequence`, `Type`, and `Any`
+# Matching against protocols
 [
     "foo" | matches(Sequence),
     [1, 2, 3] | matches(Sequence),
@@ -4323,6 +4336,16 @@ Returns:
     newError("badIdea") | matches(Sequence),
     Number | matches(Sequence),
     Sequence | matches(Sequence),
+
+    "foo" | matches(Instance),
+    [1, 2, 3] | matches(Instance),
+    {foo: 1, bar: 2} | matches(Instance),
+    classOf | matches(Instance),
+    ((x) => x) | matches(Instance),
+    newError("badIdea") | matches(Instance),
+    Number | matches(Instance),
+    Sequence | matches(Instance),
+
     "foo" | matches(Type),
     [1, 2, 3] | matches(Type),
     {foo: 1, bar: 2} | matches(Type),
@@ -4331,6 +4354,7 @@ Returns:
     newError("badIdea") | matches(Type),
     Number | matches(Type),
     Sequence | matches(Type),
+
     "foo" | matches(Any),
     [1, 2, 3] | matches(Any),
     {foo: 1, bar: 2} | matches(Any),
@@ -4349,6 +4373,16 @@ Returns:
     false,
     false,
     false,
+
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+
     false,
     false,
     false,
@@ -4357,6 +4391,7 @@ Returns:
     false,
     true,
     true,
+
     true,
     true,
     true,
