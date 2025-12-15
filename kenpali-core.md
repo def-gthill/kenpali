@@ -898,7 +898,8 @@ A class value is defined for each of the basic types.
 
 There are also protocol constants for the following protocols:
 
-- `Sequence` covers collections with a definite order: strings, arrays, and streams.
+- `Collection` covers values that contain other values.
+- `Sequence` covers collections with a definite order, such as strings, arrays, and streams.
 - `Display` covers instances that customize how the `display` function treats them.
 - `Instance` covers all values except null, booleans, numbers, strings, arrays, objects, and functions.
 - `Type` covers values that represent Kenpali types: classes and protocols.
@@ -907,6 +908,7 @@ There are also protocol constants for the following protocols:
 ```
 # Protocol constants
 [
+    Collection,
     Sequence,
     Display,
     Instance,
@@ -915,7 +917,7 @@ There are also protocol constants for the following protocols:
 ]
 | transform(|.name)
 | toArray
->> ["Sequence", "Display", "Instance", "Type", "Any"]
+>> ["Collection", "Sequence", "Display", "Instance", "Type", "Any"]
 ```
 
 ### classOf|classOf
@@ -3380,6 +3382,17 @@ set = ["foo", "bar", "baz"] | newSet;
 >> [true, "Set", "Set {elements: [\"foo\", \"bar\", \"baz\"]}"]
 ```
 
+```
+# Set as collection
+set = ["foo", "bar", "baz"] | newSet;
+[
+    set | matches(Collection),
+    set | toArray,
+    set | toStream | toArray,
+]
+>> [true, ["foo", "bar", "baz"], ["foo", "bar", "baz"]]
+```
+
 ### Map|Map
 
 A `Map` is a collection of key-value pairs, where keys are unique. Looking up a value by key is fast regardless of the size of the map.
@@ -3920,6 +3933,17 @@ set = ["foo", "bar", "baz"] | newMutableSet;
 >> [true, "MutableSet", "MutableSet {elements: [\"foo\", \"bar\", \"baz\"]}"]
 ```
 
+```
+# Mutable set as collection
+set = ["foo", "bar", "baz"] | newMutableSet;
+[
+    set | matches(Collection),
+    set | toArray,
+    set | toStream | toArray,
+]
+>> [true, ["foo", "bar", "baz"], ["foo", "bar", "baz"]]
+```
+
 ### MutableMap|MutableMap
 
 A mutable map is a collection of key-value pairs where keys are unique, and entries can be added, updated, and removed dynamically.
@@ -4328,6 +4352,15 @@ Returns:
 ```
 # Matching against protocols
 [
+    "foo" | matches(Collection),
+    [1, 2, 3] | matches(Collection),
+    {foo: 1, bar: 2} | matches(Collection),
+    classOf | matches(Collection),
+    ((x) => x) | matches(Collection),
+    newError("badIdea") | matches(Collection),
+    Number | matches(Collection),
+    Sequence | matches(Collection),
+
     "foo" | matches(Sequence),
     [1, 2, 3] | matches(Sequence),
     {foo: 1, bar: 2} | matches(Sequence),
@@ -4365,6 +4398,15 @@ Returns:
     Sequence | matches(Any),
 ]
 >> [
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+
     true,
     true,
     false,
