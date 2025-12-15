@@ -633,38 +633,152 @@ foo = (n) => n | isBetween(42, 97);
 
 ### least|least
 
-Returns the least element in the specified sequence, i.e. the element that is less than or equal to all other elements, according to the [Comparison Rules](#comparison-rules).
+Returns the least element in the specified sequence, i.e. the element that is less than or equal to all other elements.
+
+If `by` is `null`, the elements are compared in their natural order, following the [Comparison Rules](#comparison-rules).
+
+Otherwise, `by` is called on each element to obtain a comparison key, and this key is used to determine the least element, again following the Comparison Rules. If multiple elements have the same minimum key, the first one is returned.
+
+If the sequence is empty and `default` is provided, the result of calling `default` is returned. Otherwise, an error is thrown.
 
 Parameters:
 
 - `sequence` (_Sequence_): The values to find the least element of.
+- `by` (_Function or Null_, default `null`): A function to produce a comparison key from each element, or `null` to compare the elements in their natural order.
+- `default:` (_Function or Null_, default `null`): A function to call and return the result of if the sequence is empty, or `null` to throw an error if the sequence is empty.
 
 Returns:
 
-- (_Number, String, Boolean, or Array_): The least element.
+- (_Any_): The least element.
 
 ```
-# Least
+# Least by natural order
 [97, 42, 216] | least
 >> 42
 ```
 
+```
+# Least by comparison key
+["foobar", "zoo", "spam"]
+| least(by: length)
+>> "zoo"
+```
+
+```
+# Least with equal keys
+["spam", "foo", "bar", "eggs"]
+| least(by: length)
+>> "foo"
+```
+
+```
+# Least with incomparable elements
+[97, "42"] | least
+!! wrongArgumentType {"value": "42", "expectedType": "Number"}
+```
+
+```
+# Least with incomparable elements with a valid sort key
+[97, "42"] | least(by: toNumber)
+>> "42"
+```
+
+```
+# Least with incomparable keys
+[97, 42] | least(by: (n) => (
+    if(n | gt(50), then: $ n, else: $ n | display)
+))
+!! wrongArgumentType {"value": "42", "expectedType": "Number"}
+```
+
+```
+# Least on empty sequence
+[] | least
+!! indexOutOfBounds {"length": 0, "index": 1}
+```
+
+```
+# Least with default
+[
+    [] | least(default: $ 42),
+    ["foo"] | least(default: $ 42),
+]
+>> [42, "foo"]
+```
+
 ### greatest|greatest
 
-Returns the greatest element in the specified sequence, i.e. the element that is greater than or equal to all other elements, according to the [Comparison Rules](#comparison-rules).
+Returns the greatest element in the specified sequence, i.e. the element that is greater than or equal to all other elements.
+
+If `by` is `null`, the elements are compared in their natural order, following the [Comparison Rules](#comparison-rules).
+
+Otherwise, `by` is called on each element to obtain a comparison key, and this key is used to determine the greatest element, again following the Comparison Rules. If multiple elements have the same maximum key, the first one is returned.
+
+If the sequence is empty and `default` is provided, the result of calling `default` is returned. Otherwise, an error is thrown.
 
 Parameters:
 
 - `sequence` (_Sequence_): The values to find the greatest element of.
+- `by` (_Function or Null_, default `null`): A function to produce a comparison key from each element, or `null` to compare the elements in their natural order.
+- `default:` (_Function or Null_, default `null`): A function to call and return the result of if the sequence is empty, or `null` to throw an error if the sequence is empty.
 
 Returns:
 
 - (_Number, String, Boolean, or Array_): The greatest element.
 
 ```
-# Greatest
+# Greatest by natural order
 [97, 42, 216] | greatest
 >> 216
+```
+
+```
+# Greatest by comparison key
+["foobar", "zoo", "spam"]
+| greatest(by: length)
+>> "foobar"
+```
+
+```
+# Greatest with equal keys
+["spam", "foo", "bar", "eggs"]
+| greatest(by: length)
+>> "spam"
+```
+
+```
+# Greatest with incomparable elements
+[97, "42"] | greatest
+!! wrongArgumentType {"value": "42", "expectedType": "Number"}
+```
+
+```
+# Greatest with incomparable elements with a valid sort key
+[97, "42"] | greatest(by: toNumber)
+>> 97
+```
+
+```
+# Greatest with incomparable keys
+[97, 42] | greatest(by: (n) => (
+    if(n | gt(50), then: $ n, else: $ n | display)
+))
+!! wrongArgumentType {"value": "42", "expectedType": "Number"}
+```
+
+```
+# Greatest with empty sequence
+[] | greatest
+!! indexOutOfBounds {"length": 0, "index": 1}
+```
+
+```
+# Greatest with default
+[
+    [] | greatest(default: $ 42),
+    ["foo"] | greatest(default: $ 42),
+]
+>> [42, "foo"]
 ```
 
 ## Logic|logic
@@ -2159,9 +2273,37 @@ Returns:
 
 ```
 # Sorting by sort key
-["foo", "bar", "spam", "eggs"]
-| sort(by: (word) => [word | length, word])
->> ["bar", "foo", "eggs", "spam"]
+["foobar", "zoo", "spam"]
+| sort(by: (word) => word | length)
+>> ["zoo", "spam", "foobar"]
+```
+
+```
+# Sort stability
+["spam", "foo", "bar", "eggs"]
+| sort(by: (word) => word | length)
+>> ["foo", "bar", "spam", "eggs"]
+```
+
+```
+# Sorting incomparable elements
+[97, "42"] | sort
+!! badArgumentValue {"value": [97, "42"]}
+```
+
+```
+# Sorting incomparable elements with a valid sort key
+[97, "42"] | sort(by: toNumber)
+>> ["42", 97]
+```
+
+```
+# Sorting with incomparable sort keys
+[97, 42]
+| sort(by: (n) => (
+    if(n | gt(50), then: $ n, else: $ n | display)
+))
+!! wrongReturnType {"value": "42", "expectedType": "Number"}
 ```
 
 ### group|group

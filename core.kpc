@@ -6,33 +6,61 @@ splitLines = (string) => (string | split(on: "\n"));
 isBetween = (n, lower, upper) => (
     n | ge(lower) | and($ n | le(upper))
 );
-least = (sequence) => (
+least = (sequence, by: = null, default: = null) => (
+    byFunction = if(
+        by | isNull,
+        then: $ itself,
+        else: $ by,
+    );
     sequence
     | running(
-        start: null,
-        next: (element, state: leastSoFar) => if(
-            leastSoFar | isNull | or(
-                $ element | lt(leastSoFar)
+        start: if(
+            default | isNull,
+            then: $ (
+                sequence | first
+                | ((element) => [byFunction(element), element])
             ),
-            then: $ element,
-            else: $ leastSoFar,
+            else: $ [null, default()],
+        ),
+        next: (element, state: [leastKey, leastElement]) => (
+            key = byFunction(element);
+            if(
+                leastKey | isNull | or($ leastKey | gt(key)),
+                then: $ [key, element],
+                else: $ [leastKey, leastElement],
+            )
         )
     )
     | last
+    @ 2
 );
-greatest = (sequence) => (
+greatest = (sequence, by: = null, default: = null) => (
+    byFunction = if(
+        by | isNull,
+        then: $ itself,
+        else: $ by,
+    );
     sequence
     | running(
-        start: null,
-        next: (element, state: greatestSoFar) => if(
-            greatestSoFar | isNull | or(
-                $ element | gt(greatestSoFar)
+        start: if(
+            default | isNull,
+            then: $ (
+                sequence | first
+                | ((element) => [byFunction(element), element])
             ),
-            then: $ element,
-            else: $ greatestSoFar,
+            else: $ [null, default()],
+        ),
+        next: (element, state: [greatestKey, greatestElement]) => (
+            key = byFunction(element);
+            if(
+                greatestKey | isNull | or($ greatestKey | lt(key)),
+                then: $ [key, element],
+                else: $ [greatestKey, greatestElement],
+            )
         )
     )
     | last
+    @ 2
 );
 toFunction = (value) => if(
     value | isFunction,
