@@ -29,7 +29,7 @@ Returns the sum of the values in the specified sequence.
 
 Parameters:
 
-- `numbers` (_Sequence of Number_): The numbers to add up.
+- `numbers` (_Collection of Number_): The numbers to add up.
 
 Returns:
 
@@ -37,8 +37,12 @@ Returns:
 
 ```
 # Sum
-sum([1, 2, 3, 4, 5])
->> 15
+[
+    sum([1, 2, 3, 4, 5]),
+    sum(1 | to(5)),
+    sum([1, 2, 3, 4, 5] | newSet)
+]
+>> [15, 15, 15]
 ```
 
 ### sub|sub
@@ -633,19 +637,19 @@ foo = (n) => n | isBetween(42, 97);
 
 ### least|least
 
-Returns the least element in the specified sequence, i.e. the element that is less than or equal to all other elements.
+Returns the least element in the specified collection, i.e. the element that is less than or equal to all other elements.
 
 If `by` is `null`, the elements are compared in their natural order, following the [Comparison Rules](#comparison-rules).
 
 Otherwise, `by` is called on each element to obtain a comparison key, and this key is used to determine the least element, again following the Comparison Rules. If multiple elements have the same minimum key, the first one is returned.
 
-If the sequence is empty and `default` is provided, the result of calling `default` is returned. Otherwise, an error is thrown.
+If the collection is empty and `default` is provided, the result of calling `default` is returned. Otherwise, an error is thrown.
 
 Parameters:
 
-- `sequence` (_Sequence_): The values to find the least element of.
+- `collection` (_Collection_): The values to find the least element of.
 - `by` (_Function or Null_, default `null`): A function to produce a comparison key from each element, or `null` to compare the elements in their natural order.
-- `default:` (_Function or Null_, default `null`): A function to call and return the result of if the sequence is empty, or `null` to throw an error if the sequence is empty.
+- `default:` (_Function or Null_, default `null`): A function to call and return the result of if the collection is empty, or `null` to throw an error if the collection is empty.
 
 Returns:
 
@@ -655,6 +659,15 @@ Returns:
 # Least by natural order
 [97, 42, 216] | least
 >> 42
+```
+
+```
+# Least on collections
+[
+    [97, 42, 216] | toStream | least,
+    [97, 42, 216] | newSet | least,
+]
+>> [42, 42]
 ```
 
 ```
@@ -708,19 +721,19 @@ Returns:
 
 ### greatest|greatest
 
-Returns the greatest element in the specified sequence, i.e. the element that is greater than or equal to all other elements.
+Returns the greatest element in the specified collection, i.e. the element that is greater than or equal to all other elements.
 
 If `by` is `null`, the elements are compared in their natural order, following the [Comparison Rules](#comparison-rules).
 
 Otherwise, `by` is called on each element to obtain a comparison key, and this key is used to determine the greatest element, again following the Comparison Rules. If multiple elements have the same maximum key, the first one is returned.
 
-If the sequence is empty and `default` is provided, the result of calling `default` is returned. Otherwise, an error is thrown.
+If the collection is empty and `default` is provided, the result of calling `default` is returned. Otherwise, an error is thrown.
 
 Parameters:
 
-- `sequence` (_Sequence_): The values to find the greatest element of.
+- `collection` (_Collection_): The values to find the greatest element of.
 - `by` (_Function or Null_, default `null`): A function to produce a comparison key from each element, or `null` to compare the elements in their natural order.
-- `default:` (_Function or Null_, default `null`): A function to call and return the result of if the sequence is empty, or `null` to throw an error if the sequence is empty.
+- `default:` (_Function or Null_, default `null`): A function to call and return the result of if the collection is empty, or `null` to throw an error if the collection is empty.
 
 Returns:
 
@@ -730,6 +743,15 @@ Returns:
 # Greatest by natural order
 [97, 42, 216] | greatest
 >> 216
+```
+
+```
+# Greatest on collections
+[
+    [97, 42, 216] | toStream | greatest,
+    [97, 42, 216] | newSet | greatest,
+]
+>> [216, 216]
 ```
 
 ```
@@ -1231,15 +1253,25 @@ Returns:
 
 ### toArray|toArray
 
-Collects the elements of the specified sequence into an array.
+Dumps the elements of the specified collection into an array.
 
 Parameters:
 
-- `value` (_Sequence_): The value to convert.
+- `value` (_Collection_): The value to convert.
 
 Returns:
 
 - (_Array_): The array of elements.
+
+```
+# To array
+[
+    [42, 97, 216] | toArray,
+    1 | to(5) | toArray,
+    [42, 97, 216] | newSet | toArray | sort,
+]
+>> [[42, 97, 216], [1, 2, 3, 4, 5], [42, 97, 216]]
+```
 
 ### isStream|isStream
 
@@ -1275,17 +1307,33 @@ Returns:
 
 ### toStream|toStream
 
-Returns a stream that iterates over the elements of the specified sequence.
+Returns a stream that iterates over the elements of the specified collection. If the collection is not a sequence, the order in which the stream returns the elements may not be predictable.
 
 If the argument is already a stream, the same stream is returned, rather than a wrapper, i.e. `x | toStream | eq(x)` is true if `x` is a stream.
 
 Parameters:
 
-- `value` (_Sequence_): The value to convert.
+- `value` (_Collection_): The value to convert.
 
 Returns:
 
 - (_Stream_): The stream of elements.
+
+```
+# To stream
+[
+    [42, 97, 216] | toStream | isStream,
+    [42, 97, 216] | newSet | toStream | isStream,
+]
+>> [true, true]
+```
+
+```
+# To stream on stream
+stream = 1 | to(5);
+stream | toStream | eq(stream)
+>> true
+```
 
 ### isObject|isObject
 
@@ -2148,11 +2196,11 @@ arr = [42, 97, 6, 12, 64];
 
 ### count|count
 
-Returns the number of elements in the sequence matching the specified condition.
+Returns the number of elements in the collection matching the specified condition.
 
 Parameters:
 
-- `sequence` (_Sequence_): The sequence to count from.
+- `collection` (_Collection_): The collection to count from.
 - `condition` (_Function_): A function that returns `true` for elements to count.
 
 Returns:
@@ -2164,17 +2212,18 @@ Returns:
 [
     [1, 10, 2, 9, 3, 12] | count(| lt(10)),
     [1, 10, 2, 9, 3, 12] | toStream | count(| lt(10)),
+    [1, 10, 2, 9, 3, 12] | newSet | count(| lt(10)),
 ]
->> [4, 4]
+>> [4, 4, 4]
 ```
 
 ### forAll|forAll
 
-Tests whether the specified condition is true for all elements in the sequence.
+Tests whether the specified condition is true for all elements in the collection.
 
 Parameters:
 
-- `sequence` (_Sequence_): The sequence to test.
+- `collection` (_Collection_): The collection to test.
 - `condition` (_Function_): A function that returns `true` for acceptable elements.
 
 Returns:
@@ -2188,17 +2237,19 @@ Returns:
     [1, 42, 3] | forAll(| lt(10)),
     [1, 2, 3] | toStream | forAll(| lt(10)),
     [1, 42, 3] | toStream | forAll(| lt(10)),
+    [1, 2, 3] | newSet | forAll(| lt(10)),
+    [1, 42, 3] | newSet | forAll(| lt(10)),
 ]
->> [true, false, true, false]
+>> [true, false, true, false, true, false]
 ```
 
 ### forSome|forSome
 
-Tests whether the specified condition is true for at least one element in the sequence.
+Tests whether the specified condition is true for at least one element in the collection.
 
 Parameters:
 
-- `sequence` (_Sequence_): The sequence to test.
+- `collection` (_Collection_): The collection to test.
 - `condition` (_Function_): A function that returns `true` for acceptable elements.
 
 Returns:
@@ -2212,8 +2263,10 @@ Returns:
     [41, 42, 43] | forSome(| lt(10)),
     [41, 2, 43] | toStream | forSome(| lt(10)),
     [41, 42, 43] | toStream | forSome(| lt(10)),
+    [41, 2, 43] | newSet | forSome(| lt(10)),
+    [41, 42, 43] | newSet | forSome(| lt(10)),
 ]
->> [true, false, true, false]
+>> [true, false, true, false, true, false]
 ```
 
 ### reverse|reverse
@@ -2242,15 +2295,15 @@ Returns:
 
 ### sort|sort
 
-Returns an array with the same elements as the specified sequence, but in ascending order.
+Returns an array with the same elements as the specified collection, but in ascending order.
 
 If `by` is `null`, the elements are sorted in their natural order, following the [Comparison Rules](#comparison-rules).
 
-Otherwise, `by` is called on each element to obtain a sort key, and the elements are sorted by that sort key, again following the Comparison Rules. The sort is stable: two elements with equal sort keys will appear in the same relative order in the sorted array as they were in the original sequence.
+Otherwise, `by` is called on each element to obtain a sort key, and the elements are sorted by that sort key, again following the Comparison Rules. The sort is stable: if the collection is a sequence, two elements with equal sort keys will appear in the same relative order in the sorted array as they were in the original sequence.
 
 Parameters:
 
-- `sequence` (_Sequence_): The sequence to sort.
+- `collection` (_Collection_): The collection to sort.
 - `by:` (_Function or Null_, default `null`): A function to produce a sort key from each element, or `null` to sort the elements in their natural order.
 
 Returns:
@@ -2267,6 +2320,15 @@ Returns:
     ["bar", "eggs", "foo", "spam"],
     ["bar", "eggs", "foo", "spam"],
 ]
+```
+
+```
+# Sorting on collections
+[
+    [97, 42, 216] | toStream | sort,
+    [97, 42, 216] | newSet | sort,
+]
+>> [[42, 97, 216], [42, 97, 216]]
 ```
 
 ```
@@ -2312,11 +2374,11 @@ Returns:
 
 ### group|group
 
-Groups a sequence of pairs by their first element.
+Groups a collection of pairs by their first element.
 
 Parameters:
 
-- `pairs` (_Sequence_): A sequence of pairs whose first element is the grouping key.
+- `pairs` (_Collection_): A collection of pairs whose first element is the grouping key.
 - `onGroup:` (_Function_, default `(x) => x`): A function to call on each group after assembling it.
 
 Returns:
@@ -2334,6 +2396,25 @@ Returns:
 ```
 
 ```
+# Grouping on stream
+[["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]] | toStream | group
+>> [
+    ["foo", [42, 216, 729]],
+    ["bar", [97]],
+    ["spam", [57]],
+]
+```
+
+```
+# Grouping on non-sequence
+[["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]] | newSet | group | sort
+>> [
+    ["bar", [97]],
+    ["foo", [42, 216, 729]],
+    ["spam", [57]],
+]
+```
+```
 # Grouping with aggregation
 [["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]]
 | group(onGroup: length)
@@ -2346,21 +2427,39 @@ Returns:
 
 ### groupBy|groupBy
 
-Groups a sequence by a key function.
+Groups a collection by a key function.
 
 Parameters:
 
-- `sequence` (_Sequence_): The sequence to group.
+- `collection` (_Collection_): The collection to group.
 - `by` (_Function_): A function that returns a grouping key for a given value.
 - `onGroup:` (_Function_, default `(x) => x`): A function to call on each group after assembling it.
 
 Returns:
 
-- (_Array_): A sequence of pairs whose first element is the grouping key, and whose second element is the result of calling `onGroup` on an array of the elements with that grouping key.
+- (_Array_): An array of pairs whose first element is the grouping key, and whose second element is the result of calling `onGroup` on an array of the elements with that grouping key.
 
 ```
 # Grouping by a key function
 ["foo", "bar", "spam", "eggs"] | groupBy(length)
+>> [
+    [3, ["foo", "bar"]],
+    [4, ["spam", "eggs"]],
+]
+```
+
+```
+# Grouping by a key function on stream
+["foo", "bar", "spam", "eggs"] | toStream | groupBy(length)
+>> [
+    [3, ["foo", "bar"]],
+    [4, ["spam", "eggs"]],
+]
+```
+
+```
+# Grouping by a key function on non-sequence
+["foo", "bar", "spam", "eggs"] | newSet | groupBy(length) | sort
 >> [
     [3, ["foo", "bar"]],
     [4, ["spam", "eggs"]],
@@ -2379,16 +2478,16 @@ Returns:
 
 ### forEach|forEach
 
-Applies a function to each element in a sequence for its side effects.
+Applies a function to each element in a collection for its side effects.
 
 Parameters:
 
-- `sequence` (_Sequence_): The sequence of values to iterate over.
+- `collection` (_Collection_): The collection of values to iterate over.
 - `action` (_Function_): The function to apply to each element.
 
 Returns:
 
-- (_Array_): The input sequence as an array.
+- (_Array_): An array containing the elements of the input collection.
 
 ```
 # Applying a side effect to each element
@@ -2399,21 +2498,29 @@ result.elements()
 >> ["foo", "bar", "baz", 1, 2, 3, 4, 5]
 ```
 
+```
+# Applying a side effect to each element of a non-sequence
+result = newMutableArray();
+["foo", "bar", "baz"] | newSet | forEach(result.append);
+result.elements() | sort
+>> ["bar", "baz", "foo"]
+```
+
 ## Stream Accessors|stream-accessors
 
 These functions calculate a scalar value from a stream, but only access a finite number of elements to do so. Therefore, they are safe to call even on infinite streams.
 
 ### isEmpty|isEmpty
 
-Tests whether the specified sequence has no elements.
+Tests whether the specified collection has no elements.
 
 Parameters:
 
-- `sequence` (_Sequence_): The sequence to check for emptiness.
+- `collection` (_Collection_): The collection to check for emptiness.
 
 Returns:
 
-- (_Boolean_): Whether the sequence is empty.
+- (_Boolean_): Whether the collection is empty.
 
 ```
 # Is empty
@@ -2469,11 +2576,11 @@ These functions create new streams that depend on existing ones, preserving stre
 
 ### transform|transform
 
-Creates a stream from applying a function to each element in an input sequence.
+Creates a stream from applying a function to each element in an input collection.
 
 Parameters:
 
-- `sequence` (_Sequence_): The sequence of values to transform.
+- `collection` (_Collection_): The collection of values to transform.
 - `f` (_Function_): The function to apply to each element.
 
 Returns:
@@ -2485,6 +2592,7 @@ Returns:
 [
     [1, 2, 3] | transform((i) => mul(i, i)) | toArray,
     1 | to(3) | transform((i) => mul(i, i)) | toArray,
+    [1, 2, 3] | newSet | transform((i) => mul(i, i)) | sort,
     1 | build(| up)
     | transform((i) => mul(i, i))
     | keepFirst(3)
@@ -2498,6 +2606,7 @@ Returns:
     [1, 4, 9],
     [1, 4, 9],
     [1, 4, 9],
+    [1, 4, 9],
     1,
 ]
 ```
@@ -2508,7 +2617,7 @@ Maintains state while processing a sequence, producing a stream of intermediate 
 
 Parameters:
 
-- `sequence` (_Sequence_): The sequence of values to process.
+- `in` (_Sequence_): The sequence of values to process.
 - `start:` (_Any_): The initial state.
 - `next:` (_Function_): A function that computes the next state from the current element and state. The state is passed as a named argument `state:`.
 
@@ -2849,11 +2958,11 @@ diffs = (sequence) => (
 
 ### where|where
 
-Filters a sequence, keeping only elements that satisfy a condition.
+Filters a collection, keeping only elements that satisfy a condition.
 
 Parameters:
 
-- `sequence` (_Sequence_): The sequence to filter.
+- `collection` (_Collection_): The collection to filter.
 - `condition` (_Function_): A function that returns `true` for elements to keep.
 
 Returns:
@@ -2864,6 +2973,7 @@ Returns:
 # Filtering
 [
     [1, 10, 2, 9, 3, 12] | where(| lt(10)) | toArray,
+    [1, 10, 2, 9, 3, 12] | newSet | where(| lt(10)) | sort,
     [1, 10, 2, 9, 3, 12]
     | repeat
     | flatten
@@ -2873,6 +2983,7 @@ Returns:
 ]
 >> [
     [1, 2, 9, 3],
+    [1, 2, 3, 9],
     [1, 2, 9, 3, 1],
 ]
 ```
@@ -2893,7 +3004,7 @@ Combines multiple sequences into a stream of tuples, stopping when the shortest 
 
 Parameters:
 
-- `*sequences` (_Array of Sequence_): The sequences to combine.
+- `*sequences` (_Sequence of Sequence_): The sequences to combine.
 
 Returns:
 
@@ -3281,7 +3392,7 @@ Creates an immutable set.
 
 Parameters:
 
-- `elements` (_Sequence_, default `[]`): The set's elements. Duplicate elements are silently discarded.
+- `elements` (_Collection_, default `[]`): The set's elements. Duplicate elements are silently discarded.
 
 Returns:
 
@@ -3292,10 +3403,12 @@ Returns:
 [
     "foobar" | newSet |.elements() | sort,
     [42, 97, 42, 73] | newSet |.elements() | sort,
+    [42, 97, 42, 73] | newSet | newSet |.elements() | sort,
     1 | build(| mul(2)) | keepFirst(3) | newSet |.elements() | sort,
 ]
 >> [
     ["a", "b", "f", "o", "r"],
+    [42, 73, 97],
     [42, 73, 97],
     [1, 2, 4],
 ]
@@ -3387,10 +3500,10 @@ set = ["foo", "bar", "baz"] | newSet;
 set = ["foo", "bar", "baz"] | newSet;
 [
     set | matches(Collection),
-    set | toArray,
-    set | toStream | toArray,
+    set | toArray | sort,
+    set | toStream | toArray | sort,
 ]
->> [true, ["foo", "bar", "baz"], ["foo", "bar", "baz"]]
+>> [true, ["bar", "baz", "foo"], ["bar", "baz", "foo"]]
 ```
 
 ### Map|Map
@@ -3403,7 +3516,7 @@ Creates an immutable map.
 
 Parameters:
 
-- `entries` (_Sequence_, default `[]`): A sequence of `[key, value]` pairs. If duplicate keys exist, only the last one is kept.
+- `entries` (_Collection_, default `[]`): A collection of `[key, value]` pairs. If duplicate keys exist, only the last one is kept.
 
 Returns:
 
@@ -3413,6 +3526,7 @@ Returns:
 # Map creation
 [
     [["foo", 42], ["bar", 97]] | newMap |.entries() | sort,
+    [["foo", 42], ["bar", 97]] | newSet | newMap |.entries() | sort,
     [1, "f"]
     | build(([n, s]) => [n | mul(2), [s, "o"] | join])
     | keepFirst(3)
@@ -3421,6 +3535,7 @@ Returns:
     | sort,
 ]
 >> [
+    [["bar", 97], ["foo", 42]],
     [["bar", 97], ["foo", 42]],
     [[1, "f"], [2, "fo"], [4, "foo"]],
 ]
@@ -3542,6 +3657,17 @@ map = [["foo", 42], ["bar", 97]] | newMap;
     map | display,
 ]
 >> [true, "Map", "Map {entries: [[\"foo\", 42], [\"bar\", 97]]}"]
+```
+
+```
+# Map as collection
+map = [["foo", 42], ["bar", 97]] | newMap;
+[
+    map | matches(Collection),
+    map | toArray | sort,
+    map | toStream | toArray | sort,
+]
+>> [true, [["bar", 97], ["foo", 42]], [["bar", 97], ["foo", 42]]]
 ```
 
 ## Mutable Objects|mutable
@@ -3781,6 +3907,20 @@ array = ["foo", "bar", "baz"] | newMutableArray;
 >> [true, ["foo", "bar", "baz"], ["foo", "bar", "baz"], "bar", "boo"]
 ```
 
+```
+# Mutating an array while iterating over it
+array = ["foo", "bar", "baz"] | newMutableArray;
+[
+    array | transform((element) => (
+        array.set(3, [element, element] | join);
+        element
+    ))
+    | toArray,
+    array.elements(),
+]
+>> [["foo", "bar", "baz"], ["foo", "bar", "bazbaz"]]
+```
+
 ### MutableSet|MutableSet
 
 A mutable set is like a regular set, but it allows adding and removing elements dynamically.
@@ -3791,7 +3931,7 @@ Creates a mutable set.
 
 Parameters:
 
-- `elements` (_Sequence_, default `[]`): The initial elements of the set. Duplicate elements are silently discarded.
+- `elements` (_Collection_, default `[]`): The initial elements of the set. Duplicate elements are silently discarded.
 
 Returns:
 
@@ -3802,10 +3942,12 @@ Returns:
 [
     "foobar" | newMutableSet |.elements() | sort,
     [42, 97, 42, 73] | newMutableSet |.elements() | sort,
+    [42, 97, 42, 73] | newSet | newMutableSet |.elements() | sort,
     1 | build(| mul(2)) | keepFirst(3) | newMutableSet |.elements() | sort,
 ]
 >> [
     ["a", "b", "f", "o", "r"],
+    [42, 73, 97],
     [42, 73, 97],
     [1, 2, 4],
 ]
@@ -3938,10 +4080,24 @@ set = ["foo", "bar", "baz"] | newMutableSet;
 set = ["foo", "bar", "baz"] | newMutableSet;
 [
     set | matches(Collection),
-    set | toArray,
-    set | toStream | toArray,
+    set | toArray | sort,
+    set | toStream | toArray | sort,
 ]
->> [true, ["foo", "bar", "baz"], ["foo", "bar", "baz"]]
+>> [true, ["bar", "baz", "foo"], ["bar", "baz", "foo"]]
+```
+
+```
+# Mutating a set while iterating over it
+set = ["foo", "bar", "baz"] | newMutableSet;
+[
+    set | transform((element) => (
+        set.add("bazbaz");
+        element
+    ))
+    | toArray | sort,
+    set.elements() | sort,
+]
+>> [["bar", "baz", "foo"], ["bar", "baz", "bazbaz", "foo"]]
 ```
 
 ### MutableMap|MutableMap
@@ -3954,7 +4110,7 @@ Creates a mutable map.
 
 Parameters:
 
-- `entries` (_Sequence_, default `[]`): A sequence of `[key, value]` pairs to initialize the map.
+- `entries` (_Collection_, default `[]`): A collection of `[key, value]` pairs to initialize the map.
 
 Returns:
 
@@ -3964,6 +4120,7 @@ Returns:
 # Mutable map creation
 [
     [["foo", 42], ["bar", 97]] | newMutableMap |.entries() | sort,
+    [["foo", 42], ["bar", 97]] | newSet | newMutableMap |.entries() | sort,
     [1, "f"]
     | build(([n, s]) => [n | mul(2), [s, "o"] | join])
     | keepFirst(3)
@@ -3972,6 +4129,7 @@ Returns:
     | sort,
 ]
 >> [
+    [["bar", 97], ["foo", 42]],
     [["bar", 97], ["foo", 42]],
     [[1, "f"], [2, "fo"], [4, "foo"]],
 ]
@@ -4142,6 +4300,31 @@ map = [["foo", 42], ["bar", 97]] | newMutableMap;
     map | display,
 ]
 >> [true, "MutableMap", "MutableMap {entries: [[\"foo\", 42], [\"bar\", 97]]}"]
+```
+
+```
+# Mutable map as collection
+map = [["foo", 42], ["bar", 97]] | newMutableMap;
+[
+    map | matches(Collection),
+    map | toArray | sort,
+    map | toStream | toArray | sort,
+]
+>> [true, [["bar", 97], ["foo", 42]], [["bar", 97], ["foo", 42]]]
+```
+
+```
+# Mutating a map while iterating over it
+map = [["foo", 42], ["bar", 97]] | newMutableMap;
+[
+    map | transform(([key, value]) => (
+        map.set("bazbaz", 216);
+        [key, value]
+    ))
+    | toArray | sort,
+    map.entries() | sort,
+]
+>> [[["bar", 97], ["foo", 42]], [["bar", 97], ["bazbaz", 216], ["foo", 42]]]
 ```
 
 ### also|also
