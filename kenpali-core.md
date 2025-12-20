@@ -1558,7 +1558,6 @@ Returns:
 
 Evaluates a list of conditions and returns the result of the first matching case.
 
-
 Parameters:
 
 - `conditions` (_Array of tuple like [Function, Function]_): A list of condition-result pairs. Each condition function is called with no arguments, and if it returns `true`, the corresponding result function is called with no arguments and its result is returned.
@@ -1581,6 +1580,30 @@ foo = (a, b) => ifs(
     foo(42, 42),
 ]
 >> ["Too big!", "Too small!", "Just right!"]
+```
+
+### swapIf|swapIf
+
+Passes two arguments to a function, swapping them if a condition is true.
+
+Parameters:
+
+- `values` (_Array_): A two-element tuple of values to pass to the function.
+- `condition` (_Boolean or Function_): The condition to check. If this is a function, it is called with the two `values` as its arguments, in order, to get the condition's truth value.
+- `f` (_Function_): The function to call with the two `values`. If the condition is true, `f(values @ 2, values @ 1)` is called; otherwise, `f(values @ 1, values @ 2)` is called.
+
+Returns:
+
+- (_Any_): The result of the call to `f`.
+
+```
+# Swap if
+s = | swapIf((a, b) => a | lt(b), (a, b) => [a | display, b | display] | join);
+[
+    [42, 73] | s,
+    [97, 73] | s,
+]
+>> ["7342", "9773"]
 ```
 
 ### switch|switch
