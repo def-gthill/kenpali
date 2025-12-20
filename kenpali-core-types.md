@@ -785,6 +785,36 @@ arr = [42, 97, 6, 12, 64, 73];
 >> [1, 2, 3, "f", "o", "o"]
 ```
 
+### flatTransform|flatTransform
+
+```
+# Flat transform on sequences
+[
+    "bar" | flatTransform((x) => [x, x]) | join,
+    [1, 2, 3] | toStream | flatTransform((x) => [x, x | mul(x)]) | toArray,
+    [1, 2, 3] | newMutableArray | flatTransform((x) => [x, x | mul(x)]) | toArray,
+]
+>> [
+    "bbaarr",
+    [1, 1, 2, 4, 3, 9],
+    [1, 1, 2, 4, 3, 9],
+]
+```
+
+```
+# Flat transform with sequence returns
+[
+    [42, 73, 97] | flatTransform(display) | toArray,
+    [1, 2, 3] | flatTransform((x) => [x, x | mul(x)] | toStream) | toArray,
+    [1, 2, 3] | flatTransform((x) => [x, x | mul(x)] | newMutableArray) | toArray,
+]
+>> [
+    ["4", "2", "7", "3", "9", "7"],
+    [1, 1, 2, 4, 3, 9],
+    [1, 1, 2, 4, 3, 9],
+]
+```
+
 ### dissect|dissect
 
 ```

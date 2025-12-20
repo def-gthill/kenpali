@@ -2737,6 +2737,25 @@ Returns:
 ]
 ```
 
+### flatTransform|flatTransform
+
+Does `transform` followed by `flatten`.
+
+Parameters:
+
+- `sequence` (_Sequence_): The sequence to process.
+- `f` (_Function returning Sequence_): The function to apply to each element.
+
+Returns:
+
+- (_Stream_): A stream containing the flattened results of applying `f` to each element of the input sequence.
+
+```
+# Flat transform
+[1, 2, 3] | flatTransform((x) => [x, x | mul(x)]) | toArray
+>> [1, 1, 2, 4, 3, 9]
+```
+
 ### dissect|dissect
 
 Splits a sequence into chunks at elements that satisfy a condition.
