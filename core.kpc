@@ -373,6 +373,21 @@ merge = (objects) => (
     objects | transform(properties) | flatten | toObject
 );
 itself = (x) => x;
+cache = (f) => (
+    cache = newMutableMap();
+    (*posArgs, **namedArgs) => (
+        key = [posArgs, namedArgs];
+        if(
+            cache.has(key),
+            then: $ cache.at(key),
+            else: $ (
+                result = f(*posArgs, **namedArgs);
+                cache.set(key, result);
+                result
+            )
+        )
+    )
+);
 also = (value, action) => (action(value); value);
 catch = (f) => try(
     f,

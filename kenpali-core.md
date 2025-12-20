@@ -2099,7 +2099,9 @@ Returns an array with the same elements as the specified collection, but in asce
 
 If `by` is `null`, the elements are sorted in their natural order, following the [Comparison Rules](#comparison-rules).
 
-Otherwise, `by` is called on each element to obtain a sort key, and the elements are sorted by that sort key, again following the Comparison Rules. The sort is stable: if the collection is a sequence, two elements with equal sort keys will appear in the same relative order in the sorted array as they were in the original sequence.
+Otherwise, `by` is called on each element to obtain a sort key, and the elements are sorted by that sort key, again following the Comparison Rules. The `by` function is only called once for each element.
+
+The sort is stable: if the collection is a sequence, two elements with equal sort keys will appear in the same relative order in the sorted array as they were in the original sequence.
 
 Parameters:
 
@@ -3064,6 +3066,34 @@ out = newMutableArray();
 foo = callOnce($ 42 | also(| out.append));
 [foo(), foo(), foo(), out.elements()]
 >> [42, 42, 42, [42]]
+```
+
+### cache|cache
+
+Creates a function that remembers its result for each combination of arguments it has been called with.
+
+Parameters:
+
+- `f` (_Function_): A function wrap with a cache.
+
+Returns:
+
+- (_Function_): The wrapped function.
+
+```
+# Caching
+out = newMutableArray();
+foo = cache(| mul(2) | also(| out.append));
+[foo(42), foo(73), foo(42), out.elements()]
+>> [84, 146, 84, [84, 146]]
+```
+
+```
+# Caching with multiple arguments
+out = newMutableArray();
+foo = cache((a, b:) => [a, b] | join | also(| out.append));
+[foo("bar", b: "baz"), foo("bar", b: "qux"), foo("bar", b: "baz"), out.elements()]
+>> ["barbaz", "barqux", "barbaz", ["barbaz", "barqux"]]
 ```
 
 ## Sets and Maps|sets-maps
