@@ -2229,6 +2229,25 @@ result.elements()
 >> ["foo", "bar", "baz", 1, 2, 3, 4, 5]
 ```
 
+### transformArray|transformArray
+
+Does `transform` followed by `toArray`.
+
+Parameters:
+
+- `collection` (_Collection_): The collection to transform.
+- `f` (_Function_): The function to apply to each element.
+
+Returns:
+
+- (_Array_): An array of the transformed values.
+
+```
+# Transform array
+[1, 2, 3] | transformArray((i) => mul(i, i))
+>> [1, 4, 9]
+```
+
 ## Stream Accessors|stream-accessors
 
 These functions calculate a scalar value from a stream, but only access a finite number of elements to do so. Therefore, they are safe to call even on infinite streams.

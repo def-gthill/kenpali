@@ -73,6 +73,11 @@ butIf = (value, condition, ifTrue) => if(
     else: $ value,
 );
 ifs = (*conditions, else:) => null | switch(*conditions, else:);
+swapIf = ([a, b], condition, f) => if(
+    toFunction(condition)(a, b),
+    then: $ f(b, a),
+    else: $ f(a, b),
+);
 build = (start, next) => (
     streamFrom = (getState) => (
         getStateOnce = callOnce(getState);
@@ -144,6 +149,11 @@ groupBy = (collection, by, onGroup: = (x) => x) => (
     collection
     | transform((element) => [by(element), element])
     | group(onGroup: onGroup)
+);
+transformArray = (collection, f) => (
+    collection
+    | transform(f)
+    | toArray
 );
 first = (sequence) => sequence @ 1;
 transform = (collection, f) => (
@@ -237,6 +247,15 @@ continueIf = (sequence, condition) => (
     );
     streamFrom(start)
 );
+dropWhile = (sequence, condition) => (
+    sequence
+    | toStream
+    | build((stream) => stream.next())
+    | continueIf((stream) => stream.isEmpty() | not | and(
+        $ stream.value() | condition
+    ))
+    | last
+);
 thenRepeat = (sequence, values) => [sequence, repeat(values)] | flatten;
 sliding = (sequence, size) => (
     sequence
@@ -254,6 +273,15 @@ where = (collection, condition) => (
         else: $ [],
     ))
     | flatten
+);
+distinct = (collection) => (
+    seen = newMutableSet();
+    collection
+    | where((value) => (
+        seen.has(value) | not | and(
+            $ (seen.add(value); true)
+        )
+    ))
 );
 zip = (*sequences) => (
     streams = sequences | transform(toStream);
@@ -302,6 +330,11 @@ flatten = (sequence) => (
         )
     );
     streamFrom(outer, emptyStream())
+);
+transformFlat = (sequence, f) => (
+    sequence
+    | transform(f)
+    | flatten
 );
 dissect = (sequence, condition) => (
     start = sequence | toStream;
