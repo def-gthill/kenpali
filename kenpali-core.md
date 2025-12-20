@@ -2353,6 +2353,25 @@ Returns:
 >> [0, 2, 28, 289, 2893, 28937]
 ```
 
+### with|with
+
+Tags each element of the input sequence with the result of calling a function on it.
+
+Parameters:
+
+- `sequence` (_Sequence_): The sequence to add tags to.
+- `f` (_Function_): The function to call on each element.
+
+Returns:
+
+- (_Stream_): A stream of pairs, where the first element is the tag and the second element is the element from the input sequence.
+
+```
+# Adding tags
+["fooo", "fo", "foo"] | with(length) | toArray
+>> [[4, "fooo"], [2, "fo"], [3, "foo"]]
+```
+
 ### withIndex|withIndex
 
 Tags each element of the input sequence with its index.

@@ -627,6 +627,22 @@ result.elements() | sort
 ]
 ```
 
+### with|with
+
+```
+# With on sequences
+[
+    "bar" | with((x) => [x, x] | join) | toArray,
+    ["fooo", "fo", "foo"] | toStream | with(length) | toArray,
+    ["fooo", "fo", "foo"] | newMutableArray | with(length) | toArray,
+]
+>> [
+    [["bb", "b"], ["aa", "a"], ["rr", "r"]],
+    [[4, "fooo"], [2, "fo"], [3, "foo"]],
+    [[4, "fooo"], [2, "fo"], [3, "foo"]],
+]
+```
+
 ### withIndex|withIndex
 
 ```

@@ -99,6 +99,14 @@ repeat(1) | running(start: 1, next: (number, state:) => state | add(number)) @ 9
 >> 9999
 ```
 
+## with|with
+
+```
+# With only advances the input stream when needed
+"foo" | build($ throw(newError("badIdea"))) | with(length) | first
+>> [3, "foo"]
+```
+
 ## withIndex|withIndex
 
 ```
