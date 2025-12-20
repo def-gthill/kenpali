@@ -452,6 +452,16 @@ result.elements() | sort
 >> ["fooar", [1, 2, 9, 3], [1, 2, 3, 9]]
 ```
 
+### distinct|distinct
+```
+# Distinct on collections
+[
+    [42, 97, 42, 73] | toStream | distinct | toArray,
+    [42, 97, 42, 73] | newSet | distinct | sort,
+]
+>> [[42, 97, 73], [42, 73, 97]]
+```
+
 ### newSet|newSet
 
 ```

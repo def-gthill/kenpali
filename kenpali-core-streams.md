@@ -209,6 +209,18 @@ badStart | dropFirst(3) | keepFirst(3) | toArray
 >> [1, 2, 9, 3, 1]
 ```
 
+## distinct|distinct
+
+```
+# Distinct doesn't ask for values beyond the last element it needs
+[[42, 97, 73], 42 | build($ throw(newError("badIdea")))]
+| flatten
+| distinct
+| keepFirst(3)
+| toArray
+>> [42, 97, 73]
+```
+
 ## zip|zip
 
 ```

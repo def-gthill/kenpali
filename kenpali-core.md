@@ -2560,6 +2560,28 @@ Returns:
 >> [1, 2, 9, 3]
 ```
 
+### distinct|distinct
+
+Keeps only the unique elements in a collection.
+
+Elements are considered equal based on the [Comparison Rules](#comparison-rules).
+
+If the argument is a sequence, the resulting stream is in the order each element first appears in the sequence.
+
+Parameters:
+
+- `collection` (_Collection_): The collection to remove duplicates from.
+
+Returns:
+
+- (_Stream_): A stream of the unique elements in the collection.
+
+```
+# Distinct
+[42, 97, 42, 73] | distinct | toArray
+>> [42, 97, 73]
+```
+
 ### zip|zip
 
 Combines multiple sequences into a stream of tuples, stopping when the shortest sequence is exhausted.
