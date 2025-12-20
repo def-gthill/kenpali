@@ -2737,7 +2737,7 @@ Returns:
 ]
 ```
 
-### flatTransform|flatTransform
+### transformFlat|transformFlat
 
 Does `transform` followed by `flatten`.
 
@@ -2751,8 +2751,8 @@ Returns:
 - (_Stream_): A stream containing the flattened results of applying `f` to each element of the input sequence.
 
 ```
-# Flat transform
-[1, 2, 3] | flatTransform((x) => [x, x | mul(x)]) | toArray
+# Transform flat
+[1, 2, 3] | transformFlat((x) => [x, x | mul(x)]) | toArray
 >> [1, 1, 2, 4, 3, 9]
 ```
 

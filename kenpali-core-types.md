@@ -785,14 +785,14 @@ arr = [42, 97, 6, 12, 64, 73];
 >> [1, 2, 3, "f", "o", "o"]
 ```
 
-### flatTransform|flatTransform
+### transformFlat|transformFlat
 
 ```
-# Flat transform on sequences
+# Transform flat on sequences
 [
-    "bar" | flatTransform((x) => [x, x]) | join,
-    [1, 2, 3] | toStream | flatTransform((x) => [x, x | mul(x)]) | toArray,
-    [1, 2, 3] | newMutableArray | flatTransform((x) => [x, x | mul(x)]) | toArray,
+    "bar" | transformFlat((x) => [x, x]) | join,
+    [1, 2, 3] | toStream | transformFlat((x) => [x, x | mul(x)]) | toArray,
+    [1, 2, 3] | newMutableArray | transformFlat((x) => [x, x | mul(x)]) | toArray,
 ]
 >> [
     "bbaarr",
@@ -802,11 +802,11 @@ arr = [42, 97, 6, 12, 64, 73];
 ```
 
 ```
-# Flat transform with sequence returns
+# Transform flat with sequence returns
 [
-    [42, 73, 97] | flatTransform(display) | toArray,
-    [1, 2, 3] | flatTransform((x) => [x, x | mul(x)] | toStream) | toArray,
-    [1, 2, 3] | flatTransform((x) => [x, x | mul(x)] | newMutableArray) | toArray,
+    [42, 73, 97] | transformFlat(display) | toArray,
+    [1, 2, 3] | transformFlat((x) => [x, x | mul(x)] | toStream) | toArray,
+    [1, 2, 3] | transformFlat((x) => [x, x | mul(x)] | newMutableArray) | toArray,
 ]
 >> [
     ["4", "2", "7", "3", "9", "7"],
