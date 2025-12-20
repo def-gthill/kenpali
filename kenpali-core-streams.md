@@ -185,6 +185,17 @@ badStart | dropFirst(3) | keepFirst(3) | toArray
 >> [1]
 ```
 
+## dropWhile|dropWhile
+```
+# Drop while doesn't advance beyond what it's asked for
+[[1, 2, 1, 1, 3, 4, 1], 1 | build($ throw(newError("badIdea")))]
+| flatten
+| dropWhile(| lt(3))
+| keepFirst(4)
+| toArray
+>> [3, 4, 1, 1]
+```
+
 ## sliding|sliding
 
 ```

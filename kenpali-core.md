@@ -2505,6 +2505,31 @@ Returns:
 >> [1, 2, 4, 8, 16, 32, 64, 128]
 ```
 
+### dropWhile|dropWhile
+
+Creates a stream of elements from the input sequence, skipping elements while a condition holds.
+
+This skips exactly the elements that `while` keeps. It returns an empty stream if the condition is never true.
+
+Parameters:
+
+- `sequence` (_Sequence_): The sequence to process.
+- `condition` (_Function returning Boolean_): A function that returns `true` for elements to skip.
+
+Returns:
+
+- (_Stream_): A stream containing the elements the first element for which `condition` returns `false`, and all elements after it.
+
+```
+# Drop while
+1
+| build(| mul(2))
+| dropWhile(| lt(100))
+| keepFirst(3)
+| toArray
+>> [128, 256, 512]
+```
+
 ### thenRepeat|thenRepeat
 
 Adds endless copies of a constant value to the end of the sequence.

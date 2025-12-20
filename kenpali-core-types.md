@@ -701,6 +701,18 @@ arr = [42, 97, 6, 12, 64, 73];
 >> ["foob", [1, 2, 1, 1, 3], [1, 2, 1, 1, 3]]
 ```
 
+### dropWhile|dropWhile
+
+```
+# Drop while on sequences
+[
+    "foobar" | dropWhile(| eq("b") | not) | join,
+    [1, 2, 1, 1, 3, 4, 1] | dropWhile(| lt(3)) | toArray,
+    [1, 2, 1, 1, 3, 4, 1] | newMutableArray | dropWhile(| lt(3)) | toArray,
+]
+>> ["bar", [3, 4, 1], [3, 4, 1]]
+```
+
 ### thenRepeat|thenRepeat
 
 ```
