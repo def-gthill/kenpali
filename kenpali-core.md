@@ -1831,18 +1831,28 @@ Returns:
 ]
 ```
 
+```
+# Ranges with wrong-way steps
+[
+    1 | to(10, by: -3) | toArray,
+    5 | to(1, by: 1) | toArray,
+]
+>> [[], []]
+```
+
 ### toSize|toSize
 
-Generates a stream of incrementing numbers with a given size.
+Generates a stream of evenly spaced numbers with a given size.
 
 Parameters:
 
 - `start` (_Number_): The number to start counting from.
 - `size` (_Number_): The number of elements to include in the stream.
+- `by:` (_Number_, default `1`): The number to count by. Each element of the stream will be `by` more than the previous one. If `by` is negative, the stream will count down.
 
 Returns:
 
-- (_Stream_): A stream of numbers counting up from `start`, with `size` elements in total.
+- (_Stream_): A stream of numbers counting up from `start` incrementing by `by`, with `size` elements in total.
 
 ```
 # Ranges defined by size
@@ -1855,6 +1865,30 @@ Returns:
     true,
     [1, 2, 3, 4, 5],
     [5, 6, 7, 8, 9, 10],
+]
+```
+
+```
+# Ranges defined by size with step
+[
+    1 | toSize(4, by: 3) | toArray,
+    5 | toSize(3, by: 2) | toArray,
+]
+>> [
+    [1, 4, 7, 10],
+    [5, 7, 9],
+]
+```
+
+```
+# Ranges defined by size with negative step
+[
+    5 | toSize(5, by: -1) | toArray,
+    10 | toSize(3, by: -2) | toArray,
+]
+>> [
+    [5, 4, 3, 2, 1],
+    [10, 8, 6],
 ]
 ```
 

@@ -101,7 +101,9 @@ to = (start, end, by: = 1) => (
     | build(| add(by))
     | while(| isNoFurtherThan(end))
 );
-toSize = (start, size) => (start | to(start | add(size | down)));
+toSize = (start, size, by: = 1) => (
+    start | to(start | add(size | down | mul(by)), by:)
+);
 repeat = (value) => value | build((x) => x);
 last = (sequence) => sequence @ -1;
 keepLast = (sequence, n) => (
