@@ -453,6 +453,7 @@ result.elements() | sort
 ```
 
 ### distinct|distinct
+
 ```
 # Distinct on collections
 [
