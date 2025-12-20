@@ -105,7 +105,7 @@ toSize = (start, size, by: = 1) => (
     start | to(start | add(size | down | mul(by)), by:)
 );
 repeat = (value) => value | build((x) => x);
-last = (sequence) => sequence @ -1;
+last = (sequence, default: = null) => sequence | at(-1, default:);
 keepLast = (sequence, n) => (
     result = sequence | dropFirst(length(sequence) | sub(n));
     result | butIf(| isString | not, | toArray)
@@ -157,7 +157,7 @@ transformArray = (collection, f) => (
     | transform(f)
     | toArray
 );
-first = (sequence) => sequence @ 1;
+first = (sequence, default: = null) => sequence | at(1, default:);
 transform = (collection, f) => (
     start = collection | toStream;
     streamFrom = (current) => if(

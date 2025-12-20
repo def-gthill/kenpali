@@ -1927,6 +1927,7 @@ Returns the last element of the specified sequence. Equivalent to indexing with 
 Parameters:
 
 - `sequence` (_Sequence_): The sequence to get the last element of.
+- `default:` (_Function or Null_, default `null`): A function to call and return the result of if the sequence is empty, or `null` to throw an error if the sequence is empty.
 
 Returns:
 
@@ -1940,6 +1941,15 @@ Returns:
     1 | to(5) | last,
 ]
 >> ["foo", "baz", 5]
+```
+
+```
+# Last element with default
+[
+    [] | last(default: $ 42),
+    ["foo"] | last(default: $ 42),
+]
+>> [42, "foo"]
 ```
 
 ### length|length
@@ -2325,6 +2335,7 @@ Returns the first element of the specified sequence. Equivalent to indexing with
 Parameters:
 
 - `sequence` (_Sequence_): The sequence to get the first element of.
+- `default:` (_Function or Null_, default `null`): A function to call and return the result of if the sequence is empty, or `null` to throw an error if the sequence is empty.
 
 Returns:
 
@@ -2337,6 +2348,15 @@ Returns:
     ["foo", "bar", "baz"] | first
 ]
 >> ["foo", "foo"]
+```
+
+```
+# First element with default
+[
+    [] | first(default: $ 42),
+    ["foo"] | first(default: $ 42),
+]
+>> [42, "foo"]
 ```
 
 ## Stream Rebuilders|stream-rebuilders
