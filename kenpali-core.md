@@ -25,7 +25,7 @@ Returns:
 
 ### sum|sum
 
-Returns the sum of the values in the specified sequence.
+Returns the sum of the values in the specified collection.
 
 Parameters:
 
@@ -37,12 +37,8 @@ Returns:
 
 ```
 # Sum
-[
-    sum([1, 2, 3, 4, 5]),
-    sum(1 | to(5)),
-    sum([1, 2, 3, 4, 5] | newSet)
-]
->> [15, 15, 15]
+sum([1, 2, 3, 4, 5])
+>> 15
 ```
 
 ### sub|sub
@@ -198,6 +194,8 @@ Returns:
 
 Returns the integer quotient of its first argument divided by its second argument.
 
+The quotient is always rounded down for a positive divisor, and rounded up for a negative divisor.
+
 Parameters:
 
 - `a` (_Number_): The dividend.
@@ -315,7 +313,7 @@ Returns a string created by joining the given values with a separator.
 
 Parameters:
 
-- `strings` (_Array or Stream of String_): The values to join.
+- `strings` (_Sequence of String_): The values to join.
 - `on:` (_String_, default `""`): The separator to insert between values.
 
 Returns:
@@ -339,7 +337,7 @@ Returns a string created by joining the given values with newlines.
 
 Parameters:
 
-- `strings` (_Array or Stream of String_): The values to join.
+- `strings` (_Sequence of String_): The values to join.
 
 Returns:
 
@@ -404,9 +402,9 @@ Returns:
 
 Kenpali can perform equality and ordering comparisons on various types.
 
-All comparisons are strict about types: testing values of different types for equality always returns `false`, while using ordering comparisons on different types always throws a `wrongArgumentType` error.
+All comparisons are strict about types: testing values of different classes for equality always returns `false`, while using ordering comparisons on different classes always throws a `wrongArgumentType` error.
 
-Any two values can be tested for equality. To be considered equal, the values must have the same type, _and_:
+Any two values can be tested for equality. To be considered equal, the values must have the same class, _and_:
 
 - If both are booleans, they must both be true or both be false.
 - If both are numbers, they must have the same numerical value.
@@ -436,40 +434,67 @@ Returns:
 - (_Boolean_): Whether the values are equal.
 
 ```
-# Equality
+# Equality of null
+eq(null, null)
+>> true
+```
+
+```
+# Equality of booleans
+[eq(true, true), eq(false, true), eq(false, false)]
+>> [true, false, true]
+```
+
+```
+# Equality of numbers
+[eq(42, 42), eq(42, 43)]
+>> [true, false]
+```
+
+```
+# Equality of strings
+[eq("bar", "bar"), eq("bar", "baz")]
+>> [true, false]
+```
+
+```
+# Equality of arrays
 [
-    [eq(null, null)],
-    [eq(true, true), eq(false, true), eq(false, false)],
-    [eq(42, 42), eq(42, 43)],
-    [eq("foo", "foo"), eq("foo", "bar")],
-    [
-        eq(["foo", "bar"], ["foo", "bar"]),
-        eq(["foo", "bar"], ["foo", "baz"]),
-    ],
-    [
-        eq([[1, 2], [3, 4]], [[1, 2], [3, 4]]),
-        eq([[1, 2], [3, 4]], [[1, 2], [3, 5]]),
-    ],
-    [
-        eq(
-            {foo: "bar", spam: "eggs"},
-            {spam: "eggs", foo: "bar"},
-        ),
-        eq(
-            {foo: "bar", spam: "eggs"},
-            {spam: "eggs", foo: "baz"},
-        ),
-    ],
+    eq(["foo", "bar"], ["foo", "bar"]),
+    eq(["foo", "bar"], ["foo", "baz"]),
 ]
->> [
-    [true],
-    [true, false, true],
-    [true, false],
-    [true, false],
-    [true, false],
-    [true, false],
-    [true, false]
+>> [true, false]
+```
+
+```
+# Equality of nested arrays
+[
+    eq([[1, 2], [3, 4]], [[1, 2], [3, 4]]),
+    eq([[1, 2], [3, 4]], [[1, 2], [3, 5]]),
 ]
+>> [true, false]
+```
+
+```
+# Equality of objects
+[
+    eq(
+        {foo: "bar", spam: "eggs"},
+        {spam: "eggs", foo: "bar"},
+    ),
+    eq(
+        {foo: "bar", spam: "eggs"},
+        {spam: "eggs", foo: "baz"},
+    ),
+]
+>> [true, false]
+```
+
+```
+# Equality of different types
+// Values of different types are never equal
+[eq(null, false), eq(1, true), eq(42, "42")]
+>> [false, false, false]
 ```
 
 ### lt|lt
@@ -486,45 +511,57 @@ Returns:
 - (_Boolean_): Whether `a` is less than `b`.
 
 ```
-# Less than
+# Less than on booleans
 [
-    [
-        false | lt(true),
-        true | lt(true),
-        true | lt(false),
-    ],
-    [
-        42 | lt(43),
-        43 | lt(43),
-        43 | lt(42),
-    ],
-    [
-        "bar" | lt("baz"),
-        "baz" | lt("baz"),
-        "baz" | lt("bar"),
-    ],
-    [
-        ["foo", "bar"] | lt(["foo", "baz"]),
-        ["foo", "bar"] | lt(["foo!", "aar"]),
-        ["foo", "bar"] | lt(["foo", "bar"]),
-        ["foo", "baz"] | lt(["foo", "bar"]),
-        ["foo!", "aar"] | lt(["foo", "bar"]),
-    ],
-    [
-        [[1, 2], [3, 4]] | lt([[1, 2], [3, 10]]),
-        [[1, 2], [3, 4]] | lt([[1, 3], [3, 3]]),
-        [[1, 2], [3, 4]] | lt([[1, 2], [3, 4]]),
-        [[1, 2], [3, 10]] | lt([[1, 2], [3, 4]]),
-        [[1, 3], [3, 3]] | lt([[1, 2], [3, 4]]),
-    ]
+    false | lt(true),
+    true | lt(true),
+    true | lt(false),
 ]
->> [
-    [true, false, false],
-    [true, false, false],
-    [true, false, false],
-    [true, true, false, false, false],
-    [true, true, false, false, false]
+>> [true, false, false]
+```
+
+```
+# Less than on numbers
+[
+    42 | lt(43),
+    43 | lt(43),
+    43 | lt(42),
 ]
+>> [true, false, false]
+```
+
+```
+# Less than on strings
+[
+    "bar" | lt("baz"),
+    "baz" | lt("baz"),
+    "baz" | lt("bar"),
+]
+>> [true, false, false]
+```
+
+```
+# Less than on arrays
+[
+    ["foo", "bar"] | lt(["foo", "baz"]),
+    ["foo", "bar"] | lt(["foo!", "aar"]),
+    ["foo", "bar"] | lt(["foo", "bar"]),
+    ["foo", "baz"] | lt(["foo", "bar"]),
+    ["foo!", "aar"] | lt(["foo", "bar"]),
+]
+>> [true, true, false, false, false]
+```
+
+```
+# Less than on nested arrays
+[
+    [[1, 2], [3, 4]] | lt([[1, 2], [3, 10]]),
+    [[1, 2], [3, 4]] | lt([[1, 3], [3, 3]]),
+    [[1, 2], [3, 4]] | lt([[1, 2], [3, 4]]),
+    [[1, 2], [3, 10]] | lt([[1, 2], [3, 4]]),
+    [[1, 3], [3, 3]] | lt([[1, 2], [3, 4]]),
+]
+>> [true, true, false, false, false]
 ```
 
 ### le|le
@@ -657,21 +694,14 @@ Returns:
 
 ```
 # Least by natural order
+// Elements are compared in their natural order by default
 [97, 42, 216] | least
 >> 42
 ```
 
 ```
-# Least on collections
-[
-    [97, 42, 216] | toStream | least,
-    [97, 42, 216] | newSet | least,
-]
->> [42, 42]
-```
-
-```
 # Least by comparison key
+// Elements can be compared by a comparison key
 ["foobar", "zoo", "spam"]
 | least(by: length)
 >> "zoo"
@@ -679,39 +709,15 @@ Returns:
 
 ```
 # Least with equal keys
+// If elements are tied, the first one is returned
 ["spam", "foo", "bar", "eggs"]
 | least(by: length)
 >> "foo"
 ```
 
 ```
-# Least with incomparable elements
-[97, "42"] | least
-!! wrongArgumentType {"value": "42", "expectedType": "Number"}
-```
-
-```
-# Least with incomparable elements with a valid sort key
-[97, "42"] | least(by: toNumber)
->> "42"
-```
-
-```
-# Least with incomparable keys
-[97, 42] | least(by: (n) => (
-    if(n | gt(50), then: $ n, else: $ n | display)
-))
-!! wrongArgumentType {"value": "42", "expectedType": "Number"}
-```
-
-```
-# Least on empty sequence
-[] | least
-!! indexOutOfBounds {"length": 0, "index": 1}
-```
-
-```
 # Least with default
+// A default value can be provided for empty collections
 [
     [] | least(default: $ 42),
     ["foo"] | least(default: $ 42),
@@ -741,21 +747,14 @@ Returns:
 
 ```
 # Greatest by natural order
+// Elements are compared in their natural order by default
 [97, 42, 216] | greatest
 >> 216
 ```
 
 ```
-# Greatest on collections
-[
-    [97, 42, 216] | toStream | greatest,
-    [97, 42, 216] | newSet | greatest,
-]
->> [216, 216]
-```
-
-```
 # Greatest by comparison key
+// Elements can be compared by a comparison key
 ["foobar", "zoo", "spam"]
 | greatest(by: length)
 >> "foobar"
@@ -763,39 +762,15 @@ Returns:
 
 ```
 # Greatest with equal keys
+// If elements are tied, the first one is returned
 ["spam", "foo", "bar", "eggs"]
 | greatest(by: length)
 >> "spam"
 ```
 
 ```
-# Greatest with incomparable elements
-[97, "42"] | greatest
-!! wrongArgumentType {"value": "42", "expectedType": "Number"}
-```
-
-```
-# Greatest with incomparable elements with a valid sort key
-[97, "42"] | greatest(by: toNumber)
->> 97
-```
-
-```
-# Greatest with incomparable keys
-[97, 42] | greatest(by: (n) => (
-    if(n | gt(50), then: $ n, else: $ n | display)
-))
-!! wrongArgumentType {"value": "42", "expectedType": "Number"}
-```
-
-```
-# Greatest with empty sequence
-[] | greatest
-!! indexOutOfBounds {"length": 0, "index": 1}
-```
-
-```
 # Greatest with default
+// A default value can be provided for empty collections
 [
     [] | greatest(default: $ 42),
     ["foo"] | greatest(default: $ 42),
@@ -831,6 +806,7 @@ Returns:
 
 ```
 # And short-circuiting
+// These second conditions would cause errors if evaluated
 [
     and(false, $ [] @ 1),
     and(false, $ (foo = foo; foo)),
@@ -864,6 +840,7 @@ Returns:
 
 ```
 # Or short-circuiting
+// These second conditions would cause errors if evaluated
 [
     or(true, $ [] @ 1),
     or(true, $ (foo = foo; foo)),
@@ -991,20 +968,9 @@ Returns:
 # Is null
 [
     isNull(null),
-    isNull(false),
-    isNull(true),
     isNull(42),
-    isNull("foo"),
-    isNull([1, 2, 3]),
-    isNull(1 | to(3)),
-    isNull({foo: 1, bar: 2}),
-    isNull(classOf),
-    isNull((x) => x),
-    isNull(newError("badIdea")),
-    isNull(Number),
-    isNull(Sequence),
 ]
->> [true, false, false, false, false, false, false, false, false, false, false, false, false]
+>> [true, false]
 ```
 
 ### isBoolean|isBoolean
@@ -1022,21 +988,11 @@ Returns:
 ```
 # Is boolean
 [
-    isBoolean(null),
     isBoolean(false),
     isBoolean(true),
     isBoolean(42),
-    isBoolean("foo"),
-    isBoolean([1, 2, 3]),
-    isBoolean(1 | to(3)),
-    isBoolean({foo: 1, bar: 2}),
-    isBoolean(classOf),
-    isBoolean((x) => x),
-    isBoolean(newError("badIdea")),
-    isBoolean(Number),
-    isBoolean(Sequence),
 ]
->> [false, true, true, false, false, false, false, false, false, false, false, false, false]
+>> [true, true, false]
 ```
 
 ### isNumber|isNumber
@@ -1054,21 +1010,10 @@ Returns:
 ```
 # Is number
 [
-    isNumber(null),
-    isNumber(false),
-    isNumber(true),
     isNumber(42),
     isNumber("foo"),
-    isNumber([1, 2, 3]),
-    isNumber(1 | to(3)),
-    isNumber({foo: 1, bar: 2}),
-    isNumber(classOf),
-    isNumber((x) => x),
-    isNumber(newError("badIdea")),
-    isNumber(Number),
-    isNumber(Sequence),
 ]
->> [false, false, false, true, false, false, false, false, false, false, false, false, false]
+>> [true, false]
 ```
 
 ### toNumber|toNumber
@@ -1113,21 +1058,10 @@ Returns:
 ```
 # Is string
 [
-    isString(null),
-    isString(false),
-    isString(true),
-    isString(42),
     isString("foo"),
-    isString([1, 2, 3]),
-    isString(1 | to(3)),
-    isString({foo: 1, bar: 2}),
-    isString(classOf),
-    isString((x) => x),
-    isString(newError("badIdea")),
-    isString(Number),
-    isString(Sequence),
+    isString(42),
 ]
->> [false, false, false, false, true, false, false, false, false, false, false, false, false]
+>> [true, false]
 ```
 
 ### display|display
@@ -1180,6 +1114,7 @@ Returns:
 
 ```
 # Display on streams
+// Streams display only elements that have already been evaluated
 stream = 1 | to(4);
 [
     stream | display,
@@ -1201,6 +1136,7 @@ stream = 1 | to(4);
 
 ```
 # Display on natural functions
+// A function displays its name and the names of its enclosing functions
 foo = $ (
     bar = $ 42;
     $ bar
@@ -1234,21 +1170,10 @@ Returns:
 ```
 # Is array
 [
-    isArray(null),
-    isArray(false),
-    isArray(true),
-    isArray(42),
-    isArray("foo"),
     isArray([1, 2, 3]),
-    isArray(1 | to(3)),
-    isArray({foo: 1, bar: 2}),
-    isArray(classOf),
-    isArray((x) => x),
-    isArray(newError("badIdea")),
-    isArray(Number),
-    isArray(Sequence),
+    isArray(42),
 ]
->> [false, false, false, false, false, true, false, false, false, false, false, false, false]
+>> [true, false]
 ```
 
 ### toArray|toArray
@@ -1288,21 +1213,10 @@ Returns:
 ```
 # Is stream
 [
-    isStream(null),
-    isStream(false),
-    isStream(true),
-    isStream(42),
-    isStream("foo"),
-    isStream([1, 2, 3]),
     isStream(1 | to(3)),
-    isStream({foo: 1, bar: 2}),
-    isStream(classOf),
-    isStream((x) => x),
-    isStream(newError("badIdea")),
-    isStream(Number),
-    isStream(Sequence),
+    isStream(42),
 ]
->> [false, false, false, false, false, false, true, false, false, false, false, false, false]
+>> [true, false]
 ```
 
 ### toStream|toStream
@@ -1330,6 +1244,7 @@ Returns:
 
 ```
 # To stream on stream
+// When called on a stream, the same stream is returned
 stream = 1 | to(5);
 stream | toStream | eq(stream)
 >> true
@@ -1338,6 +1253,8 @@ stream | toStream | eq(stream)
 ### isObject|isObject
 
 Returns whether its argument is an object.
+
+Note that instances are _not_ objects.
 
 Parameters:
 
@@ -1350,34 +1267,24 @@ Returns:
 ```
 # Is object
 [
-    isObject(null),
-    isObject(false),
-    isObject(true),
-    isObject(42),
-    isObject("foo"),
-    isObject([1, 2, 3]),
-    isObject(1 | to(3)),
     isObject({foo: 1, bar: 2}),
-    isObject(classOf),
-    isObject((x) => x),
-    isObject(newError("badIdea")),
-    isObject(Number),
-    isObject(Sequence),
+    isObject(42),
+    isObject(newSet()),
 ]
->> [false, false, false, false, false, false, false, true, false, false, false, false, false]
+>> [true, false, false]
 ```
 
 ### toObject|toObject
 
 Converts the specified value into an object.
 
-If the value is an array or stream, its elements are treated as key-value pairs. Any duplicate keys are assigned the value from the _last_ pair with that key in the sequence.
+If the value is a sequence, its elements are treated as key-value pairs. Any duplicate keys are assigned the value from the _last_ pair with that key in the sequence.
 
-If the value is an instance, an object containing its class name and properties is returned.
+If the value is a non-sequence instance, an object containing its class name and properties is returned.
 
 Parameters:
 
-- `value` (_Array or Instance_): The value to convert. If an array or stream, it must contain tuples like _[string, any]_.
+- `value` (_Sequence or Instance_): The value to convert. If a sequence, it must contain tuples like _[string, any]_.
 
 Returns:
 
@@ -1385,6 +1292,7 @@ Returns:
 
 ```
 # Object from properties
+// Arrays are treated as key-value pairs
 properties = [["foo", "bar"], ["spam", "eggs"]];
 properties | toObject
 >> {foo: "bar", spam: "eggs"}
@@ -1392,6 +1300,7 @@ properties | toObject
 
 ```
 # Object from properties with duplicates
+// Properties overwrite earlier duplicates
 properties = [["foo", "bar"], ["spam", "eggs"], ["foo", "baz"]];
 properties | toObject
 >> {foo: "baz", spam: "eggs"}
@@ -1399,6 +1308,7 @@ properties | toObject
 
 ```
 # Object from instance
+// Properties are extracted from instances
 newError("badIdea", foo: "bar") | toObject
 >> {"#class": "Error", type: "badIdea", details: {foo: "bar"}, calls: []}
 ```
@@ -1418,21 +1328,10 @@ Returns:
 ```
 # Is function
 [
-    isFunction(null),
-    isFunction(false),
-    isFunction(true),
-    isFunction(42),
-    isFunction("foo"),
-    isFunction([1, 2, 3]),
-    isFunction(1 | to(3)),
-    isFunction({foo: 1, bar: 2}),
-    isFunction(classOf),
     isFunction((x) => x),
-    isFunction(newError("badIdea")),
-    isFunction(Number),
-    isFunction(Sequence),
+    isFunction(42),
 ]
->> [false, false, false, false, false, false, false, false, true, true, false, false, false]
+>> [true, false]
 ```
 
 ### toFunction|toFunction
@@ -1477,21 +1376,10 @@ Returns:
 ```
 # Is error
 [
-    isError(null),
-    isError(false),
-    isError(true),
-    isError(42),
-    isError("foo"),
-    isError([1, 2, 3]),
-    isError(1 | to(3)),
-    isError({foo: 1, bar: 2}),
-    isError(classOf),
-    isError((x) => x),
     isError(newError("badIdea")),
-    isError(Number),
-    isError(Sequence),
+    isError(42),
 ]
->> [false, false, false, false, false, false, false, false, false, false, true, false, false]
+>> [true, false]
 ```
 
 ### isClass|isClass
@@ -1509,21 +1397,10 @@ Returns:
 ```
 # Is class
 [
-    isClass(null),
-    isClass(false),
-    isClass(true),
-    isClass(42),
-    isClass("foo"),
-    isClass([1, 2, 3]),
-    isClass(1 | to(3)),
-    isClass({foo: 1, bar: 2}),
-    isClass(classOf),
-    isClass((x) => x),
-    isClass(newError("badIdea")),
     isClass(Number),
-    isClass(Sequence),
+    isClass(42),
 ]
->> [false, false, false, false, false, false, false, false, false, false, false, true, false]
+>> [true, false]
 ```
 
 ### isProtocol|isProtocol
@@ -1541,26 +1418,15 @@ Returns:
 ```
 # Is protocol
 [
-    isProtocol(null),
-    isProtocol(false),
-    isProtocol(true),
-    isProtocol(42),
-    isProtocol("foo"),
-    isProtocol([1, 2, 3]),
-    isProtocol(1 | to(3)),
-    isProtocol({foo: 1, bar: 2}),
-    isProtocol(classOf),
-    isProtocol((x) => x),
-    isProtocol(newError("badIdea")),
-    isProtocol(Number),
     isProtocol(Sequence),
+    isProtocol(42),
 ]
->> [false, false, false, false, false, false, false, false, false, false, false, false, true]
+>> [true, false]
 ```
 
 ### isSequence|isSequence
 
-Returns whether its argument is a sequence—a string, array, or stream.
+Returns whether its argument is a sequence.
 
 Parameters:
 
@@ -1573,21 +1439,11 @@ Returns:
 ```
 # Is sequence
 [
-    isSequence(null),
-    isSequence(false),
-    isSequence(true),
-    isSequence(42),
-    isSequence("foo"),
     isSequence([1, 2, 3]),
     isSequence(1 | to(3)),
-    isSequence({foo: 1, bar: 2}),
-    isSequence(classOf),
-    isSequence((x) => x),
-    isSequence(newError("badIdea")),
-    isSequence(Number),
-    isSequence(Sequence),
+    isSequence(42),
 ]
->> [false, false, false, false, true, true, true, false, false, false, false, false, false]
+>> [true, true, false]
 ```
 
 ### isType|isType
@@ -1605,21 +1461,11 @@ Returns:
 ```
 # Is type
 [
-    isType(null),
-    isType(false),
-    isType(true),
-    isType(42),
-    isType("foo"),
-    isType([1, 2, 3]),
-    isType(1 | to(3)),
-    isType({foo: 1, bar: 2}),
-    isType(classOf),
-    isType((x) => x),
-    isType(newError("badIdea")),
     isType(Number),
     isType(Sequence),
+    isType(42),
 ]
->> [false, false, false, false, false, false, false, false, false, false, false, true, true]
+>> [true, true, false]
 ```
 
 ### isInstance|isInstance
@@ -1637,21 +1483,13 @@ Returns:
 ```
 # Is instance
 [
-    isInstance(null),
-    isInstance(false),
-    isInstance(true),
-    isInstance(42),
-    isInstance("foo"),
-    isInstance([1, 2, 3]),
     isInstance(1 | to(3)),
-    isInstance({foo: 1, bar: 2}),
-    isInstance(classOf),
-    isInstance((x) => x),
     isInstance(newError("badIdea")),
     isInstance(Number),
     isInstance(Sequence),
+    isInstance(42),
 ]
->> [false, false, false, false, false, false, true, false, false, false, true, true, true]
+>> [true, true, true, true, false]
 ```
 
 ## Control Flow|control-flow
@@ -1659,6 +1497,8 @@ Returns:
 ### if|if
 
 Evaluates and returns the result of one of two functions based on a condition.
+
+Only the function matching the condition is evaluated.
 
 Parameters:
 
@@ -1681,6 +1521,7 @@ Returns:
 
 ```
 # If short-circuiting
+// These branches would cause errors if evaluated
 [
     if(true, then: $ 1, else: $ [] @ 1),
     if(true, then: $ 1, else: $ (foo = foo; foo)),
@@ -1778,7 +1619,7 @@ These functions build up new streams from scalar inputs.
 
 ### Stream|stream
 
-A _stream_ is a lazily computed sequence of values. It is inspired by similar concepts in other languages (often called _generators_ or _iterators_), but the key difference is that streams _remember_ the values they have already computed, so they can be iterated over multiple times. Of course, this should be implemented in such a way that values that are _no longer reachable_ are freed—for example, by storing them in a linked list.
+A _stream_ is a lazily computed sequence of values. It is inspired by similar concepts in other languages (often called _generators_ or _iterators_), but the key difference is that streams _remember_ the values they have already computed, so they can be iterated over multiple times. Of course, this should be implemented in such a way that values that are _no longer reachable_ are freed—for example, by storing them as a singly-linked list.
 
 In general, streams must not compute anything more than is absolutely necessary to produce the values that have been requested. They must also take care to avoid stack overflow—iterating over a stream must interleave _calls_ and _returns_ in a way that avoids building up a large call stack.
 
@@ -1911,46 +1752,6 @@ powersOfTwo = 1 | build(| mul(2));
     powersOfTwo @ 8,
 ]
 >> [true, 1, 4, 128]
-```
-
-As a well-behaved stream, the result of `build` doesn't invoke `next` any more than is necessary to produce the values that have been requested.
-
-```
-# Build doesn't call the callback if no values are requested
-1 | build($ 1 @ 1);
-42
->> 42
-```
-
-```
-# Build only invokes the function when needed
-1
-| build((x) => if(
-    x | ge(3),
-    then: $ throw(newError("tooBig")),
-    else: $ x | up
-))
-| keepFirst(3)
-| toArray
->> [1, 2, 3]
-```
-
-```
-# Build only invokes the function once for each iteration
-out = newMutableArray();
-1 | build((x) => (out.append(x); x | up))
-| keepFirst(4)
-| toArray;
-out.elements()
->> [1, 2, 3]
-```
-
-As a well-behaved stream, the result of `build` can be iterated over thousands of times without overflowing the stack.
-
-```
-# Build doesn't overflow the stack
-1 | build(up) @ 9999
->> 9999
 ```
 
 ### to|to
@@ -2137,7 +1938,6 @@ Returns:
     [42, 97, 6, 12, 64] | keepLast(3),
     [42, 97, 6, 12, 64] | keepLast(0),
     [42, 97, 6, 12, 64] | keepLast(-1),
-    1 | to(5) | keepLast(3),
 ]
 >> [
     "bar",
@@ -2146,7 +1946,6 @@ Returns:
     [6, 12, 64],
     [],
     [],
-    [3, 4, 5],
 ]
 ```
 
@@ -2177,8 +1976,6 @@ arr = [42, 97, 6, 12, 64];
     arr | dropLast(3),
     arr | dropLast(0),
     arr | dropLast(-1),
-    1 | to(5) | dropLast,
-    1 | to(5) | dropLast(3),
 ]
 >> [
     "fooba",
@@ -2189,8 +1986,6 @@ arr = [42, 97, 6, 12, 64];
     [42, 97],
     [42, 97, 6, 12, 64],
     [42, 97, 6, 12, 64],
-    [1, 2, 3, 4],
-    [1, 2],
 ]
 ```
 
@@ -2209,12 +2004,8 @@ Returns:
 
 ```
 # Counting
-[
-    [1, 10, 2, 9, 3, 12] | count(| lt(10)),
-    [1, 10, 2, 9, 3, 12] | toStream | count(| lt(10)),
-    [1, 10, 2, 9, 3, 12] | newSet | count(| lt(10)),
-]
->> [4, 4, 4]
+[1, 10, 2, 9, 3, 12] | count(| lt(10))
+>> 4
 ```
 
 ### forAll|forAll
@@ -2235,12 +2026,8 @@ Returns:
 [
     [1, 2, 3] | forAll(| lt(10)),
     [1, 42, 3] | forAll(| lt(10)),
-    [1, 2, 3] | toStream | forAll(| lt(10)),
-    [1, 42, 3] | toStream | forAll(| lt(10)),
-    [1, 2, 3] | newSet | forAll(| lt(10)),
-    [1, 42, 3] | newSet | forAll(| lt(10)),
 ]
->> [true, false, true, false, true, false]
+>> [true, false]
 ```
 
 ### forSome|forSome
@@ -2261,12 +2048,8 @@ Returns:
 [
     [41, 2, 43] | forSome(| lt(10)),
     [41, 42, 43] | forSome(| lt(10)),
-    [41, 2, 43] | toStream | forSome(| lt(10)),
-    [41, 42, 43] | toStream | forSome(| lt(10)),
-    [41, 2, 43] | newSet | forSome(| lt(10)),
-    [41, 42, 43] | newSet | forSome(| lt(10)),
 ]
->> [true, false, true, false, true, false]
+>> [true, false]
 ```
 
 ### reverse|reverse
@@ -2283,14 +2066,8 @@ Returns:
 
 ```
 # Reversing
-[
-    ["foo", "bar", "spam", "eggs"] | reverse,
-    ["foo", "bar", "spam", "eggs"] | toStream | reverse,
-]
->> [
-    ["eggs", "spam", "bar", "foo"],
-    ["eggs", "spam", "bar", "foo"],
-]
+["foo", "bar", "baz"] | reverse
+>> ["baz", "bar", "foo"]
 ```
 
 ### sort|sort
@@ -2312,33 +2089,21 @@ Returns:
 
 ```
 # Sorting in natural order
-[
-    ["foo", "bar", "spam", "eggs"] | sort,
-    ["foo", "bar", "spam", "eggs"] | toStream | sort,
-]
->> [
-    ["bar", "eggs", "foo", "spam"],
-    ["bar", "eggs", "foo", "spam"],
-]
-```
-
-```
-# Sorting on collections
-[
-    [97, 42, 216] | toStream | sort,
-    [97, 42, 216] | newSet | sort,
-]
->> [[42, 97, 216], [42, 97, 216]]
+// Elements are sorted in their natural order by default
+["foo", "bar", "spam", "eggs"] | sort
+>> ["bar", "eggs", "foo", "spam"]
 ```
 
 ```
 # Sorting arrays lexicographically
+// Arrays are sorted lexicographically by their elements
 [[10, 2], [2, 1], [11, 3]] | sort
 >> [[2, 1], [10, 2], [11, 3]]
 ```
 
 ```
 # Sorting by sort key
+// Elements can be sorted by a sort key
 ["foobar", "zoo", "spam"]
 | sort(by: (word) => word | length)
 >> ["zoo", "spam", "foobar"]
@@ -2346,30 +2111,10 @@ Returns:
 
 ```
 # Sort stability
+// Tied elements remain in their original order
 ["spam", "foo", "bar", "eggs"]
 | sort(by: (word) => word | length)
 >> ["foo", "bar", "spam", "eggs"]
-```
-
-```
-# Sorting incomparable elements
-[97, "42"] | sort
-!! badArgumentValue {"value": [97, "42"]}
-```
-
-```
-# Sorting incomparable elements with a valid sort key
-[97, "42"] | sort(by: toNumber)
->> ["42", 97]
-```
-
-```
-# Sorting with incomparable sort keys
-[97, 42]
-| sort(by: (n) => (
-    if(n | gt(50), then: $ n, else: $ n | display)
-))
-!! wrongReturnType {"value": "42", "expectedType": "Number"}
 ```
 
 ### group|group
@@ -2383,7 +2128,7 @@ Parameters:
 
 Returns:
 
-- (_Array_): A sequence of pairs whose first element is the grouping key, and whose second element is the result of calling `onGroup` on an array of the second elements of the input pairs with that grouping key.
+- (_Array_): An array of pairs whose first element is the grouping key, and whose second element is the result of calling `onGroup` on an array of the second elements of the input pairs with that grouping key.
 
 ```
 # Grouping
@@ -2395,25 +2140,6 @@ Returns:
 ]
 ```
 
-```
-# Grouping on stream
-[["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]] | toStream | group
->> [
-    ["foo", [42, 216, 729]],
-    ["bar", [97]],
-    ["spam", [57]],
-]
-```
-
-```
-# Grouping on non-sequence
-[["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]] | newSet | group | sort
->> [
-    ["bar", [97]],
-    ["foo", [42, 216, 729]],
-    ["spam", [57]],
-]
-```
 ```
 # Grouping with aggregation
 [["foo", 42], ["bar", 97], ["foo", 216], ["foo", 729], ["spam", 57]]
@@ -2442,24 +2168,6 @@ Returns:
 ```
 # Grouping by a key function
 ["foo", "bar", "spam", "eggs"] | groupBy(length)
->> [
-    [3, ["foo", "bar"]],
-    [4, ["spam", "eggs"]],
-]
-```
-
-```
-# Grouping by a key function on stream
-["foo", "bar", "spam", "eggs"] | toStream | groupBy(length)
->> [
-    [3, ["foo", "bar"]],
-    [4, ["spam", "eggs"]],
-]
-```
-
-```
-# Grouping by a key function on non-sequence
-["foo", "bar", "spam", "eggs"] | newSet | groupBy(length) | sort
 >> [
     [3, ["foo", "bar"]],
     [4, ["spam", "eggs"]],
@@ -2498,14 +2206,6 @@ result.elements()
 >> ["foo", "bar", "baz", 1, 2, 3, 4, 5]
 ```
 
-```
-# Applying a side effect to each element of a non-sequence
-result = newMutableArray();
-["foo", "bar", "baz"] | newSet | forEach(result.append);
-result.elements() | sort
->> ["bar", "baz", "foo"]
-```
-
 ## Stream Accessors|stream-accessors
 
 These functions calculate a scalar value from a stream, but only access a finite number of elements to do so. Therefore, they are safe to call even on infinite streams.
@@ -2529,18 +2229,12 @@ Returns:
     "foo" | isEmpty,
     [] | isEmpty,
     [1] | isEmpty,
-    [] | toStream | isEmpty,
-    [1] | toStream | isEmpty,
     1 | repeat | isEmpty,
-    newStream(value: $ throw(newError("badIdea")), next: emptyStream) | isEmpty,
 ]
 >> [
     true,
     false,
     true,
-    false,
-    true,
-    false,
     false,
     false,
 ]
@@ -2562,12 +2256,9 @@ Returns:
 # First element
 [
     ["foo"] | first,
-    ["foo", "bar", "baz"] | first,
-    1 | to(5) | first,
-    1 | build(| mul(2)) | first,
-    1 | build($ throw(newError("badIdea"))) | first,
+    ["foo", "bar", "baz"] | first
 ]
->> ["foo", "foo", 1, 1, 1]
+>> ["foo", "foo"]
 ```
 
 ## Stream Rebuilders|stream-rebuilders
@@ -2589,26 +2280,8 @@ Returns:
 
 ```
 # Transforming
-[
-    [1, 2, 3] | transform((i) => mul(i, i)) | toArray,
-    1 | to(3) | transform((i) => mul(i, i)) | toArray,
-    [1, 2, 3] | newSet | transform((i) => mul(i, i)) | sort,
-    1 | build(| up)
-    | transform((i) => mul(i, i))
-    | keepFirst(3)
-    | toArray,
-    1
-    | build($ throw(newError("badIdea")))
-    | transform((i) => mul(i, i))
-    | first,
-]
->> [
-    [1, 4, 9],
-    [1, 4, 9],
-    [1, 4, 9],
-    [1, 4, 9],
-    1,
-]
+[1, 2, 3] | transform((i) => mul(i, i)) | toArray
+>> [1, 4, 9]
 ```
 
 ### running|running
@@ -2638,23 +2311,6 @@ Returns:
 >> [0, 2, 28, 289, 2893, 28937]
 ```
 
-```
-# Running only invokes `next` when needed
-[2, 8, 9, 3, 7]
-| running(
-    start: 0,
-    next: $ throw(newError("badIdea"))
-)
-| first
->> 0
-```
-
-```
-# Running doesn't overflow the stack
-repeat(1) | running(start: 1, next: (number, state:) => state | add(number)) @ 9999
->> 9999
-```
-
 ### withIndex|withIndex
 
 Tags each element of the input sequence with its index.
@@ -2671,12 +2327,6 @@ Returns:
 # Adding indices
 ["foo", "bar", "baz"] | withIndex | toArray
 >> [[1, "foo"], [2, "bar"], [3, "baz"]]
-```
-
-```
-# Adding indices only advances the input stream when needed
-1 | build($ throw(newError("badIdea"))) | withIndex | first
->> [1, 1]
 ```
 
 ### keepFirst|keepFirst
@@ -2703,8 +2353,6 @@ Returns:
     [42, 97, 6, 12, 64] | keepFirst(3) | toArray,
     [42, 97, 6, 12, 64] | keepFirst(0) | toArray,
     [42, 97, 6, 12, 64] | keepFirst(-1) | toArray,
-    1 | build(| mul(2)) | keepFirst(3) | toArray,
-    1 | build($ throw(newError("badIdea"))) | keepFirst(1) | toArray,
 ]
 >> [
     "foo",
@@ -2713,8 +2361,6 @@ Returns:
     [42, 97, 6],
     [],
     [],
-    [1, 2, 4],
-    [1],
 ]
 ```
 
@@ -2745,12 +2391,6 @@ arr = [42, 97, 6, 12, 64];
     arr | dropFirst(3) | toArray,
     arr | dropFirst(0) | toArray,
     arr | dropFirst(-1) | toArray,
-    1 | build(| mul(2)) | dropFirst(3) | keepFirst(3) | toArray,
-    [[42, 97, 6], 1 | build($ throw(newError("badIdea")))]
-    | flatten
-    | dropFirst(1)
-    | keepFirst(3)
-    | toArray,
 ]
 >> [
     "oobar",
@@ -2761,16 +2401,7 @@ arr = [42, 97, 6, 12, 64];
     [12, 64],
     [42, 97, 6, 12, 64],
     [42, 97, 6, 12, 64],
-    [8, 16, 32],
-    [97, 6, 1],
 ]
-```
-
-```
-# Dropping doesn't ask for any of the dropped values
-fs = [$ throw(newError("badIdea")), $ throw(newError("stillBadIdea")), $ 42, $ 97];
-1 | to(4) | transform((i) => (fs @ i)()) | dropFirst(2) | toArray
->> [42, 97]
 ```
 
 ### slice|slice
@@ -2811,11 +2442,6 @@ arr = [42, 97, 6, 12, 64, 73];
     arr | slice(from: -4, to: 4) | toArray,
     arr | slice(from: -4, to: -2) | toArray,
     arr | slice(from: 4, to: 2) | toArray,
-    1 | build(| mul(2)) | slice(from: 2, to: 4) | toArray,
-    [[42, 97, 6], 1 | build($ throw(newError("badIdea")))]
-    | flatten
-    | slice(from: 2, to: 4)
-    | toArray,
 ]
 >> [
     "oob",
@@ -2832,8 +2458,6 @@ arr = [42, 97, 6, 12, 64, 73];
     [6, 12],
     [6, 12, 64],
     [],
-    [2, 4, 8],
-    [97, 6, 1],
 ]
 ```
 
@@ -2859,12 +2483,6 @@ Returns:
 >> [1, 2, 4, 8, 16, 32, 64]
 ```
 
-```
-# While doesn't ask for values beyond the stopping condition
-1 | build($ throw(newError("badIdea"))) | while(| lt(0)) | toArray
->> []
-```
-
 ### continueIf|continueIf
 
 Creates a stream of elements from the input sequence, continuing to the next element if a condition holds. The resulting stream has one extra element compared to `while`—the first element that doesn't satisfy the condition—which makes some stopping conditions easier to express.
@@ -2885,12 +2503,6 @@ Returns:
 | continueIf(| lt(100))
 | toArray
 >> [1, 2, 4, 8, 16, 32, 64, 128]
-```
-
-```
-# Continue-If doesn't ask for values beyond the stopping condition
-1 | build($ throw(newError("badIdea"))) | continueIf(| lt(0)) | toArray
->> [1]
 ```
 
 ### thenRepeat|thenRepeat
@@ -2929,33 +2541,6 @@ Returns:
 >> [[2, 8, 9], [8, 9, 3], [9, 3, 7]]
 ```
 
-```
-# Operating on a sliding window
-diffs = (sequence) => (
-    sequence
-    | sliding(2)
-    | transform(([a, b]) => b | sub(a))
-);
-[
-    [2, 8, 9, 3, 7] | diffs | toArray,
-    [2, 8, 9, 3, 7] | repeat | flatten | diffs | keepFirst(6) | toArray,
-]
->> [
-    [6, 1, -6, 4],
-    [6, 1, -6, 4, -5, 6],
-]
-```
-
-```
-# Sliding doesn't ask for values beyond its last window
-[[2, 8, 9, 3], 1 | build($ throw(newError("badIdea")))]
-| flatten
-| sliding(3)
-| keepFirst(3)
-| toArray
->> [[2, 8, 9], [8, 9, 3], [9, 3, 1]]
-```
-
 ### where|where
 
 Filters a collection, keeping only elements that satisfy a condition.
@@ -2971,67 +2556,59 @@ Returns:
 
 ```
 # Filtering
-[
-    [1, 10, 2, 9, 3, 12] | where(| lt(10)) | toArray,
-    [1, 10, 2, 9, 3, 12] | newSet | where(| lt(10)) | sort,
-    [1, 10, 2, 9, 3, 12]
-    | repeat
-    | flatten
-    | where(| lt(10))
-    | keepFirst(5)
-    | toArray,
-]
->> [
-    [1, 2, 9, 3],
-    [1, 2, 3, 9],
-    [1, 2, 9, 3, 1],
-]
-```
-
-```
-# Filtering doesn't ask for values beyond the last element it needs
-[[1, 10, 2, 9, 3, 12], 1 | build($ throw(newError("badIdea")))]
-| flatten
-| where(| lt(10))
-| keepFirst(5)
-| toArray
->> [1, 2, 9, 3, 1]
+[1, 10, 2, 9, 3, 12] | where(| lt(10)) | toArray
+>> [1, 2, 9, 3]
 ```
 
 ### zip|zip
 
 Combines multiple sequences into a stream of tuples, stopping when the shortest sequence is exhausted.
 
+To force `zip` to continue past the end of one of the sequences, extend that sequence with `thenRepeat`, passing the desired default value.
+
 Parameters:
 
-- `*sequences` (_Sequence of Sequence_): The sequences to combine.
+- `*sequences` (_Array of Sequence_): The sequences to combine.
 
 Returns:
 
-- (_Stream_): A stream of tuples, where each tuple contains corresponding elements from the input sequences.
+- (_Stream of Array_): A stream of tuples, where each tuple contains corresponding elements from the input sequences.
 
 
 ```
 # Zipping
-[
-    [1, 2, 3] | zip(["one", "two", "three"]) | toArray,
-    [1, 2, 3] | zip(["one", "two"]) | toArray,
-    1 | build(| mul(2)) | zip(["one", "two", "three"]) | toArray,
-    1 | build(| mul(2)) | zip(1 | build(| mul(3))) | keepFirst(3) | toArray,
-    1 | build($ throw(newError("badIdea"))) | zip(["foo"]) | toArray,
-]
->> [
-    [[1, "one"], [2, "two"], [3, "three"]],
-    [[1, "one"], [2, "two"]],
-    [[1, "one"], [2, "two"], [4, "three"]],
-    [[1, 1], [2, 3], [4, 9]],
-    [[1, "foo"]],
-]
+[1, 2, 3] | zip(["one", "two", "three"]) | toArray
+>> [[1, "one"], [2, "two"], [3, "three"]]
+```
+
+```
+# Zip with uneven sequences
+// Zip stops when the shortest sequence is exhausted
+[1, 2, 3] | zip(["one", "two"]) | toArray
+>> [[1, "one"], [2, "two"]]
+```
+
+```
+# Zip continuing past the end of a sequence
+// thenRepeat can be used to prevent stopping
+[1, 2, 3] | zip(["one", "two"] | thenRepeat(null)) | toArray
+>> [[1, "one"], [2, "two"], [3, null]]
+```
+
+```
+# Zip with more than two sequences
+// Zip can combine more than two sequences
+[1, 2, 3] | zip(["one", "two", "three"], ["un", "deux", "trois"]) | toArray
+>> [[1, "one", "un"], [2, "two", "deux"], [3, "three", "trois"]]
 ```
 
 ### unzip|unzip
 
 Splits a sequence of tuples into multiple streams.
+
+While `unzip` does essentially the same transformation as `zip` (transposing a nested sequence), it emits the results in a different format (an array of streams instead of a stream of arrays), which makes it useful in different situations.
+
+Note that `unzip` does not attempt to guess how many streams to produce. By default, it always produces two streams, ignoring any additional elements in the input tuples. Use the `numStreams` parameter if you need a different number of streams.
 
 Parameters:
 
@@ -3044,44 +2621,27 @@ Returns:
 
 ```
 # Unzipping
-[
-    [[1, "one"], [2, "two"], [3, "three"]]
-    | unzip
-    | transform(| toArray)
-    | toArray,
-    [2, 2]
-    | build(([a, b]) => [b | mul(2), a | up])
-    | unzip
-    | transform(| keepFirst(4) | toArray)
-    | toArray,
-    [1, "one"] | build($ throw(newError("badIdea")))
-    | unzip
-    | transform(first)
-    | toArray,
-]
->> [
-    [[1, 2, 3], ["one", "two", "three"]],
-    [[2, 4, 6, 10], [2, 3, 5, 7]],
-    [1, "one"]
-]
+[[1, "one"], [2, "two"], [3, "three"]]
+| unzip
+| transform(| toArray)
+| toArray
+>> [[1, 2, 3], ["one", "two", "three"]]
 ```
 
 ```
 # Unzipping with more than two streams
-[
-    [[1, "one", "eins"], [2, "two", "zwei"], [3, "three", "drei"]]
-    | unzip(numStreams: 3)
-    | transform(| keepFirst(3) | toArray)
-    | toArray,
-]
->> [
-    [[1, 2, 3], ["one", "two", "three"], ["eins", "zwei", "drei"]],
-]
+[[1, "one", "eins"], [2, "two", "zwei"], [3, "three", "drei"]]
+| unzip(numStreams: 3)
+| transform(| toArray)
+| toArray
+>> [[1, 2, 3], ["one", "two", "three"], ["eins", "zwei", "drei"]]
 ```
 
 ### flatten|flatten
 
 Flattens a sequence of sequences into a single stream.
+
+Only _one_ level of nesting is flattened.
 
 Parameters:
 
@@ -3098,20 +2658,12 @@ Returns:
     [[]] | flatten | toArray,
     [[1], [2, 3], [4, 5, [6]]] | flatten | toArray,
     [[1], [2, 3], []] | flatten | toArray,
-    [1] | build((a) => [*a, a | last | up]) | flatten | keepFirst(7) | toArray,
-    [[1], 1 | build($ throw(newError("badIdea")))] | flatten | keepFirst(2) | toArray,
-    [[1], newStream(value: $ throw(newError("badIdea")), next: emptyStream)] | flatten | keepFirst(1) | toArray,
-    [1] | build($ throw(newError("badIdea"))) | flatten | first,
 ]
 >> [
     [],
     [],
     [1, 2, 3, 4, 5, [6]],
     [1, 2, 3],
-    [1, 1, 2, 1, 2, 3, 1],
-    [1, 1],
-    [1],
-    1,
 ]
 ```
 
@@ -3133,14 +2685,10 @@ Returns:
 [
     [] | dissect(| ge(8)) | toArray,
     [2, 8, 9, 3, 7] | dissect(| ge(8)) | toArray,
-    [2, 8, 9, 3, 7] | repeat | flatten | dissect(| ge(8)) | keepFirst(5) | toArray,
-    9 | build($ throw(newError("badIdea"))) | dissect(| ge(8)) | first,
 ]
 >> [
     [],
     [[2, 8], [9], [3, 7]],
-    [[2, 8], [9], [3, 7, 2, 8], [9], [3, 7, 2, 8]],
-    [9],
 ]
 ```
 
@@ -3163,19 +2711,11 @@ Returns:
     1 | to(9) | chunk(3) | toArray,
     1 | to(10) | chunk(3) | toArray,
     1 | to(11) | chunk(3) | toArray,
-    1 | build(| mul(2)) | chunk(3) | keepFirst(3) | toArray,
-    [1 | to(9), newStream(value: $ throw(newError("badIdea")), next: emptyStream)]
-    | flatten
-    | chunk(3)
-    | keepFirst(3)
-    | toArray,
 ]
 >> [
     [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
     [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]],
     [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11]],
-    [[1, 2, 4], [8, 16, 32], [64, 128, 256]],
-    [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
 ]
 ```
 
@@ -3202,20 +2742,26 @@ object | keys
 
 ### properties|properties
 
-Returns an array of the key-value pairs in the object.
+Returns the properties of an object or instance, as an array of name-value pairs.
 
 Parameters:
 
-- `object` (_Object_): The object whose properties to retrieve.
+- `object` (_Object or Instance_): The object or instance whose properties to retrieve.
 
 Returns:
 
-- (_Array_): An array of the object's properties.
+- (_Array_): An array of the properties.
 
 ```
-# Array of properties
+# Array of properties of an object
 {foo: 1, bar: 2} | properties
 >> [["foo", 1], ["bar", 2]]
+```
+
+```
+# Array of properties of an instance
+newError("badIdea", foo: "bar") | properties
+>> [["type", "badIdea"], ["details", {foo: "bar"}], ["calls", []]]
 ```
 
 ### merge|merge
@@ -3226,7 +2772,7 @@ If the same key appears in more than one input object, the resulting object take
 
 Parameters:
 
-- `objects` (_Array of Object_): The objects to combine.
+- `objects` (_Sequence of Object_): The objects to combine.
 
 Returns:
 
@@ -3248,7 +2794,7 @@ Without the default value, `a | at(b)` is equivalent to `a @ b`.
 
 Parameters:
 
-- `collection` (_Sequence or Object_): The collection to index into.
+- `collection` (_Sequence or Object or Instance_): The collection to index into.
 - `index` (_Number or String_): The index value.
 - `default:` (_Function or Null_, default `null`): A function to call and return the result of if the index is invalid, or `null` to throw an error if the index is invalid.
 
@@ -3282,9 +2828,8 @@ Finite streams can be indexed as if they were arrays.
     2 | to(5) | at(5, default: $ 42),
     2 | to(5) | at(0, default: $ 42),
     2 | to(5) | at(-5, default: $ 42),
-    1 | build($ throw(newError("badIdea"))) | at(1),
 ]
->> [2, 3, 5, 3, 4, 4, 42, 42, 42, 1]
+>> [2, 3, 5, 3, 4, 4, 42, 42, 42]
 ```
 
 Infinite streams only accept positive indices. They loop forever if the index is negative.
@@ -3299,6 +2844,8 @@ Infinite streams only accept positive indices. They loop forever if the index is
 >> [4, 4, 42]
 ```
 
+Objects can be indexed with string keys.
+
 ```
 # Indexing objects
 object = {foo: "bar", spam: "eggs"};
@@ -3308,7 +2855,19 @@ object = {foo: "bar", spam: "eggs"};
     object | at("baz", default: $ "nothing"),
 ]
 >> ["bar", "bar", "nothing"]
+```
 
+Instances can also be indexed with string keys.
+
+```
+# Indexing instances
+instance = newError("badIdea", foo: "bar");
+[
+    instance | at("type"),
+    instance | at("details", default: $ {}),
+    instance | at("nonExistentProperty", default: $ []),
+]
+>> ["badIdea", {foo: "bar"}, []]
 ```
 
 ## Utilities|utilities
@@ -3400,18 +2959,8 @@ Returns:
 
 ```
 # Set creation
-[
-    "foobar" | newSet |.elements() | sort,
-    [42, 97, 42, 73] | newSet |.elements() | sort,
-    [42, 97, 42, 73] | newSet | newSet |.elements() | sort,
-    1 | build(| mul(2)) | keepFirst(3) | newSet |.elements() | sort,
-]
->> [
-    ["a", "b", "f", "o", "r"],
-    [42, 73, 97],
-    [42, 73, 97],
-    [1, 2, 4],
-]
+[42, 97, 42, 73] | newSet | sort
+>> [42, 73, 97]
 ```
 
 #### Set/size|Set-size
@@ -3484,28 +3033,6 @@ set = [["foo"], {foo: 42, bar: 97}] | newSet;
 ]
 ```
 
-```
-# Set as instance
-set = ["foo", "bar", "baz"] | newSet;
-[
-    set | isInstance,
-    classOf(set).name,
-    set | display,
-]
->> [true, "Set", "Set {elements: [\"foo\", \"bar\", \"baz\"]}"]
-```
-
-```
-# Set as collection
-set = ["foo", "bar", "baz"] | newSet;
-[
-    set | matches(Collection),
-    set | toArray | sort,
-    set | toStream | toArray | sort,
-]
->> [true, ["bar", "baz", "foo"], ["bar", "baz", "foo"]]
-```
-
 ### Map|Map
 
 A `Map` is a collection of key-value pairs, where keys are unique. Looking up a value by key is fast regardless of the size of the map.
@@ -3524,21 +3051,8 @@ Returns:
 
 ```
 # Map creation
-[
-    [["foo", 42], ["bar", 97]] | newMap |.entries() | sort,
-    [["foo", 42], ["bar", 97]] | newSet | newMap |.entries() | sort,
-    [1, "f"]
-    | build(([n, s]) => [n | mul(2), [s, "o"] | join])
-    | keepFirst(3)
-    | newMap
-    |.entries()
-    | sort,
-]
->> [
-    [["bar", 97], ["foo", 42]],
-    [["bar", 97], ["foo", 42]],
-    [[1, "f"], [2, "fo"], [4, "foo"]],
-]
+[["foo", 42], ["bar", 73], ["bar", 97]] | newMap | sort
+>> [["bar", 97], ["foo", 42]]
 ```
 
 #### Map/size|Map-size
@@ -3648,28 +3162,6 @@ map = [[["foo"], 42], [{foo: 42, bar: 97}, 97]] | newMap;
 ]
 ```
 
-```
-# Map as instance
-map = [["foo", 42], ["bar", 97]] | newMap;
-[
-    map | isInstance,
-    classOf(map).name,
-    map | display,
-]
->> [true, "Map", "Map {entries: [[\"foo\", 42], [\"bar\", 97]]}"]
-```
-
-```
-# Map as collection
-map = [["foo", 42], ["bar", 97]] | newMap;
-[
-    map | matches(Collection),
-    map | toArray | sort,
-    map | toStream | toArray | sort,
-]
->> [true, [["bar", 97], ["foo", 42]], [["bar", 97], ["foo", 42]]]
-```
-
 ## Mutable Objects|mutable
 
 ### Var|Var
@@ -3748,16 +3240,8 @@ Returns:
 
 ```
 # Mutable array creation
-[
-    "foobar" | newMutableArray |.elements(),
-    [42, 97, 42, 73] | newMutableArray |.elements(),
-    1 | build(| mul(2)) | keepFirst(3) | newMutableArray |.elements(),
-]
->> [
-    ["f", "o", "o", "b", "a", "r"],
-    [42, 97, 42, 73],
-    [1, 2, 4],
-]
+[42, 97, 42, 73] | newMutableArray |.elements()
+>> [42, 97, 42, 73]
 ```
 
 #### MutableArray/size|MutableArray-size
@@ -3884,31 +3368,8 @@ array = ["foo", "bar", "baz"] | newMutableArray
 ```
 
 ```
-# Mutable array as instance
-array = ["foo", "bar", "baz"] | newMutableArray;
-[
-    array | isInstance,
-    classOf(array).name,
-    array | display,
-]
->> [true, "MutableArray", "MutableArray {elements: [\"foo\", \"bar\", \"baz\"]}"]
-```
-
-```
-# Mutable array as sequence
-array = ["foo", "bar", "baz"] | newMutableArray;
-[
-    array | isSequence,
-    array | toArray,
-    array | toStream | toArray,
-    array @ 2,
-    array | at(4, default: $ "boo"),
-]
->> [true, ["foo", "bar", "baz"], ["foo", "bar", "baz"], "bar", "boo"]
-```
-
-```
 # Mutating an array while iterating over it
+// Stream functions iterate over a snapshot
 array = ["foo", "bar", "baz"] | newMutableArray;
 [
     array | transform((element) => (
@@ -3939,18 +3400,8 @@ Returns:
 
 ```
 # Mutable set creation
-[
-    "foobar" | newMutableSet |.elements() | sort,
-    [42, 97, 42, 73] | newMutableSet |.elements() | sort,
-    [42, 97, 42, 73] | newSet | newMutableSet |.elements() | sort,
-    1 | build(| mul(2)) | keepFirst(3) | newMutableSet |.elements() | sort,
-]
->> [
-    ["a", "b", "f", "o", "r"],
-    [42, 73, 97],
-    [42, 73, 97],
-    [1, 2, 4],
-]
+[42, 97, 42, 73] | newMutableSet | sort
+>> [42, 73, 97]
 ```
 
 #### MutableSet/size|MutableSet-size
@@ -4065,28 +3516,6 @@ set = [["foo"]] | newMutableSet;
 ```
 
 ```
-# Mutable set as instance
-set = ["foo", "bar", "baz"] | newMutableSet;
-[
-    set | isInstance,
-    classOf(set).name,
-    set | display,
-]
->> [true, "MutableSet", "MutableSet {elements: [\"foo\", \"bar\", \"baz\"]}"]
-```
-
-```
-# Mutable set as collection
-set = ["foo", "bar", "baz"] | newMutableSet;
-[
-    set | matches(Collection),
-    set | toArray | sort,
-    set | toStream | toArray | sort,
-]
->> [true, ["bar", "baz", "foo"], ["bar", "baz", "foo"]]
-```
-
-```
 # Mutating a set while iterating over it
 set = ["foo", "bar", "baz"] | newMutableSet;
 [
@@ -4118,21 +3547,8 @@ Returns:
 
 ```
 # Mutable map creation
-[
-    [["foo", 42], ["bar", 97]] | newMutableMap |.entries() | sort,
-    [["foo", 42], ["bar", 97]] | newSet | newMutableMap |.entries() | sort,
-    [1, "f"]
-    | build(([n, s]) => [n | mul(2), [s, "o"] | join])
-    | keepFirst(3)
-    | newMutableMap
-    |.entries()
-    | sort,
-]
->> [
-    [["bar", 97], ["foo", 42]],
-    [["bar", 97], ["foo", 42]],
-    [[1, "f"], [2, "fo"], [4, "foo"]],
-]
+[["foo", 42], ["bar", 73], ["bar", 97]] | newMutableMap | sort
+>> [["bar", 97], ["foo", 42]]
 ```
 
 #### MutableMap/size|MutableMap-size
@@ -4289,28 +3705,6 @@ map = [[["foo"], 42]] | newMutableMap;
     false,
     97,
 ]
-```
-
-```
-# Mutable map as instance
-map = [["foo", 42], ["bar", 97]] | newMutableMap;
-[
-    map | isInstance,
-    classOf(map).name,
-    map | display,
-]
->> [true, "MutableMap", "MutableMap {entries: [[\"foo\", 42], [\"bar\", 97]]}"]
-```
-
-```
-# Mutable map as collection
-map = [["foo", 42], ["bar", 97]] | newMutableMap;
-[
-    map | matches(Collection),
-    map | toArray | sort,
-    map | toStream | toArray | sort,
-]
->> [true, [["bar", 97], ["foo", 42]], [["bar", 97], ["foo", 42]]]
 ```
 
 ```

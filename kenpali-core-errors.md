@@ -8,11 +8,15 @@ All platform functions must validate their arguments, and return appropriate err
 
 ## Arithmetic
 
+### add|add
+
 ```
 # Addition - wrong argument type
 add(1, "foo")
 !! wrongArgumentType {"value": "foo", "expectedType": "Number"}
 ```
+
+### negative|negative
 
 ```
 # Negative - missing argument
@@ -28,6 +32,8 @@ negative("foo")
 
 ## Strings
 
+### join|join
+
 ```
 # Joining strings - wrong element type
 join(["foo", 1])
@@ -36,9 +42,11 @@ join(["foo", 1])
 
 ## Comparison
 
+### lt|lt
+
 ```
 # Less than - incomparable types
-{} | lt(42)
+{} | lt({foo: "bar"})
 !! wrongArgumentType {"value": {}, "expectedType": "either(Number, String, Boolean, Array)"}
 ```
 
@@ -58,6 +66,62 @@ join(["foo", 1])
 # Less than - incompatible types in array
 [1, 2, 3] | lt([1, 2, "4"])
 !! wrongArgumentType {"value": "4", "expectedType": "Number"}
+```
+
+### least|least
+
+```
+# Least on empty sequence
+[] | least
+!! indexOutOfBounds {"length": 0, "index": 1}
+```
+
+```
+# Least with incompatible elements
+[97, "42"] | least
+!! wrongArgumentType {"value": "42", "expectedType": "Number"}
+```
+
+```
+# Least with incompatible elements but valid keys
+[97, "42"] | least(by: toNumber)
+>> "42"
+```
+
+```
+# Least with incompatible keys
+[97, 42] | least(by: (n) => (
+    if(n | gt(50), then: $ n, else: $ n | display)
+))
+!! wrongArgumentType {"value": "42", "expectedType": "Number"}
+```
+
+### greatest|greatest
+
+```
+# Greatest on empty sequence
+[] | greatest
+!! indexOutOfBounds {"length": 0, "index": 1}
+```
+
+```
+# Greatest with incompatible elements
+[97, "42"] | greatest
+!! wrongArgumentType {"value": "42", "expectedType": "Number"}
+```
+
+```
+# Greatest with incompatible elements but valid keys
+[97, "42"] | greatest(by: toNumber)
+>> 97
+```
+
+```
+# Greatest with incompatible keys
+[97, 42] | greatest(by: (n) => (
+    if(n | gt(50), then: $ n, else: $ n | display)
+))
+!! wrongArgumentType {"value": "42", "expectedType": "Number"}
 ```
 
 ## Logic
@@ -116,6 +180,29 @@ toNumber("foo")
 # To number - string with non-numeric parts
 toNumber("42a")
 !! notNumeric {"value": "42a"}
+```
+
+## Stream Collapsers|stream-collapsers
+
+```
+# Sorting incompatible elements
+[97, "42"] | sort
+!! badArgumentValue {"value": [97, "42"]}
+```
+
+```
+# Sorting incompatible elements with a valid sort key
+[97, "42"] | sort(by: toNumber)
+>> ["42", 97]
+```
+
+```
+# Sorting with incompatible sort keys
+[97, 42]
+| sort(by: (n) => (
+    if(n | gt(50), then: $ n, else: $ n | display)
+))
+!! wrongReturnType {"value": "42", "expectedType": "Number"}
 ```
 
 ## Mutable Values

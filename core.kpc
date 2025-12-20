@@ -332,9 +332,6 @@ chunk = (sequence, size) => (
     | dissect(([element, i]) => i | eq(size))
     | transform(| transform(([element]) => element) | toArray)
 );
-properties = (object) => (
-    object | keys | transform((key) => [key, object @ key]) | toArray
-);
 merge = (objects) => (
     objects | transform(properties) | flatten | toObject
 );
