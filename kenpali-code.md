@@ -82,6 +82,14 @@ true
 >> {"type": "literal", "value": "foobar"}
 ```
 
+String literals can have any of the escape sequences that are valid in JSON.
+
+```
+# Literal string with escapes
+"\n\t\r\b\f\"\\\/"
+>> {"type": "literal", "value": "\n\t\r\b\f\"\\\/"}
+```
+
 In addition to standard JSON string escapes, Kenpali supports 5- and 6-digit Unicode escape sequences using the syntax `\u{<code>}`.
 
 ```
