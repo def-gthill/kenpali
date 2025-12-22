@@ -1610,10 +1610,14 @@ s = | swapIf((a, b) => a | lt(b), (a, b) => [a | display, b | display] | join);
 
 Evaluates a list of conditions on an input value and returns the result of the first matching case.
 
+Each condition is a `[condition, result]` pair. The `condition` can either be a predicate function to call on `value`, or a value to compare `value` to using the Comparison Rules. If the condition is true, the corresponding result function is called with `value` and its result is returned. Otherwise, the next condition is tried.
+
+If all conditions fail, the `else` function is called with `value` and its result is returned.
+
 Parameters:
 
 - `value` (_Any_): The value to pass to conditions and results.
-- `conditions` (_Array of tuple like [Function, Function]_): A list of condition-result pairs. Each condition function is called with `value`, and if it returns `true`, the corresponding result function is called with `value` and its result is returned.
+- `conditions` (_Array of tuple like [Any, Function]_): The conditions to try.
 - `else:` (_Function_): The function to call if no conditions match.
 
 Returns:
@@ -1634,6 +1638,22 @@ foo = | switch(
     foo(42),
 ]
 >> ["97 is too big!", "1 is too small!", "42 is just right!"]
+```
+
+```
+# Switch with equality shortcut
+// `x` can be used as a shortcut for `| eq(x)`
+foo = | switch(
+    [42, $ "the answer"],
+    [97, $ "the question"],
+    else: (x) => ["an ordinary number, ", x | display] | join,
+);
+[
+    foo(42),
+    foo(97),
+    foo(1),
+]
+>> ["the answer", "the question", "an ordinary number, 1"]
 ```
 
 ## Stream Builders|stream-builders
