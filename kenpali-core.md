@@ -1500,11 +1500,13 @@ Evaluates and returns the result of one of two functions based on a condition.
 
 Only the function matching the condition is evaluated.
 
+The `else` branch can be omitted, useful if the `then` branch only runs side effects, and there's nothing to do if the condition is false.
+
 Parameters:
 
 - `condition` (_Boolean_): The condition to check.
 - `then:` (_Function_): The function to call if `condition` is `true`.
-- `else:` (_Function_): The function to call if `condition` is `false`.
+- `else:` (_Function or Null_, default `null`): The function to call if `condition` is `false`, or `null` to return `null` if `condition` is `false`.
 
 Returns:
 
@@ -1529,6 +1531,21 @@ Returns:
     if(false, then: $ (foo = foo; foo), else: $ 2),
 ]
 >> [1, 1, 2, 2]
+```
+
+```
+# If with then only
+// The else branch can be omitted if there's nothing to do
+foo = (x) => (
+    arr = newMutableArray();
+    arr.append(if(x | gt(0), then: $ (arr.append(x); "added")));
+    arr.elements()
+);
+[
+    foo(42),
+    foo(-1),
+]
+>> [[42, "added"], [null]]
 ```
 
 ### butIf|butIf
