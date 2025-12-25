@@ -3075,9 +3075,29 @@ instance = newError("badIdea", foo: "bar");
 
 ## Utilities|utilities
 
+### write|write
+
+Writes the specified message to a diagnostic log. Exactly where this goes depends on the implementation and configuration; writing to standard error is a common default.
+
+Parameters:
+
+- `message` (_String_): The message to write.
+
+Returns:
+
+- The value `null`.
+
+```
+# Writing a message
+write("Hello, world!") // Open the console to see the message!
+>> null
+```
+
 ### debug|debug
 
-Writes the specified value to a diagnostic log. Exactly where this goes depends on the implementation and configuration; writing to standard error is a common default.
+Writes a representation of the specified value to the diagnostic log (the same place as `write`).
+
+This function calls `display` on the value before writing it to the log. In particular, this means that strings are quoted; to write the _contents_ of a string, use `write` instead.
 
 This function returns its argument, allowing it to be dropped into pipelines temporarily without disrupting their structure. For example, `42 | foo | bar | debug | baz` has the same result as `42 | foo | bar | baz`, but it writes `bar`'s return value to the diagnostic log.
 
