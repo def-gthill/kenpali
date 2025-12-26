@@ -122,6 +122,14 @@ Kenpali supports "raw string" syntax, delimited using backticks instead of quote
 >> {"type": "literal", "value": "f\\o\\o\\b\\a\\r"}
 ```
 
+An unclosed raw string literal is invalid.
+
+```
+# Unclosed raw string literal
+`foo
+!! unclosedStringLiteral {"value": "`foo"}
+```
+
 ## Comments|comments
 
 A comment can appear on its own line or at the end of a line.
