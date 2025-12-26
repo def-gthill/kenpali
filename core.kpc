@@ -208,6 +208,17 @@ withRunning = (in, start:, next:) => (
     )
     | dropFirst
 );
+withPreviousRunning = (in, start:, next:) => (
+    in
+    | running(
+        start: [start, null, null],
+        next: (element, state: [state]) => (
+            [next(element, state:), state, element]
+        )
+    )
+    | dropFirst
+    | transform(([_, state, element]) => [state, element])
+);
 slice = (sequence, from:, to:) => (
     keeper = if(
         to | ge(0),
