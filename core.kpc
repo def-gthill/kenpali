@@ -198,6 +198,16 @@ with = (sequence, f) => (
 withIndex = (sequence) => (
     1 | build(up) | zip(sequence)
 );
+withRunning = (in, start:, next:) => (
+    in
+    | running(
+        start: [start, null],
+        next: (element, state: [state]) => (
+            [next(element, state:), element]
+        )
+    )
+    | dropFirst
+);
 slice = (sequence, from:, to:) => (
     keeper = if(
         to | ge(0),

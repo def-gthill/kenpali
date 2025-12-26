@@ -2483,6 +2483,35 @@ Returns:
 >> [[1, "foo"], [2, "bar"], [3, "baz"]]
 ```
 
+### withRunning|withRunning
+
+Maintains state while processing a sequence, tagging each element with the current state.
+
+Unlike `running`, this function does not include `start` in the stream, since there's no element to tag with it.
+
+Parameters:
+
+- `in` (_Sequence_): The sequence of values to process.
+- `start:` (_Any_): The initial state.
+- `next:` (_Function_): A function that computes the next state from the current element and state. The state is passed as a named argument `state:`.
+
+Returns:
+
+- (_Stream_): A stream of pairs, where the first element is the state and the second element is the element from the input sequence.
+
+```
+# Adding running state
+[2, 8, 9, 3, 7]
+| withRunning(
+    start: 0,
+    next: (number, state: total) => (
+        total | mul(10) | add(number)
+    ),
+)
+| toArray
+>> [[2, 2], [28, 8], [289, 9], [2893, 3], [28937, 7]]
+```
+
 ### keepFirst|keepFirst
 
 Retains only the first `n` elements of the input.
