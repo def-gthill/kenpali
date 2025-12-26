@@ -106,6 +106,14 @@ A backslash followed by any othe character is invalid.
 !! invalidStringLiteral {"value": "\"\\x\""}
 ```
 
+An unclosed string literal is invalid.
+
+```
+# Unclosed string literal
+"foo
+!! unclosedStringLiteral {"value": "\"foo"}
+```
+
 Kenpali supports "raw string" syntax, delimited using backticks instead of quotes. Raw strings treat all backslashes as literal backslashes, rather than creating escape sequences, which can make backslash-heavy strings (e.g. regexes) easier to write and read. Raw strings parse to ordinary literal expressions.
 
 ```
