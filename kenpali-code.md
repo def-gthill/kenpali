@@ -98,6 +98,14 @@ In addition to standard JSON string escapes, Kenpali supports 5- and 6-digit Uni
 >> {"type": "literal", "value": "😛"}
 ```
 
+A backslash followed by any othe character is invalid.
+
+```
+# Invalid escape sequence
+"\x"
+!! invalidStringLiteral {"value": "\"\\x\""}
+```
+
 Kenpali supports "raw string" syntax, delimited using backticks instead of quotes. Raw strings treat all backslashes as literal backslashes, rather than creating escape sequences, which can make backslash-heavy strings (e.g. regexes) easier to write and read. Raw strings parse to ordinary literal expressions.
 
 ```
