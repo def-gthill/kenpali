@@ -3,6 +3,7 @@ absolute = (n) => n | butIf(n | lt(0), $ negative(n));
 isDivisibleBy = (a, b) => a | remainderBy(b) | eq(0);
 joinLines = (strings) => (strings | join(on: "\n"));
 splitLines = (string) => (string | split(on: "\n"));
+eqOneOf = (value, *options) => options | forSome(| eq(value));
 isBetween = (n, lower, upper) => (
     n | ge(lower) | and($ n | le(upper))
 );
@@ -201,7 +202,7 @@ withIndex = (sequence) => (
 withRunning = (in, start:, next:) => (
     in
     | running(
-        start: [start, null],
+        start: [start],
         next: (element, state: [state]) => (
             [next(element, state:), element]
         )
@@ -211,9 +212,10 @@ withRunning = (in, start:, next:) => (
 withPreviousRunning = (in, start:, next:) => (
     in
     | running(
-        start: [start, null, null],
-        next: (element, state: [state]) => (
-            [next(element, state:), state, element]
+        start: [$ start, null, null],
+        next: (element, state: [getState]) => (
+            state = getState();
+            [$ next(element, state:), state, element]
         )
     )
     | dropFirst

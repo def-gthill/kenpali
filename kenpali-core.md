@@ -497,6 +497,31 @@ eq(null, null)
 >> [false, false, false]
 ```
 
+### eqOneOf|eqOneOf
+
+Returns whether its first argument is equal to one of the given values, according to the [Comparison Rules](#comparison-rules).
+
+This is intended for checking a value against a known list of constants. To check containment in an arbitrary collection, use `collection | forSome(| eq(value))` instead.
+
+Parameters:
+
+- `value` (_Any_): The value to test.
+- `*options` (_Array of Any_): The values to compare to.
+
+Returns:
+
+- (_Boolean_): Whether `value` is equal to one of the given options.
+
+```
+# Equality to one of
+[
+    42 | eqOneOf(42, 97),
+    97 | eqOneOf(42, 97),
+    43 | eqOneOf(42, 97),
+]
+>> [true, true, false]
+```
+
 ### lt|lt
 
 Returns whether its first argument is less than its second argument, according to the [Comparison Rules](#comparison-rules).
