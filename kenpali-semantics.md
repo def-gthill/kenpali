@@ -133,14 +133,6 @@ string = "\"\\\/\b\f\n\r\t\u1234";
 >> ["\"", "\f", "\u1234"]
 ```
 
-If a string literal contains invalid escape sequences, a runtime error occurs.
-
-```
-# Malformed string literal
-"foo\u{1f61b"
-!! invalidStringLiteral {"value": "\"foo\\u{1f61b\""}
-```
-
 ## Arrays|arrays
 
 Arrays can freely mix different types of elements.

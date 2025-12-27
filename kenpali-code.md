@@ -98,12 +98,20 @@ In addition to standard JSON string escapes, Kenpali supports 5- and 6-digit Uni
 >> {"type": "literal", "value": "😛"}
 ```
 
-A backslash followed by any othe character is invalid.
+A backslash followed by any other character is invalid.
 
 ```
 # Invalid escape sequence
 "\x"
 !! invalidStringLiteral {"value": "\"\\x\""}
+```
+
+So is an invalid Unicode escape sequence.
+
+```
+# Invalid Unicode escape sequence
+"foo\u{1f61b"
+!! invalidStringLiteral {"value": "\"foo\\u{1f61b\""}
 ```
 
 An unclosed string literal is invalid.
@@ -173,6 +181,13 @@ FOO
 # Name with numbers
 f00
 >> {"type": "name", "name": "f00"}
+```
+
+```
+# Name starting with a keyword
+// Overeager lexers might mistake this for a keyword!
+trueLove
+>> {"type": "name", "name": "trueLove"}
 ```
 
 ```
@@ -512,6 +527,14 @@ In an array pattern, elements can be ignored by using an underscore instead of a
     ],
     "result": {"type": "name", "name": "foo"}
 }
+```
+
+Using underscores outside of a name pattern is invalid.
+
+```
+# Underscore outside of a name pattern
+_
+!! missingEqualsInDefinition {}
 ```
 
 An object pattern has a similar syntax to an object, and parses to an object pattern node in the JSON representation. The names to the left of the colon are the keys to look up in the object, with the name pattern to bind them to appearing on the right.
