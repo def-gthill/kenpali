@@ -132,6 +132,10 @@ reverse = (sequence) => (
     | transform((i) => array @ i)
     | toArray
 );
+sift = (collection, condition) => {
+    yes: collection | where(condition) | toArray,
+    no: collection | where(| condition | not) | toArray,
+};
 group = (pairs, onGroup: = (x) => x) => (
     result = newMutableMap();
     pairs

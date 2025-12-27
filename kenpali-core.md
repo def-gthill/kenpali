@@ -2248,6 +2248,25 @@ Returns:
 >> ["foo", "bar", "spam", "eggs"]
 ```
 
+### sift|sift
+
+Splits the elements of a collection into two arrays, one for elements that match a condition and one for elements that don't.
+
+Parameters:
+
+- `collection` (_Collection_): The collection to split.
+- `condition` (_Function_): A function whose boolean result indicates which array to put the element in.
+
+Returns:
+
+- (_Object_): An object whose `yes` property is an array of elements for which `condition` returned `true`, and whose `no` property is an array of elements for which `condition` returned `false`.
+
+```
+# Sifting
+[1, 10, 2, 9, 3, 12] | sift(| lt(10))
+>> {yes: [1, 2, 9, 3], no: [10, 12]}
+```
+
 ### group|group
 
 Groups a collection of pairs by their first element.
