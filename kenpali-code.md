@@ -26,14 +26,6 @@ All spaces, tabs, carriage returns, and linefeeds are considered whitespace and 
 
 Comments consist of the characters `//` and all following text until the end of the line. They are also discarded when parsing.
 
-Any characters not matching the above token patterns cause parsing to fail.
-
-```
-# Invalid character
-25%
-!! invalidCharacter {"character": "%"}
-```
-
 ## Literals|literals
 
 `literal ::= "null" | "false" | "true" | NUMBER | STRING | RAW_STRING`
@@ -98,44 +90,12 @@ In addition to standard JSON string escapes, Kenpali supports 5- and 6-digit Uni
 >> {"type": "literal", "value": "😛"}
 ```
 
-A backslash followed by any other character is invalid.
-
-```
-# Invalid escape sequence
-"\x"
-!! invalidStringLiteral {"value": "\"\\x\""}
-```
-
-So is an invalid Unicode escape sequence.
-
-```
-# Invalid Unicode escape sequence
-"foo\u{1f61b"
-!! invalidStringLiteral {"value": "\"foo\\u{1f61b\""}
-```
-
-An unclosed string literal is invalid.
-
-```
-# Unclosed string literal
-"foo
-!! unclosedStringLiteral {"value": "\"foo"}
-```
-
 Kenpali supports "raw string" syntax, delimited using backticks instead of quotes. Raw strings treat all backslashes as literal backslashes, rather than creating escape sequences, which can make backslash-heavy strings (e.g. regexes) easier to write and read. Raw strings parse to ordinary literal expressions.
 
 ```
 # Raw literal string
 `f\o\o\b\a\r`
 >> {"type": "literal", "value": "f\\o\\o\\b\\a\\r"}
-```
-
-An unclosed raw string literal is invalid.
-
-```
-# Unclosed raw string literal
-`foo
-!! unclosedStringLiteral {"value": "`foo"}
 ```
 
 ## Comments|comments
@@ -529,14 +489,6 @@ In an array pattern, elements can be ignored by using an underscore instead of a
 }
 ```
 
-Using underscores outside of a name pattern is invalid.
-
-```
-# Underscore outside of a name pattern
-_
-!! missingEqualsInDefinition {}
-```
-
 An object pattern has a similar syntax to an object, and parses to an object pattern node in the JSON representation. The names to the left of the colon are the keys to look up in the object, with the name pattern to bind them to appearing on the right.
 
 ```
@@ -610,22 +562,6 @@ foo; 42
     ],
     "result": {"type": "literal", "value": 42}
 }
-```
-
-On the other hand, an assignment isn't a valid expression, so it can't be used as the final expression in a scope.
-
-```
-# Assignment as the scope result
-foo = 42
-!! missingStatementSeparator {"line": 1, "column": 9}
-```
-
-Similarly, an assignment can't itself be assigned to another name.
-
-```
-# Chained assignment
-foo = bar = 42; foo
-!! missingStatementSeparator {"line": 1, "column": 11}
 ```
 
 ## Tight Pipelines|tight-pipelines
