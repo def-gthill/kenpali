@@ -587,6 +587,15 @@ Kenpali Code syntax relies heavily on _pipelines_—sequences of operations wher
 Function call steps parse to [call expressions](/docs/json#functions).
 
 ```
+# No arguments
+foo()
+>> {
+    "type": "call",
+    "callee": {"type": "name", "name": "foo"}
+}
+```
+
+```
 # One positional argument
 foo(1)
 >> {
