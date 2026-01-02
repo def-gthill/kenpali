@@ -1,5 +1,9 @@
 # Kenpali JSON Specification
 
+A Kenpali JSON expression is made of nested nodes. Each node has a `type` property that identifies the type of the node. The other properties are specific to the node type.
+
+A node *may* also have `start` and `end` properties that indicate the starting and ending positions of the syntax that produced the node in the original source code. Both are 1-based character offsets, and both are inclusive. A node that doesn't come from source code will not have these properties.
+
 ## Literals|literals
 
 A _literal expression_ has the form `{"type": "literal", "value": <value>}`. The value can be `null`, `true`, `false`, or [any valid JSON string or number](https://www.json.org/json-en.html).

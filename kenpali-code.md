@@ -219,7 +219,7 @@ An array can optionally have a comma after the last element, though this is norm
 Any of the array's elements can be _spreads_ instead of normal expressions, indicated by a `*` prefix. These are parsed into spread nodes in the JSON representation.
 
 ```
-# Arrays with spread
+# Array with spread
 [42, *foo, 97]
 >> {
     "type": "array",

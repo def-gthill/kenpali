@@ -10,33 +10,33 @@ The tests here verify that the Kenpali code parser:
 ```
 # Invalid character
 25%
-!! invalidCharacter {"character": "%", start: {line: 1, column: 3}, end: {line: 1, column: 3}}
+!! invalidCharacter {"character": "%", "start": 3, "end": 3}
 ```
 
 ## Literals|literals
 
 ```
 # Invalid escape sequence
-"\x"
-!! invalidEscapeSequence {"value": "\"\\x\"", start: {line: 1, column: 2}, end: {line: 1, column: 3}}
+[42, "foo\x"]
+!! invalidEscapeSequence {"value": "\\x", "start": 10, "end": 11}
 ```
 
 ```
-# Invalid Unicode escape sequence
-"foo\u{1f61b"
-!! unclosedUnicodeEscapeSequence {"value": "\"foo\\u{1f61b\"", start: {line: 1, column: 7}, end: {line: 1, column: 12}}
+# Unclosed Unicode escape sequence
+[42, "foo\u{1f61b"]
+!! unclosedUnicodeEscapeSequence {"value": "\\u{1f61b", "start": 10, "end": 17}
 ```
 
 ```
 # Unclosed string literal
 "foo
-!! unclosedStringLiteral {"value": "\"foo", start: {line: 1, column: 1}, end: {line: 1, column: 4}}
+!! unclosedStringLiteral {"value": "\"foo", "start": 1, "end": 4}
 ```
 
 ```
 # Unclosed raw string literal
 `foo
-!! unclosedStringLiteral {"value": "`foo", start: {line: 1, column: 1}, end: {line: 1, column: 4}}
+!! unclosedStringLiteral {"value": "`foo", "start": 1, "end": 4}
 ```
 
 ## Scopes|scopes
@@ -44,17 +44,17 @@ The tests here verify that the Kenpali code parser:
 ```
 # Underscore at the top level
 _
-!! ignoreAsExpression {start: {line: 1, column: 1}, end: {line: 1, column: 1}}
+!! ignoreAsExpression {"start": 1, "end": 1}
 ```
 
 ```
-# Assignment as the scope result
+# Assignment at the top level
 foo = 42
-!! assignmentAsExpression {start: {line: 1, column: 1}, end: {line: 1, column: 8}}
+!! assignmentAsExpression {"start": 1, "end": 8}
 ```
 
 ```
 # Chained assignment
 foo = bar = 42; foo
-!! assignmentAsExpression {start: {line: 1, column: 7}, end: {line: 1, column: 14}}
+!! assignmentAsExpression {"start": 7, "end": 14}
 ```
