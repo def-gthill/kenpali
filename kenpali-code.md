@@ -442,6 +442,8 @@ foo = (bar = 1; bar); foo
 
 The left-hand side of an assignment can be a pattern instead of a single name.
 
+### Array Patterns|array-patterns
+
 An array pattern has a similar syntax to an array, and parses to an array pattern node in the JSON representation.
 
 ```
@@ -488,6 +490,32 @@ In an array pattern, elements can be ignored by using an underscore instead of a
     "result": {"type": "name", "name": "foo"}
 }
 ```
+
+An array pattern can include a _rest_ element, indicated by a `*` prefix, to collect up the remaining elements that aren't matched explicitly. A rest element parses to a rest node in the JSON representation.
+
+```
+# Array destructuring with rest
+[foo, bar, *rest] = arr; rest
+>> {
+    "type": "block",
+    "defs": [
+        [
+            {
+                "type": "arrayPattern",
+                "names": [
+                    {"type": "name", "name": "foo"},
+                    {"type": "name", "name": "bar"},
+                    {"type": "rest", "name": {"type": "name", "name": "rest"}}
+                ]
+            },
+            {"type": "name", "name": "arr"}
+        ]
+    ],
+    "result": {"type": "name", "name": "rest"}
+}
+```
+
+### Object Patterns|object-patterns
 
 An object pattern has a similar syntax to an object, and parses to an object pattern node in the JSON representation. The names to the left of the colon are the keys to look up in the object, with the name pattern to bind them to appearing on the right.
 
@@ -546,6 +574,37 @@ If the name pattern to the right of the colon is omitted, the value is assigned 
     "result": {"type": "name", "name": "foo"}
 }
 ```
+
+An object pattern can include a _rest_ entry, indicated by a `**` prefix, to collect up the remaining entries that aren't matched explicitly. A rest entry parses to an entry whose key is `{"type": "rest"}`.
+
+```
+# Object destructuring with rest
+{foo:, **rest} = obj; rest
+>> {
+    "type": "block",
+    "defs": [
+        [
+            {
+                "type": "objectPattern",
+                "entries": [
+                    [
+                        {"type": "literal", "value": "foo"},
+                        {"type": "name", "name": "foo"}
+                    ],
+                    [
+                        {"type": "rest"},
+                        {"type": "name", "name": "rest"}
+                    ]
+                ]
+            },
+            {"type": "name", "name": "obj"}
+        ]
+    ],
+    "result": {"type": "name", "name": "rest"}
+}
+```
+
+### Expression Statements|expression-statements
 
 An expression can be used directly as a statement. This is equivalent to assigning to `_`; the resulting JSON has an ignore node as the assignment target, so the expression is evaluated and its result is discarded.
 
